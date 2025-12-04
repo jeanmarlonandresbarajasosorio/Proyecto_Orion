@@ -1,85 +1,54 @@
+import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import crypto from "crypto";
-import { Usuario } from "Orion.Models/src/Usuario.model.js";
-import { generarToken } from "Orion.SHARED/src/helpers/jwt.helper.js";
+import { createToken, createRefreshToken } from "../helpers/token.helper.js";
 
-export class AuthService {
+class AuthService {
 
-  // REGISTRO
-  async register(data) {
-    const existe = await Usuario.findOne({ email: data.email });
-    if (existe) return null;
-
-    const hash = await bcrypt.hash(data.password, 10);
-
-    const nuevo = new Usuario({
-      nombre: data.nombre,
-      email: data.email,
-      passwordHash: hash,
-      rol: data.rol || "User"
-    });
-
-    await nuevo.save();
-
-    return nuevo;
-  }
-
-  // LOGIN
-  async login(email, password) {
-    const usuario = await Usuario.findOne({ email });
-    if (!usuario) return null;
-
-    const valido = await bcrypt.compare(password, usuario.passwordHash);
-    if (!valido) return null;
-
-    const token = generarToken(usuario);
-    const refresh = jwt.sign({ id: usuario._id }, process.env.JWT_REFRESH, { expiresIn: "7d" });
-
-    return { token, refresh, usuario };
-  }
-
-  // REFRESH TOKEN
-  async refreshToken(token) {
+  async register(req, res) {
     try {
-      const data = jwt.verify(token, process.env.JWT_REFRESH);
+      const { nombre, email, password } = req.body;
 
-      const usuario = await Usuario.findById(data.id);
-      if (!usuario) return null;
+      const existe = await User.findOne({ email });
+      if (existe) return res.status(400).json({ message: "Email ya registrado" });
 
-      return generarToken(usuario);
+      const hash = bcrypt.hashSync(password, 10);
 
-    } catch {
-      return null;
+      await User.create({ nombre, email, password: hash });
+
+      res.json({ message: "Usuario creado correctamente" });
+
+    } catch (e) {
+      res.status(500).json({ message: "Error en registro" });
     }
   }
 
-  // RECUPERACIÓN DE CONTRASEÑA
-  async generarCodigoRecuperacion(email) {
-    const usuario = await Usuario.findOne({ email });
-    if (!usuario) return null;
+  async login(req, res) {
+    try {
+      const { email, password } = req.body;
 
-    const codigo = crypto.randomInt(100000, 999999).toString();
+      const user = await User.findOne({ email });
+      if (!user) return res.status(404).json({ message: "Usuario no existe" });
 
-    usuario.resetCode = codigo;
-    usuario.resetExpiration = Date.now() + 1000 * 60 * 10; // 10 minutos
-    await usuario.save();
+      const valido = bcrypt.compareSync(password, user.password);
+      if (!valido) return res.status(400).json({ message: "Contraseña incorrecta" });
 
-    return codigo; // Se enviaría por correo
+      const token = createToken(user);
+      const refresh = createRefreshToken(user);
+
+      res.json({ token, refresh });
+
+    } catch (e) {
+      res.status(500).json({ message: "Error en login" });
+    }
   }
 
-  async cambiarPassword(email, codigo, nuevaPassword) {
-    const usuario = await Usuario.findOne({ email });
-    if (!usuario) return null;
+  async resetPassword(req, res) {
+    res.json({ message: "Código enviado (simulado)" });
+  }
 
-    if (usuario.resetCode !== codigo) return "codigo_invalido";
-    if (usuario.resetExpiration < Date.now()) return "expirado";
-
-    usuario.passwordHash = await bcrypt.hash(nuevaPassword, 10);
-    usuario.resetCode = null;
-    usuario.resetExpiration = null;
-    await usuario.save();
-
-    return true;
+  async changePassword(req, res) {
+    res.json({ message: "Contraseña cambiada" });
   }
 }
+
+export default new AuthService();
