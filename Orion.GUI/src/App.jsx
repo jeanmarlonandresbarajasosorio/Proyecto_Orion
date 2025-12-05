@@ -1,120 +1,136 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
+  BarChart, Bar, PieChart, Pie, Cell, Legend
+} from "recharts";
+import "./styles.css";
 
-function App() {
-  const [usuario] = useState("Jean Marlon");
-  const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
-  const [registros, setRegistros] = useState([]);
+export default function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const agregarRegistro = () => {
-    if (!nombre.trim() || !email.trim()) return;
+  const dataGarantias = [
+    { name: "Ene", value: 10 },
+    { name: "Feb", value: 40 },
+    { name: "Mar", value: 25 },
+    { name: "Abr", value: 60 },
+  ];
+  const dataMantenimientos = [
+    { name: "Pendientes", value: 12 },
+    { name: "Completados", value: 30 },
+  ];
+  const dataHardware = [
+    { name: "CPU", value: 30 },
+    { name: "RAM", value: 20 },
+    { name: "Discos", value: 25 },
+    { name: "Periféricos", value: 15 },
+  ];
+  const COLORS = ["#2563EB", "#1E3A8A", "#3B82F6", "#60A5FA"];
 
-    setRegistros([
-      ...registros,
-      { id: Date.now(), nombre, email }
-    ]);
-
-    setNombre("");
-    setEmail("");
-  };
-
-  const eliminarRegistro = (id) => {
-    setRegistros(registros.filter(r => r.id !== id));
-  };
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth > 1100) setSidebarOpen(true);
+      else setSidebarOpen(false);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   return (
-    <div className="layout">
+    <div className={`app-root ${sidebarOpen ? "" : "sidebar-closed"}`}>
+      
+      {/* TOPBAR */}
+      <header className="topbar">
+        <div className="left">
+          <button
+            className="menu-btn"
+            onClick={() => setSidebarOpen((s) => !s)}
+          >
+            ☰
+          </button>
+          <div className="brand">Panel Orion</div>
+        </div>
 
-      {/* SIDEBAR IZQUIERDO */}
-      <aside className="sidebar">
-        <h2 className="sidebar-title">Panel</h2>
+        <div className="right">
+          <div className="user-box">Jean Marlon</div>
+        </div>
+      </header>
+
+      {/* SIDEBAR */}
+      <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
+        <button className="close-arrow" onClick={() => setSidebarOpen(false)}>
+          ‹
+        </button>
+
+        <h2 className="sidebar-title">Menú</h2>
 
         <nav className="menu">
-          <a className="menu-item" href="#">Dashboard</a>
-          <a className="menu-item" href="#">Usuarios</a>
-          <a className="menu-item" href="#">Reportes</a>
-          <a className="menu-item" href="#">Configuración</a>
+          <a href="#">Dashboard</a>
+          <a href="#">Garantías</a>
+          <a href="#">Checklist Software</a>
+          <a href="#">Checklist Hardware</a>
+          <a href="#">Mantenimientos</a>
+          <a href="#">Informacion</a>
         </nav>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL */}
-      <div className="main">
+      {/* Overlay (solo móviles) */}
+      <div
+        className={`overlay ${sidebarOpen && window.innerWidth <= 1100 ? "visible" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+      />
 
-        {/* PANEL SUPERIOR */}
-        <header className="header">
-          <h1 className="logo">Proyecto Orion</h1>
-          <div className="usuario-info">
-            <span className="usuario-nombre">{usuario}</span>
-          </div>
-        </header>
-
-        {/* CONTENIDO */}
-        <div className="content">
-
-          {/* FORMULARIO */}
+      {/* MAIN */}
+      <main className="main-area">
+        <section className="grid">
+          
           <div className="card">
-            <h2>Registrar Usuario</h2>
-
-            <div className="form-group">
-              <label>Nombre</label>
-              <input 
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ingrese un nombre"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Correo</label>
-              <input 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Ingrese un correo"
-              />
-            </div>
-
-            <button className="btn" onClick={agregarRegistro}>Guardar</button>
+            <h3>Garantías (últimos meses)</h3>
+            <LineChart width={320} height={200} data={dataGarantias}>
+              <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} />
+              <CartesianGrid stroke="#e5e7eb" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+            </LineChart>
           </div>
 
-          {/* TABLA */}
           <div className="card">
-            <h2>Usuarios registrados</h2>
-
-            <div className="tabla-responsive">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {registros.map(r => (
-                    <tr key={r.id}>
-                      <td>{r.nombre}</td>
-                      <td>{r.email}</td>
-                      <td>
-                        <button 
-                          className="btn-danger"
-                          onClick={() => eliminarRegistro(r.id)}
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
+            <h3>Mantenimientos</h3>
+            <BarChart width={320} height={200} data={dataMantenimientos}>
+              <CartesianGrid stroke="#e5e7eb" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="value">
+                {dataMantenimientos.map((entry, index) => (
+                  <Cell key={index} fill={COLORS[index]} />
+                ))}
+              </Bar>
+            </BarChart>
           </div>
 
-        </div>
-      </div>
+          <div className="card">
+            <h3>Checklist Hardware</h3>
+            <PieChart width={320} height={240}>
+              <Pie
+                data={dataHardware}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={80}
+                label
+              >
+                {dataHardware.map((entry, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend />
+              <Tooltip />
+            </PieChart>
+          </div>
 
+        </section>
+      </main>
     </div>
   );
 }
-
-export default App;
