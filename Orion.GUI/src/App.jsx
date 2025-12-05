@@ -1,28 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
-import Recover from "./pages/auth/Recover";
-import Dashboard from "./pages/Dashboard";
-import PrivateRoute from "./components/PrivateRoute";
+// src/app.jsx
+import React from "react";
+import "./index.css"; // Importa tus estilos puros
 
-export default function App(){
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login/>} />
-        <Route path="/register" element={<Register/>} />
-        <Route path="/recover" element={<Recover/>} />
-
-        {/* RUTA PROTEGIDA */}
-        <Route path="/dashboard" element={
-          <PrivateRoute>
-            <Dashboard/>
-          </PrivateRoute>
-        } />
-
-        <Route path="*" element={<h2>404 - Not found</h2>} />
-      </Routes>
-    </BrowserRouter>
+    <div className="container">
+      <h1>Proyecto Orion</h1>
+      <p>React + CSS Funciona correctamente 🚀</p>
+    </div>
   );
 }
