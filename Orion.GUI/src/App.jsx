@@ -5,9 +5,23 @@ import {
 } from "recharts";
 import "./styles.css";
 
+import MantenimientoList from "./pages/MantenimientoForm.jsx";
+
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
+
+  // 👤 Estado para usuario logueado
+  const [userName] = useState("Jean Marlon");
+
+  // 🔽 Mostrar / ocultar menú de usuario
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // 📌 Función cerrar sesión
+  const logout = () => {
+    alert("Sesión cerrada");
+    // Aquí puedes limpiar tokens, redirigir, etc.
+  };
 
   const dataGarantias = [
     { name: "Ene", value: 10 },
@@ -15,10 +29,12 @@ export default function App() {
     { name: "Mar", value: 25 },
     { name: "Abr", value: 60 },
   ];
+
   const dataMantenimientos = [
     { name: "Pendientes", value: 12 },
     { name: "Completados", value: 30 },
   ];
+
   const dataHardware = [
     { name: "CPU", value: 30 },
     { name: "RAM", value: 20 },
@@ -37,45 +53,6 @@ export default function App() {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-
-  const MantenimientosForm = () => (
-    <div className="form-container">
-      <h2 className="form-title">Mantenimiento</h2>
-
-      <div className="card form-card">
-
-        <label>Tipo de mantenimiento</label>
-        <select>
-          <option>Preventivo</option>
-          <option>Correctivo</option>
-        </select>
-
-        <label>Estatus</label>
-        <select>
-          <option>En proceso</option>
-          <option>Pendiente</option>
-          <option>Finalizado</option>
-        </select>
-
-        <label>Estado final</label>
-        <input type="text" placeholder="Estado del equipo…" />
-
-        <label>¿Requiere repuestos?</label>
-        <select>
-          <option>No</option>
-          <option>Sí</option>
-        </select>
-
-        <label>Tiempo estimado (horas)</label>
-        <input type="number" placeholder="Ej: 4" />
-
-        <label>Técnico asignado</label>
-        <input type="text" placeholder="Nombre del técnico…" />
-
-        <button className="btn-save">Guardar mantenimiento</button>
-      </div>
-    </div>
-  );
 
   const Dashboard = () => (
     <section className="grid">
@@ -129,7 +106,7 @@ export default function App() {
   return (
     <div className={`app-root ${sidebarOpen ? "" : "sidebar-closed"}`}>
 
-      {/* TOPBAR */}
+      {/* 🔵 TOPBAR */}
       <header className="topbar">
         <div className="left">
           <button
@@ -138,15 +115,29 @@ export default function App() {
           >
             ☰
           </button>
-          <div className="brand">Panel Orion</div>
+          <div className="brand">ORION</div>
         </div>
 
-        <div className="right">
-          <div className="user-box">Jean Marlon</div>
+        {/* 👤 USER DROPDOWN */}
+        <div className="right" style={{ position: "relative" }}>
+          <div
+            className="user-box"
+            onClick={() => setUserMenuOpen(!userMenuOpen)}
+            style={{ cursor: "pointer" }}
+          >
+            {userName}
+          </div>
+
+          {/* 🔽 Menú desplegable */}
+          {userMenuOpen && (
+            <div className="user-dropdown">
+              <button onClick={logout}>Cerrar sesión</button>
+            </div>
+          )}
         </div>
       </header>
 
-      {/* SIDEBAR */}
+      {/* 🔵 SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>
           ‹
@@ -155,8 +146,6 @@ export default function App() {
         <h2 className="sidebar-title">Menú</h2>
 
         <nav className="menu">
-
-          {/* ⬇️ Menú con el MISMO DISEÑO pero funcional */}
           <a
             className={activePage === "dashboard" ? "active" : ""}
             onClick={() => setActivePage("dashboard")}
@@ -165,8 +154,8 @@ export default function App() {
           </a>
 
           <a
-            className={activePage === "mantenimientos" ? "active" : ""}
-            onClick={() => setActivePage("mantenimientos")}
+            className={activePage === "listamantenimientos" ? "active" : ""}
+            onClick={() => setActivePage("listamantenimientos")}
           >
             Mantenimientos
           </a>
@@ -180,19 +169,15 @@ export default function App() {
         </nav>
       </aside>
 
-      {/* Overlay móvil */}
       <div
         className={`overlay ${sidebarOpen && window.innerWidth <= 1100 ? "visible" : ""}`}
         onClick={() => setSidebarOpen(false)}
       />
 
-      {/* MAIN */}
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
-        {activePage === "mantenimientos" && <MantenimientosForm />}
+        {activePage === "listamantenimientos" && <MantenimientoList />}
         {activePage === "info" && <h2>Información del Sistema</h2>}
-        {activePage === "info" && <h2>Tipo Mantenimiento</h2>}
-
       </main>
     </div>
   );
