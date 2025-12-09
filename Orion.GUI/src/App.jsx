@@ -38,10 +38,9 @@ export default function App() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // ---------- FORMULARIO MANTENIMIENTOS ----------
   const MantenimientosForm = () => (
     <div className="form-container">
-      <h2 className="form-title">Mantenimiento — Registro</h2>
+      <h2 className="form-title">Mantenimiento</h2>
 
       <div className="card form-card">
 
@@ -78,7 +77,6 @@ export default function App() {
     </div>
   );
 
-  // ---------- DASHBOARD ----------
   const Dashboard = () => (
     <section className="grid">
       <div className="card">
@@ -193,6 +191,7 @@ export default function App() {
         {activePage === "dashboard" && <Dashboard />}
         {activePage === "mantenimientos" && <MantenimientosForm />}
         {activePage === "info" && <h2>Información del Sistema</h2>}
+        {activePage === "info" && <h2>Tipo Mantenimiento</h2>}
 
       </main>
     </div>
