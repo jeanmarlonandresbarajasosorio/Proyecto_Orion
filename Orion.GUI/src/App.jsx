@@ -7,6 +7,7 @@ import "./styles.css";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activePage, setActivePage] = useState("dashboard");
 
   const dataGarantias = [
     { name: "Ene", value: 10 },
@@ -24,6 +25,7 @@ export default function App() {
     { name: "Discos", value: 25 },
     { name: "Periféricos", value: 15 },
   ];
+
   const COLORS = ["#2563EB", "#1E3A8A", "#3B82F6", "#60A5FA"];
 
   useEffect(() => {
@@ -36,9 +38,99 @@ export default function App() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  // ---------- FORMULARIO MANTENIMIENTOS ----------
+  const MantenimientosForm = () => (
+    <div className="form-container">
+      <h2 className="form-title">Mantenimiento — Registro</h2>
+
+      <div className="card form-card">
+
+        <label>Tipo de mantenimiento</label>
+        <select>
+          <option>Preventivo</option>
+          <option>Correctivo</option>
+        </select>
+
+        <label>Estatus</label>
+        <select>
+          <option>En proceso</option>
+          <option>Pendiente</option>
+          <option>Finalizado</option>
+        </select>
+
+        <label>Estado final</label>
+        <input type="text" placeholder="Estado del equipo…" />
+
+        <label>¿Requiere repuestos?</label>
+        <select>
+          <option>No</option>
+          <option>Sí</option>
+        </select>
+
+        <label>Tiempo estimado (horas)</label>
+        <input type="number" placeholder="Ej: 4" />
+
+        <label>Técnico asignado</label>
+        <input type="text" placeholder="Nombre del técnico…" />
+
+        <button className="btn-save">Guardar mantenimiento</button>
+      </div>
+    </div>
+  );
+
+  // ---------- DASHBOARD ----------
+  const Dashboard = () => (
+    <section className="grid">
+      <div className="card">
+        <h3>Garantías (últimos meses)</h3>
+        <LineChart width={320} height={200} data={dataGarantias}>
+          <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} />
+          <CartesianGrid stroke="#e5e7eb" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+        </LineChart>
+      </div>
+
+      <div className="card">
+        <h3>Mantenimientos</h3>
+        <BarChart width={320} height={200} data={dataMantenimientos}>
+          <CartesianGrid stroke="#e5e7eb" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="value">
+            {dataMantenimientos.map((entry, index) => (
+              <Cell key={index} fill={COLORS[index]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </div>
+
+      <div className="card">
+        <h3>Checklist Hardware</h3>
+        <PieChart width={320} height={240}>
+          <Pie
+            data={dataHardware}
+            dataKey="value"
+            nameKey="name"
+            outerRadius={80}
+            label
+          >
+            {dataHardware.map((entry, i) => (
+              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+            ))}
+          </Pie>
+          <Legend />
+          <Tooltip />
+        </PieChart>
+      </div>
+    </section>
+  );
+
   return (
     <div className={`app-root ${sidebarOpen ? "" : "sidebar-closed"}`}>
-      
+
       {/* TOPBAR */}
       <header className="topbar">
         <div className="left">
@@ -65,16 +157,32 @@ export default function App() {
         <h2 className="sidebar-title">Menú</h2>
 
         <nav className="menu">
-          <a href="#">Dashboard</a>
-          <a href="#">Garantías</a>
-          <a href="#">Checklist Software</a>
-          <a href="#">Checklist Hardware</a>
-          <a href="#">Mantenimientos</a>
-          <a href="#">Informacion</a>
+
+          {/* ⬇️ Menú con el MISMO DISEÑO pero funcional */}
+          <a
+            className={activePage === "dashboard" ? "active" : ""}
+            onClick={() => setActivePage("dashboard")}
+          >
+            Garantías
+          </a>
+
+          <a
+            className={activePage === "mantenimientos" ? "active" : ""}
+            onClick={() => setActivePage("mantenimientos")}
+          >
+            Mantenimientos
+          </a>
+
+          <a
+            className={activePage === "info" ? "active" : ""}
+            onClick={() => setActivePage("info")}
+          >
+            Información
+          </a>
         </nav>
       </aside>
 
-      {/* Overlay (solo móviles) */}
+      {/* Overlay móvil */}
       <div
         className={`overlay ${sidebarOpen && window.innerWidth <= 1100 ? "visible" : ""}`}
         onClick={() => setSidebarOpen(false)}
@@ -82,54 +190,10 @@ export default function App() {
 
       {/* MAIN */}
       <main className="main-area">
-        <section className="grid">
-          
-          <div className="card">
-            <h3>Garantías (últimos meses)</h3>
-            <LineChart width={320} height={200} data={dataGarantias}>
-              <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} />
-              <CartesianGrid stroke="#e5e7eb" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-            </LineChart>
-          </div>
+        {activePage === "dashboard" && <Dashboard />}
+        {activePage === "mantenimientos" && <MantenimientosForm />}
+        {activePage === "info" && <h2>Información del Sistema</h2>}
 
-          <div className="card">
-            <h3>Mantenimientos</h3>
-            <BarChart width={320} height={200} data={dataMantenimientos}>
-              <CartesianGrid stroke="#e5e7eb" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value">
-                {dataMantenimientos.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </div>
-
-          <div className="card">
-            <h3>Checklist Hardware</h3>
-            <PieChart width={320} height={240}>
-              <Pie
-                data={dataHardware}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={80}
-                label
-              >
-                {dataHardware.map((entry, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-              <Tooltip />
-            </PieChart>
-          </div>
-
-        </section>
       </main>
     </div>
   );
