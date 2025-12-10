@@ -10,7 +10,7 @@
 
 .mui-container {
   max-width: 1200px;
-  margin: 24px auto;
+  margin: -10px auto 24px;  /* 🔥 Ajuste aplicado: contenido más arriba */
   padding: 20px;
   color: #0f1724;
 }
@@ -65,7 +65,11 @@
   font-size: 14px;
 }
 
-.mui-textarea { min-height: 110px; resize: vertical; padding-top: 10px; }
+.mui-textarea { 
+  min-height: 110px; 
+  resize: vertical; 
+  padding-top: 10px; 
+}
 
 .mui-input:focus, .mui-select:focus, .mui-textarea:focus {
   box-shadow: 0 6px 18px rgba(30,58,138,0.08);
@@ -81,33 +85,125 @@
 .mt { margin-top: 12px; }
 .field { display:flex; flex-direction:column; gap:6px; }
 
-.mui-actions { display:flex; gap:12px; justify-content:flex-start; margin: 10px 0 24px; }
-.mui-btn { padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-1); transition: transform .12s ease, box-shadow .12s ease; }
-.mui-btn-primary { background: var(--blue-dark); color: white; }
-.mui-btn-primary:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); }
-.mui-btn-secondary { background: white; color: var(--blue-dark); border: 1px solid #e6edf7; }
-.mui-btn-secondary.enabled:hover { background: var(--blue); color: white; transform: translateY(-3px); box-shadow: var(--shadow-2); }
-.mui-btn-ghost { background: transparent; color: var(--muted); border: 1px dashed #eef3ff; }
+.mui-actions { 
+  display:flex; 
+  gap:12px; 
+  justify-content:flex-start; 
+  margin: 10px 0 24px; 
+}
 
-.results-card { position: sticky; top: 20px; align-self: start; }
-.table-responsive { overflow-x:auto; margin-top: 8px; }
-.table { width:100%; border-collapse:collapse; }
-.table th, .table td { padding:10px; border-bottom: 1px solid #f0f4fb; text-align:left; font-size:14px; }
-.table th { background:#fbfdff; color:var(--blue-dark); font-weight:600; }
+.mui-btn { 
+  padding: 10px 16px; 
+  border-radius: 10px; 
+  border: none; 
+  cursor: pointer; 
+  font-weight: 600; 
+  box-shadow: var(--shadow-1); 
+  transition: transform .12s ease, box-shadow .12s ease; 
+}
 
-.small.btn { padding:6px 8px; font-size:13px; border-radius:8px; cursor:pointer; border:0; }
-.small.btn.neutral { background:#eef3ff; color:var(--blue-dark); }
-.small.btn.primary { background:var(--blue-dark); color:white; }
-.small.btn.danger { background:#ef4444; color:white; }
+.mui-btn-primary { 
+  background: var(--blue-dark); 
+  color: white; 
+}
 
-.muted { color: var(--muted); font-size:14px; }
-.error { color:#b91c1c; font-size:13px; margin-top:6px; }
+.mui-btn-primary:hover { 
+  transform: translateY(-3px); 
+  box-shadow: var(--shadow-2); 
+}
+
+.mui-btn-secondary { 
+  background: white; 
+  color: var(--blue-dark); 
+  border: 1px solid #e6edf7; 
+}
+
+.mui-btn-secondary.enabled:hover { 
+  background: var(--blue); 
+  color: white; 
+  transform: translateY(-3px); 
+  box-shadow: var(--shadow-2); 
+}
+
+.mui-btn-ghost { 
+  background: transparent; 
+  color: var(--muted); 
+  border: 1px dashed #eef3ff; 
+}
+
+.results-card { 
+  position: sticky; 
+  top: 20px; 
+  align-self: start; 
+}
+
+.table-responsive { 
+  overflow-x:auto; 
+  margin-top: 8px; 
+}
+
+.table { 
+  width:100%; 
+  border-collapse:collapse; 
+}
+
+.table th, .table td { 
+  padding:10px; 
+  border-bottom: 1px solid #f0f4fb; 
+  text-align:left; 
+  font-size:14px; 
+}
+
+.table th { 
+  background:#fbfdff; 
+  color:var(--blue-dark); 
+  font-weight:600; 
+}
+
+.small.btn { 
+  padding:6px 8px; 
+  font-size:13px; 
+  border-radius:8px; 
+  cursor:pointer; 
+  border:0; 
+}
+
+.small.btn.neutral { 
+  background:#eef3ff; 
+  color:var(--blue-dark); 
+}
+
+.small.btn.primary { 
+  background:var(--blue-dark); 
+  color:white; 
+}
+
+.small.btn.danger { 
+  background:#ef4444; 
+  color:white; 
+}
+
+.muted { 
+  color: var(--muted); 
+  font-size:14px; 
+}
+
+.error { 
+  color:#b91c1c; 
+  font-size:13px; 
+  margin-top:6px; 
+}
 
 @media (max-width: 1000px) {
-  .mui-grid { grid-template-columns: 1fr; }
-  .results-card { position: static; }
+  .mui-grid { 
+    grid-template-columns: 1fr; 
+  }
+  .results-card { 
+    position: static; 
+  }
 }
-  :root {
+
+:root {
   --blue: #1E3A8A;
   --blue-light: #3B82F6;
   --bg-light: #f8faff;

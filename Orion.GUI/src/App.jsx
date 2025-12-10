@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import "./styles.css";
 
-import MantenimientoList from "./pages/MantenimientoForm.jsx";
+import MantenimientoList from "./pages/MantenimientosPage.jsx";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
