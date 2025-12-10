@@ -156,10 +156,8 @@ export default function MantenimientoForm() {
       <h1 className="mui-title">Mantenimiento Preventivo</h1>
 
       <div className="mui-grid">
-        {/* Left column: form */}
         <div className="mui-column form-column">
 
-          {/* AREA */}
           <div className="mui-card">
             <div className="mui-card-header">Datos del Área</div>
             <div className="mui-card-body">
@@ -177,7 +175,6 @@ export default function MantenimientoForm() {
             </div>
           </div>
 
-          {/* EQUIPO */}
           <div className="mui-card">
             <div className="mui-card-header">Datos del Equipo</div>
             <div className="mui-card-body">
@@ -217,7 +214,6 @@ export default function MantenimientoForm() {
             </div>
           </div>
 
-          {/* Retiro / Entrega */}
           <div className="mui-card">
             <div className="mui-card-header">Autorización de Retiro y Recibo</div>
             <div className="mui-card-body">

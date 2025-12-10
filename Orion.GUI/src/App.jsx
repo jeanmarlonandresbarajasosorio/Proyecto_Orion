@@ -10,17 +10,11 @@ import MantenimientoList from "./pages/MantenimientoForm.jsx";
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
-
-  // 👤 Estado para usuario logueado
   const [userName] = useState("Jean Marlon");
-
-  // 🔽 Mostrar / ocultar menú de usuario
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  // 📌 Función cerrar sesión
   const logout = () => {
     alert("Sesión cerrada");
-    // Aquí puedes limpiar tokens, redirigir, etc.
   };
 
   const dataGarantias = [
@@ -55,58 +49,74 @@ export default function App() {
   }, []);
 
   const Dashboard = () => (
-    <section className="grid">
-      <div className="card">
-        <h3>Garantías (últimos meses)</h3>
-        <LineChart width={320} height={200} data={dataGarantias}>
-          <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} />
-          <CartesianGrid stroke="#e5e7eb" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-        </LineChart>
-      </div>
+    <>
+      <section className="grid">
+        <div className="card">
+          <h3>Garantías (últimos meses)</h3>
+          <LineChart width={320} height={200} data={dataGarantias}>
+            <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} />
+            <CartesianGrid stroke="#e5e7eb" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+          </LineChart>
+        </div>
 
-      <div className="card">
-        <h3>Mantenimientos</h3>
-        <BarChart width={320} height={200} data={dataMantenimientos}>
-          <CartesianGrid stroke="#e5e7eb" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="value">
-            {dataMantenimientos.map((entry, index) => (
-              <Cell key={index} fill={COLORS[index]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </div>
+        <div className="card">
+          <h3>Mantenimientos</h3>
+          <BarChart width={320} height={200} data={dataMantenimientos}>
+            <CartesianGrid stroke="#e5e7eb" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value">
+              {dataMantenimientos.map((entry, index) => (
+                <Cell key={index} fill={COLORS[index]} />
+              ))}
+            </Bar>
+          </BarChart>
+        </div>
 
-      <div className="card">
-        <h3>Checklist Hardware</h3>
-        <PieChart width={320} height={240}>
-          <Pie
-            data={dataHardware}
-            dataKey="value"
-            nameKey="name"
-            outerRadius={80}
-            label
-          >
-            {dataHardware.map((entry, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} />
-            ))}
-          </Pie>
-          <Legend />
-          <Tooltip />
-        </PieChart>
+        <div className="card">
+          <h3>Checklist Hardware</h3>
+          <PieChart width={320} height={240}>
+            <Pie
+              data={dataHardware}
+              dataKey="value"
+              nameKey="name"
+              outerRadius={80}
+              label
+            >
+              {dataHardware.map((entry, i) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Pie>
+            <Legend />
+            <Tooltip />
+          </PieChart>
+        </div>
+      </section>
+
+      <div className="filtro-container-grande">
+        <h3>Buscar Mantenimientos Pendientes</h3>
+
+        <input
+          type="text"
+          placeholder="Ingrese el nombre del diseño..."
+          className="filtro-input-grande"
+          onChange={(e) => console.log("Buscar:", e.target.value)}
+        />
+
+        <button className="filtro-btn-grande">
+          Buscar
+        </button>
       </div>
-    </section>
+    </>
   );
 
   return (
     <div className={`app-root ${sidebarOpen ? "" : "sidebar-closed"}`}>
 
-      {/* 🔵 TOPBAR */}
       <header className="topbar">
         <div className="left">
           <button
@@ -118,7 +128,6 @@ export default function App() {
           <div className="brand">ORION</div>
         </div>
 
-        {/* 👤 USER DROPDOWN */}
         <div className="right" style={{ position: "relative" }}>
           <div
             className="user-box"
@@ -128,7 +137,6 @@ export default function App() {
             {userName}
           </div>
 
-          {/* 🔽 Menú desplegable */}
           {userMenuOpen && (
             <div className="user-dropdown">
               <button onClick={logout}>Cerrar sesión</button>
@@ -137,7 +145,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* 🔵 SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>
           ‹
