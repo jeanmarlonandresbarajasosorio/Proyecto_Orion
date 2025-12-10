@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./MantenimientoDialog.css";
 
 const initialForm = {
-  sede: "",          // <-- NUEVO CAMPO
-  area: "",
+  sede: "",         
   ubicacion: "",
   dispositivo: "",
   inventario: "",
@@ -80,11 +79,9 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
           <form onSubmit={handleSubmit} className="md-form">
 
-            {/* DATOS DEL ÁREA */}
             <div className="md-section">
               <h3>Datos del Área</h3>
 
-              {/* 3 columnas: Sede, Área, Ubicación */}
               <div className="row-3">
                 <div className="field">
                   <label>Sede</label>
@@ -116,7 +113,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* DATOS DEL EQUIPO */}
             <div className="md-section">
               <h3>Datos del Equipo</h3>
 
@@ -167,7 +163,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* AUTORIZACIÓN */}
             <div className="md-section">
               <h3>Autorización de Retiro y Recibo</h3>
 
@@ -194,7 +189,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* SOFTWARE CHECK */}
             <div className="md-section">
               <h3>Lista de Chequeo de Software</h3>
 
@@ -215,7 +209,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* GARANTÍA */}
             <div className="md-section">
               <h3>Garantía</h3>
 
@@ -241,7 +234,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* HARDWARE CHECK */}
+           
             <div className="md-section">
               <h3>Lista de Chequeo de Hardware</h3>
 
@@ -271,7 +264,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* TIEMPO DE PARADA */}
             <div className="md-section">
               <h3>Tiempo de Parada</h3>
 
@@ -291,7 +283,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* FUNCIONARIOS */}
             <div className="md-section">
               <h3>Funcionarios</h3>
 
@@ -320,7 +311,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* BOTONES */}
             <div className="md-actions">
               <button type="button" className="btn-cancel" onClick={onClose}>
                 Cancelar

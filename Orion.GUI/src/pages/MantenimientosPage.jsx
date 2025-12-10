@@ -19,10 +19,8 @@ export default function MantenimientosPage() {
 
   const saveRecord = (record) => {
     if (record.id) {
-      // UPDATE
       setRecords((prev) => prev.map((r) => (r.id === record.id ? record : r)));
     } else {
-      // NEW
       record.id = Date.now();
       setRecords((prev) => [record, ...prev]);
     }
@@ -44,7 +42,6 @@ export default function MantenimientosPage() {
         </button>
       </div>
 
-      {/* LISTA */}
       <div className="mui-card">
         <div className="mui-card-header">
           Registros Guardados ({records.length})
@@ -147,7 +144,6 @@ export default function MantenimientosPage() {
         </div>
       </div>
 
-      {/* DIALOGO */}
       {dialogOpen && (
         <MantenimientoDialog
           onClose={() => setDialogOpen(false)}
