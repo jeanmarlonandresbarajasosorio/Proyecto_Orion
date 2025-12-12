@@ -6,7 +6,13 @@ import {
 import "./styles.css";
 
 import MantenimientoList from "./pages/MantenimientosPage.jsx";
-import SedePage from "./pages/sedes/SedePage.jsx"; // ⭐ IMPORTANTE
+import SedePage from "./pages/sedes/SedePage.jsx";
+import AreaPage from "./pages/area/areapage.jsx";
+import FuncionarioPage from "./pages/funcionario/FuncionarioPage.jsx";
+import ChequeoPage from "./pages/chequeo/ChequeoPage.jsx";
+import TipoListaPage from "./pages/tipolista/TipoListaPage.jsx";
+import TipoDispositivoPage from "./pages/tipodispositivo/TipoDispositivoPage.jsx";
+import SistemaOperativoPage from "./pages/sistemaoperativo/SistemaOperativoPage.jsx";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -118,6 +124,7 @@ export default function App() {
   return (
     <div className={`app-root ${sidebarOpen ? "" : "sidebar-closed"}`}>
 
+      {/* TOPBAR */}
       <header className="topbar">
         <div className="left">
           <button
@@ -146,6 +153,7 @@ export default function App() {
         </div>
       </header>
 
+      {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>
           ‹
@@ -154,6 +162,7 @@ export default function App() {
         <h2 className="sidebar-title">Menú</h2>
 
         <nav className="menu">
+
           <a
             className={activePage === "dashboard" ? "active" : ""}
             onClick={() => setActivePage("dashboard")}
@@ -168,13 +177,41 @@ export default function App() {
             Mantenimientos
           </a>
 
-          <a>Sistema Operativo</a>
-          <a>Tipo Dispositivo</a>
-          <a>Tipo Lista</a>
-          <a>Lista Chequeo</a>
-          <a>Funcionario</a>
+          <a
+            className={activePage === "tipodispositivo" ? "active" : ""}
+            onClick={() => setActivePage("tipodispositivo")}
+          >
+            Tipo Dispositivo
+          </a>
 
-          {/* ⭐ AQUI SE AGREGA LA RUTA DE SEDES */}
+          <a
+            className={activePage === "sistemaoperativo" ? "active" : ""}
+            onClick={() => setActivePage("sistemaoperativo")}
+          >
+            Sistema Operativo
+          </a>
+
+          <a
+            className={activePage === "tipolista" ? "active" : ""}
+            onClick={() => setActivePage("tipolista")}
+          >
+            Tipo Lista
+          </a>
+
+          <a
+            className={activePage === "chequeo" ? "active" : ""}
+            onClick={() => setActivePage("chequeo")}
+          >
+            Lista Chequeo
+          </a>
+
+          <a
+            className={activePage === "funcionarios" ? "active" : ""}
+            onClick={() => setActivePage("funcionarios")}
+          >
+            Funcionario
+          </a>
+
           <a
             className={activePage === "sedes" ? "active" : ""}
             onClick={() => setActivePage("sedes")}
@@ -182,23 +219,32 @@ export default function App() {
             Sede
           </a>
 
-          <a>Area</a>
+          <a
+            className={activePage === "area" ? "active" : ""}
+            onClick={() => setActivePage("area")}
+          >
+            Área
+          </a>
         </nav>
       </aside>
 
+      {/* OVERLAY MOBILE */}
       <div
         className={`overlay ${sidebarOpen && window.innerWidth <= 1100 ? "visible" : ""}`}
         onClick={() => setSidebarOpen(false)}
       />
 
+      {/* MAIN */}
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
         {activePage === "listamantenimientos" && <MantenimientoList />}
-
-        {/* ⭐ CARGA LA LISTA DE SEDES */}
         {activePage === "sedes" && <SedePage />}
-
-        {activePage === "info" && <h2>Información del Sistema</h2>}
+        {activePage === "area" && <AreaPage />}
+        {activePage === "funcionarios" && <FuncionarioPage />}
+        {activePage === "chequeo" && <ChequeoPage />}
+        {activePage === "tipolista" && <TipoListaPage />}
+        {activePage === "tipodispositivo" && <TipoDispositivoPage />}
+        {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
       </main>
     </div>
   );

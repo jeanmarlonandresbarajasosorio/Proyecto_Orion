@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./AriaDialog.css";
+import "./AreaDialog.css";
 
 export default function SedeDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({

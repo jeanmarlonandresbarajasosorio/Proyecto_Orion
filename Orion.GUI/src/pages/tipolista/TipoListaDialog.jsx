@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "./SedeDialog.css";
+import "./TipoListaDialog.css";
 
-export default function SedeDialog({ onClose, onSave, editingRecord }) {
+export default function TipoListaDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
     id: null,
     nombre: "",
@@ -39,7 +39,7 @@ export default function SedeDialog({ onClose, onSave, editingRecord }) {
       <div className="md-modal">
         <div className="md-modal-content">
 
-          <h2>{form.id ? "Editar Sede" : "Nueva Sede"}</h2>
+          <h2>{form.id ? "Editar Tipo de Lista" : "Nuevo Tipo de Lista"}</h2>
 
           <div className="md-form row-2">
             <div>
@@ -52,6 +52,7 @@ export default function SedeDialog({ onClose, onSave, editingRecord }) {
                 onChange={handleChange}
               />
             </div>
+         
           </div>
 
           <div className="md-actions">

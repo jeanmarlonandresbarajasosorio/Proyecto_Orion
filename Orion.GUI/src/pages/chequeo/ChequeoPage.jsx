@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import "./AreaPage.css";
-import AreaDialog from "./AreaDialog.jsx";
+import "./ChequeoPage.css";
+import ChequeoDialog from "./ChequeoDialog.jsx";
 
-export default function AreaPage() {
-  const [areas, setAreas] = useState([]);
+export default function ChequeoPage() {
+  const [items, setItems] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
 
@@ -19,37 +19,35 @@ export default function AreaPage() {
 
   const saveRecord = (record) => {
     if (record.id) {
-      setAreas((prev) =>
-        prev.map((a) => (a.id === record.id ? record : a))
-      );
+      setItems((prev) => prev.map((e) => (e.id === record.id ? record : e)));
     } else {
       record.id = Date.now();
       record.estado = true;
       record.fecha_creacion = new Date().toISOString();
       record.usuario_creacion = "admin";
 
-      setAreas((prev) => [record, ...prev]);
+      setItems((prev) => [record, ...prev]);
     }
   };
 
   return (
     <div className="mui-container">
-      <h1 className="mui-title">Áreas</h1>
+      <h1 className="mui-title">Checklist de Chequeo</h1>
 
       <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
         <button className="mui-btn mui-btn-primary" onClick={openCreateDialog}>
-          + Crear Área
+          + Crear Chequeo
         </button>
       </div>
 
       <div className="mui-card">
         <div className="mui-card-header">
-          Registros Guardados ({areas.length})
+          Registros Guardados ({items.length})
         </div>
 
         <div className="mui-card-body">
-          {areas.length === 0 ? (
-            <div className="muted">Aún no hay áreas creadas.</div>
+          {items.length === 0 ? (
+            <div className="muted">Aún no hay registros creados.</div>
           ) : (
             <div className="table-responsive">
               <table className="table">
@@ -65,25 +63,25 @@ export default function AreaPage() {
                 </thead>
 
                 <tbody>
-                  {areas.map((a) => (
-                    <tr key={a.id}>
-                      <td>{String(a.id).slice(-6)}</td>
-                      <td>{a.nombre}</td>
-                      <td>{a.estado ? "Activo" : "Inactivo"}</td>
-                      <td>{new Date(a.fecha_creacion).toLocaleDateString()}</td>
-                      <td>{a.usuario_creacion}</td>
+                  {items.map((item) => (
+                    <tr key={item.id}>
+                      <td>{String(item.id).slice(-6)}</td>
+                      <td>{item.nombre}</td>
+                      <td>{item.estado ? "Activo" : "Inactivo"}</td>
+                      <td>{new Date(item.fecha_creacion).toLocaleDateString()}</td>
+                      <td>{item.usuario_creacion}</td>
 
                       <td>
                         <button
                           className="small btn neutral"
-                          onClick={() => openEditDialog(a)}
+                          onClick={() => openEditDialog(item)}
                         >
                           Editar
                         </button>
 
                         <button
                           className="small btn primary"
-                          onClick={() => alert(JSON.stringify(a, null, 2))}
+                          onClick={() => alert(JSON.stringify(item, null, 2))}
                         >
                           Ver
                         </button>
@@ -98,7 +96,7 @@ export default function AreaPage() {
       </div>
 
       {dialogOpen && (
-        <AreaDialog
+        <ChequeoDialog
           onClose={() => setDialogOpen(false)}
           onSave={saveRecord}
           editingRecord={editingRecord}

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import "./AreaPage.css";
-import AreaDialog from "./AreaDialog.jsx";
+import "./SistemaOperativoPage.css";
+import SistemaOperativoDialog from "./SistemaOperativoDialog.jsx";
 
-export default function AreaPage() {
-  const [areas, setAreas] = useState([]);
+export default function SistemaOperativoPage() {
+  const [sistemas, setSistemas] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
 
@@ -19,8 +19,8 @@ export default function AreaPage() {
 
   const saveRecord = (record) => {
     if (record.id) {
-      setAreas((prev) =>
-        prev.map((a) => (a.id === record.id ? record : a))
+      setSistemas((prev) =>
+        prev.map((s) => (s.id === record.id ? record : s))
       );
     } else {
       record.id = Date.now();
@@ -28,28 +28,28 @@ export default function AreaPage() {
       record.fecha_creacion = new Date().toISOString();
       record.usuario_creacion = "admin";
 
-      setAreas((prev) => [record, ...prev]);
+      setSistemas((prev) => [record, ...prev]);
     }
   };
 
   return (
     <div className="mui-container">
-      <h1 className="mui-title">Áreas</h1>
+      <h1 className="mui-title">Sistema Operativo</h1>
 
       <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
         <button className="mui-btn mui-btn-primary" onClick={openCreateDialog}>
-          + Crear Área
+          + Crear Sistema Operativo
         </button>
       </div>
 
       <div className="mui-card">
         <div className="mui-card-header">
-          Registros Guardados ({areas.length})
+          Registros Guardados ({sistemas.length})
         </div>
 
         <div className="mui-card-body">
-          {areas.length === 0 ? (
-            <div className="muted">Aún no hay áreas creadas.</div>
+          {sistemas.length === 0 ? (
+            <div className="muted">Aún no hay sistemas operativos creados.</div>
           ) : (
             <div className="table-responsive">
               <table className="table">
@@ -65,25 +65,25 @@ export default function AreaPage() {
                 </thead>
 
                 <tbody>
-                  {areas.map((a) => (
-                    <tr key={a.id}>
-                      <td>{String(a.id).slice(-6)}</td>
-                      <td>{a.nombre}</td>
-                      <td>{a.estado ? "Activo" : "Inactivo"}</td>
-                      <td>{new Date(a.fecha_creacion).toLocaleDateString()}</td>
-                      <td>{a.usuario_creacion}</td>
+                  {sistemas.map((s) => (
+                    <tr key={s.id}>
+                      <td>{String(s.id).slice(-6)}</td>
+                      <td>{s.nombre}</td>
+                      <td>{s.estado ? "Activo" : "Inactivo"}</td>
+                      <td>{new Date(s.fecha_creacion).toLocaleDateString()}</td>
+                      <td>{s.usuario_creacion}</td>
 
                       <td>
                         <button
                           className="small btn neutral"
-                          onClick={() => openEditDialog(a)}
+                          onClick={() => openEditDialog(s)}
                         >
                           Editar
                         </button>
 
                         <button
                           className="small btn primary"
-                          onClick={() => alert(JSON.stringify(a, null, 2))}
+                          onClick={() => alert(JSON.stringify(s, null, 2))}
                         >
                           Ver
                         </button>
@@ -98,7 +98,7 @@ export default function AreaPage() {
       </div>
 
       {dialogOpen && (
-        <AreaDialog
+        <SistemaOperativoDialog
           onClose={() => setDialogOpen(false)}
           onSave={saveRecord}
           editingRecord={editingRecord}
