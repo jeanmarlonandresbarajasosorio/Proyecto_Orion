@@ -5,6 +5,7 @@ import {
 } from "recharts";
 import "./styles.css";
 
+// Páginas
 import MantenimientoList from "./pages/MantenimientosPage.jsx";
 import SedePage from "./pages/sedes/SedePage.jsx";
 import AreaPage from "./pages/area/areapage.jsx";
@@ -15,10 +16,13 @@ import TipoDispositivoPage from "./pages/tipodispositivo/TipoDispositivoPage.jsx
 import SistemaOperativoPage from "./pages/sistemaoperativo/SistemaOperativoPage.jsx";
 
 export default function App() {
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
   const [userName] = useState("Jean Marlon");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const [maestrosOpen, setMaestrosOpen] = useState(false); // <<--- NUEVO
 
   const logout = () => {
     alert("Sesión cerrada");
@@ -87,13 +91,7 @@ export default function App() {
         <div className="card">
           <h3>Checklist Hardware</h3>
           <PieChart width={320} height={240}>
-            <Pie
-              data={dataHardware}
-              dataKey="value"
-              nameKey="name"
-              outerRadius={80}
-              label
-            >
+            <Pie data={dataHardware} dataKey="value" nameKey="name" outerRadius={80} label>
               {dataHardware.map((entry, i) => (
                 <Cell key={i} fill={COLORS[i % COLORS.length]} />
               ))}
@@ -127,10 +125,7 @@ export default function App() {
       {/* TOPBAR */}
       <header className="topbar">
         <div className="left">
-          <button
-            className="menu-btn"
-            onClick={() => setSidebarOpen((s) => !s)}
-          >
+          <button className="menu-btn" onClick={() => setSidebarOpen((s) => !s)}>
             ☰
           </button>
           <div className="brand">ORION</div>
@@ -155,6 +150,7 @@ export default function App() {
 
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
+
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>
           ‹
         </button>
@@ -167,7 +163,7 @@ export default function App() {
             className={activePage === "dashboard" ? "active" : ""}
             onClick={() => setActivePage("dashboard")}
           >
-            Garantías
+            Mantenimientos
           </a>
 
           <a
@@ -177,54 +173,48 @@ export default function App() {
             Mantenimientos
           </a>
 
-          <a
-            className={activePage === "tipodispositivo" ? "active" : ""}
-            onClick={() => setActivePage("tipodispositivo")}
-          >
-            Tipo Dispositivo
-          </a>
+          {/* ------------------------ */}
+          {/*       MODULO MAESTROS     */}
+          {/* ------------------------ */}
+          <div className="submenu">
+            <a onClick={() => setMaestrosOpen(!maestrosOpen)}>
+              Maestros {maestrosOpen ? "▲" : "▼"}
+            </a>
 
-          <a
-            className={activePage === "sistemaoperativo" ? "active" : ""}
-            onClick={() => setActivePage("sistemaoperativo")}
-          >
-            Sistema Operativo
-          </a>
+            {maestrosOpen && (
+              <div className="submenu-items">
 
-          <a
-            className={activePage === "tipolista" ? "active" : ""}
-            onClick={() => setActivePage("tipolista")}
-          >
-            Tipo Lista
-          </a>
+                <a onClick={() => setActivePage("tipodispositivo")}>
+                  Tipo Dispositivo
+                </a>
 
-          <a
-            className={activePage === "chequeo" ? "active" : ""}
-            onClick={() => setActivePage("chequeo")}
-          >
-            Lista Chequeo
-          </a>
+                <a onClick={() => setActivePage("sistemaoperativo")}>
+                  Sistema Operativo
+                </a>
 
-          <a
-            className={activePage === "funcionarios" ? "active" : ""}
-            onClick={() => setActivePage("funcionarios")}
-          >
-            Funcionario
-          </a>
+                <a onClick={() => setActivePage("tipolista")}>
+                  Tipo Lista
+                </a>
 
-          <a
-            className={activePage === "sedes" ? "active" : ""}
-            onClick={() => setActivePage("sedes")}
-          >
-            Sede
-          </a>
+                <a onClick={() => setActivePage("chequeo")}>
+                  Lista Chequeo
+                </a>
 
-          <a
-            className={activePage === "area" ? "active" : ""}
-            onClick={() => setActivePage("area")}
-          >
-            Área
-          </a>
+                <a onClick={() => setActivePage("funcionarios")}>
+                  Funcionario
+                </a>
+
+                <a onClick={() => setActivePage("sedes")}>
+                  Sede
+                </a>
+
+                <a onClick={() => setActivePage("area")}>
+                  Área
+                </a>
+
+              </div>
+            )}
+          </div>
         </nav>
       </aside>
 
@@ -238,13 +228,15 @@ export default function App() {
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
         {activePage === "listamantenimientos" && <MantenimientoList />}
-        {activePage === "sedes" && <SedePage />}
-        {activePage === "area" && <AreaPage />}
-        {activePage === "funcionarios" && <FuncionarioPage />}
-        {activePage === "chequeo" && <ChequeoPage />}
-        {activePage === "tipolista" && <TipoListaPage />}
+
+        {/* MAESTROS */}
         {activePage === "tipodispositivo" && <TipoDispositivoPage />}
         {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
+        {activePage === "tipolista" && <TipoListaPage />}
+        {activePage === "chequeo" && <ChequeoPage />}
+        {activePage === "funcionarios" && <FuncionarioPage />}
+        {activePage === "sedes" && <SedePage />}
+        {activePage === "area" && <AreaPage />}
       </main>
     </div>
   );
