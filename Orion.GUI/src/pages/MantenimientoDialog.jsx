@@ -116,6 +116,11 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
             <div className="md-section">
               <h3>Datos del Equipo</h3>
 
+                <div className="field">
+                  <label>Nombre del Equipo</label>
+                  <input name="nombreEquipo" value={form.nombreEquipo} onChange={handleChange} />
+                </div>
+
               <div className="row-3">
                 <div className="field">
                   <label>Dispositivo</label>
@@ -131,11 +136,12 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <label>No. Inventario</label>
                   <input name="inventario" value={form.inventario} onChange={handleChange} />
                 </div>
-
-                <div className="field">
-                  <label>Nombre del Equipo</label>
-                  <input name="nombreEquipo" value={form.nombreEquipo} onChange={handleChange} />
+                      <div className="field">
+                  <label>Procesador</label>
+                  <input name="procesador" value={form.procesador} onChange={handleChange} />
                 </div>
+
+              
               </div>
 
               <div className="row-3 mt">
@@ -148,18 +154,15 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <label>Memoria RAM</label>
                   <input name="ram" value={form.ram} onChange={handleChange} />
                 </div>
-
-                <div className="field">
-                  <label>Procesador</label>
-                  <input name="procesador" value={form.procesador} onChange={handleChange} />
-                </div>
-              </div>
-
-              <div className="row-1 mt">
-                <div className="field">
+                 <div className="field">
                   <label>Sistema Operativo</label>
                   <input name="so" value={form.so} onChange={handleChange} />
                 </div>
+
+              </div>
+
+              <div className="row-1 mt">
+               
               </div>
             </div>
 
@@ -227,10 +230,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <input type="date" name="vencimientoGarantia" value={form.vencimientoGarantia} onChange={handleChange} />
                 </div>
 
-                <div className="field">
-                  <label>No. Orden SAP</label>
-                  <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
-                </div>
+              
               </div>
             </div>
 
@@ -264,24 +264,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            <div className="md-section">
-              <h3>Tiempo de Parada</h3>
 
-              <div className="row-3">
-                <div className="field">
-                  <label>Minutos Parada</label>
-                  <input name="minutosParada" value={form.minutosParada} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>Proporción (%)</label>
-                  <input name="proporcionParada" value={form.proporcionParada} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>Total Minutos Disponibles</label>
-                  <input name="totalDisponibilidad" value={form.totalDisponibilidad} onChange={handleChange} />
-                </div>
-              </div>
-            </div>
 
             <div className="md-section">
               <h3>Funcionarios</h3>
@@ -309,6 +292,29 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <input type="datetime-local" name="fechaAprueba" value={form.fechaAprueba} onChange={handleChange} />
                 </div>
               </div>
+            </div>
+
+             <div className="md-section">
+              <h3>Tiempo de Parada</h3>
+
+              <div className="row-3">
+                <div className="field">
+                  <label>Minutos Parada</label>
+                  <input name="minutosParada" value={form.minutosParada} onChange={handleChange} />
+                </div>
+                <div className="field">
+                  <label>Proporción (%)</label>
+                  <input name="proporcionParada" value={form.proporcionParada} onChange={handleChange} />
+                </div>
+                <div className="field">
+                  <label>Total Minutos Disponibles</label>
+                  <input name="totalDisponibilidad" value={form.totalDisponibilidad} onChange={handleChange} />
+                </div>
+              </div>
+                <div className="field">
+                  <label>No. Orden SAP</label>
+                  <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
+                </div>
             </div>
 
             <div className="md-actions">

@@ -1,0 +1,83 @@
+import React, { useState, useEffect } from "react";
+import "./SedeDialog.css";
+
+export default function SedeDialog({ onClose, onSave, editingRecord }) {
+  const [form, setForm] = useState({
+    id: null,
+    nombre: "",
+    estado: true,
+  });
+
+  useEffect(() => {
+    if (editingRecord) setForm(editingRecord);
+  }, [editingRecord]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "estado") {
+      setForm({ ...form, estado: value === "true" });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
+
+  const handleSubmit = () => {
+    let updated = { ...form };
+
+    if (form.id) {
+      updated.fecha_modificacion = new Date().toISOString();
+      updated.usuario_modifica = "admin";
+    }
+
+    onSave(updated);
+    onClose();
+  };
+
+  return (
+    <div className="md-overlay">
+      <div className="md-modal">
+        <div className="md-modal-content">
+
+          <h2>{form.id ? "Editar Sede" : "Nueva Sede"}</h2>
+
+          <div className="md-form row-2">
+            <div>
+              <label>Nombre</label>
+              <input
+                className="mui-input"
+                type="text"
+                name="nombre"
+                value={form.nombre}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <label>Estado</label>
+              <select
+                className="mui-input"
+                name="estado"
+                value={form.estado}
+                onChange={handleChange}
+              >
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="md-actions">
+            <button className="btn-cancel" onClick={onClose}>
+              Cancelar
+            </button>
+            <button className="btn-save" onClick={handleSubmit}>
+              Guardar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}

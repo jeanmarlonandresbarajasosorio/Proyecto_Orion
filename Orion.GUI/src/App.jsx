@@ -6,6 +6,7 @@ import {
 import "./styles.css";
 
 import MantenimientoList from "./pages/MantenimientosPage.jsx";
+import SedePage from "./pages/sedes/SedePage.jsx"; // ⭐ IMPORTANTE
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -167,12 +168,21 @@ export default function App() {
             Mantenimientos
           </a>
 
+          <a>Sistema Operativo</a>
+          <a>Tipo Dispositivo</a>
+          <a>Tipo Lista</a>
+          <a>Lista Chequeo</a>
+          <a>Funcionario</a>
+
+          {/* ⭐ AQUI SE AGREGA LA RUTA DE SEDES */}
           <a
-            className={activePage === "info" ? "active" : ""}
-            onClick={() => setActivePage("info")}
+            className={activePage === "sedes" ? "active" : ""}
+            onClick={() => setActivePage("sedes")}
           >
-            Información
+            Sede
           </a>
+
+          <a>Area</a>
         </nav>
       </aside>
 
@@ -184,6 +194,10 @@ export default function App() {
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
         {activePage === "listamantenimientos" && <MantenimientoList />}
+
+        {/* ⭐ CARGA LA LISTA DE SEDES */}
+        {activePage === "sedes" && <SedePage />}
+
         {activePage === "info" && <h2>Información del Sistema</h2>}
       </main>
     </div>
