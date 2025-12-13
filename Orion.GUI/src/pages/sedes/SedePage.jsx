@@ -1,11 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SedePage.css";
 import SedeDialog from "./SedeDialog";
+
+const API_URL = "http://localhost:3001/api/sedes";
 
 export default function SedePage() {
   const [sedes, setSedes] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  const loadSedes = async () => {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    setSedes(data);
+  };
+
+  useEffect(() => {
+    loadSedes();
+  }, []);
 
   const openCreateDialog = () => {
     setEditingRecord(null);
@@ -17,25 +29,28 @@ export default function SedePage() {
     setDialogOpen(true);
   };
 
-  const saveRecord = (record) => {
-    if (record.id) {
-      // Editar
-      setSedes((prev) => prev.map((s) => (s.id === record.id ? record : s)));
+  const saveRecord = async (record) => {
+    if (record._id) {
+      await fetch(`${API_URL}/${record._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
     } else {
-      // Crear
-      record.id = Date.now(); // ID temporal como tu ejemplo
-      record.fecha_creacion = new Date().toISOString();
-      record.usuario_creacion = "admin";
-      record.fecha_modificacion = null;
-      record.usuario_modifica = null;
-
-      setSedes((prev) => [record, ...prev]);
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
     }
+
+    setDialogOpen(false);
+    setEditingRecord(null);
+    loadSedes();
   };
 
   return (
     <div className="mui-container">
-
       <h1 className="mui-title">Sedes</h1>
 
       <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
@@ -68,17 +83,14 @@ export default function SedePage() {
 
                 <tbody>
                   {sedes.map((s) => (
-                    <tr key={s.id}>
-                      <td>{String(s.id).slice(-6)}</td>
+                    <tr key={s._id}>
+                      <td>{s._id.slice(-6)}</td>
                       <td>{s.nombre}</td>
                       <td>{s.estado ? "Activo" : "Inactivo"}</td>
                       <td>
-                        {s.fecha_creacion
-                          ? new Date(s.fecha_creacion).toLocaleDateString()
-                          : "-"}
+                        {new Date(s.fecha_creacion).toLocaleDateString()}
                       </td>
                       <td>{s.usuario_creacion}</td>
-
                       <td>
                         <button
                           className="small btn neutral"

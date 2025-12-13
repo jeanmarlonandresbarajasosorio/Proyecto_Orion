@@ -3,13 +3,16 @@ import "./SedeDialog.css";
 
 export default function SedeDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
-    id: null,
     nombre: "",
     estado: true,
   });
 
   useEffect(() => {
-    if (editingRecord) setForm(editingRecord);
+    if (editingRecord) {
+      setForm(editingRecord);
+    } else {
+      setForm({ nombre: "", estado: true });
+    }
   }, [editingRecord]);
 
   const handleChange = (e) => {
@@ -23,15 +26,7 @@ export default function SedeDialog({ onClose, onSave, editingRecord }) {
   };
 
   const handleSubmit = () => {
-    let updated = { ...form };
-
-    if (form.id) {
-      updated.fecha_modificacion = new Date().toISOString();
-      updated.usuario_modifica = "admin";
-    }
-
-    onSave(updated);
-    onClose();
+    onSave(form);
   };
 
   return (
@@ -39,7 +34,7 @@ export default function SedeDialog({ onClose, onSave, editingRecord }) {
       <div className="md-modal">
         <div className="md-modal-content">
 
-          <h2>{form.id ? "Editar Sede" : "Nueva Sede"}</h2>
+          <h2>{form._id ? "Editar Sede" : "Nueva Sede"}</h2>
 
           <div className="md-form row-2">
             <div>

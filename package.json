@@ -1,12 +1,35 @@
 {
   "dependencies": {
     "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongoose": "^9.0.1",
     "react-router-dom": "^7.10.1",
     "recharts": "^3.5.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.22",
+    "nodemon": "^3.1.11",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17"
-  }
+  },
+  "name": "proyecto_orion",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeanmarlonandresbarajasosorio/Proyecto_Orion.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jeanmarlonandresbarajasosorio/Proyecto_Orion/issues"
+  },
+  "homepage": "https://github.com/jeanmarlonandresbarajasosorio/Proyecto_Orion#readme",
+  "description": ""
 }

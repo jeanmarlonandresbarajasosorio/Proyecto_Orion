@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./FuncionarioPage.css";
 import FuncionarioDialog from "./FuncionarioDialog.jsx";
+
+const API_URL = "http://localhost:3001/api/funcionarios";
 
 export default function FuncionarioPage() {
   const [funcionarios, setFuncionarios] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setFuncionarios(Array.isArray(data) ? data : []))
+      .catch(() => setFuncionarios([]));
+  }, []);
 
   const openCreateDialog = () => {
     setEditingRecord(null);
@@ -17,18 +26,27 @@ export default function FuncionarioPage() {
     setDialogOpen(true);
   };
 
-  const saveRecord = (record) => {
-    if (record.id) {
+  const saveRecord = async (record) => {
+    if (record._id) {
+      const res = await fetch(`${API_URL}/${record._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
+
+      const updated = await res.json();
       setFuncionarios((prev) =>
-        prev.map((f) => (f.id === record.id ? record : f))
+        prev.map((f) => (f._id === updated._id ? updated : f))
       );
     } else {
-      record.id = Date.now();
-      record.estado = true;
-      record.fecha_creacion = new Date().toISOString();
-      record.usuario_creacion = "admin";
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
 
-      setFuncionarios((prev) => [record, ...prev]);
+      const created = await res.json();
+      setFuncionarios((prev) => [created, ...prev]);
     }
   };
 
@@ -36,7 +54,7 @@ export default function FuncionarioPage() {
     <div className="mui-container">
       <h1 className="mui-title">Funcionarios</h1>
 
-      <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
+      <div className="mui-card" style={{ padding: 16, marginBottom: 20 }}>
         <button className="mui-btn mui-btn-primary" onClick={openCreateDialog}>
           + Crear Funcionario
         </button>
@@ -51,48 +69,42 @@ export default function FuncionarioPage() {
           {funcionarios.length === 0 ? (
             <div className="muted">Aún no hay funcionarios creados.</div>
           ) : (
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Estado</th>
-                    <th>Fecha Creación</th>
-                    <th>Usuario</th>
-                    <th>Acciones</th>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Usuario</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {funcionarios.map((f, index) => (
+                  <tr key={f._id ?? index}>
+                    <td>{f._id ? f._id.slice(-6) : "-"}</td>
+                    <td>{f.nombre}</td>
+                    <td>{f.estado ? "Activo" : "Inactivo"}</td>
+                    <td>
+                      {f.fecha_creacion
+                        ? new Date(f.fecha_creacion).toLocaleDateString()
+                        : "-"}
+                    </td>
+                    <td>{f.usuario_creacion || "-"}</td>
+                    <td>
+                      <button
+                        className="small btn neutral"
+                        onClick={() => openEditDialog(f)}
+                      >
+                        Editar
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody>
-                  {funcionarios.map((f) => (
-                    <tr key={f.id}>
-                      <td>{String(f.id).slice(-6)}</td>
-                      <td>{f.nombre}</td>
-                      <td>{f.estado ? "Activo" : "Inactivo"}</td>
-                      <td>{new Date(f.fecha_creacion).toLocaleDateString()}</td>
-                      <td>{f.usuario_creacion}</td>
-
-                      <td>
-                        <button
-                          className="small btn neutral"
-                          onClick={() => openEditDialog(f)}
-                        >
-                          Editar
-                        </button>
-
-                        <button
-                          className="small btn primary"
-                          onClick={() => alert(JSON.stringify(f, null, 2))}
-                        >
-                          Ver
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
       </div>

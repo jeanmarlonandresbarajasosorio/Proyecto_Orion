@@ -3,29 +3,36 @@ import "./ChequeoDialog.css";
 
 export default function ChequeoDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
-    id: null,
+    _id: null,
     nombre: "",
     estado: true,
   });
 
   useEffect(() => {
-    if (editingRecord) setForm(editingRecord);
+    if (editingRecord) {
+      setForm({
+        _id: editingRecord._id,
+        nombre: editingRecord.nombre || "",
+        estado:
+          typeof editingRecord.estado === "boolean"
+            ? editingRecord.estado
+            : true,
+      });
+    }
   }, [editingRecord]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "estado") {
-      setForm({ ...form, estado: value === "true" });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = () => {
-    let updated = { ...form };
+    const updated = {
+      ...form,
+      estado: typeof form.estado === "boolean" ? form.estado : true,
+    };
 
-    if (form.id) {
+    if (form._id) {
       updated.fecha_modificacion = new Date().toISOString();
       updated.usuario_modifica = "admin";
     }
@@ -39,7 +46,7 @@ export default function ChequeoDialog({ onClose, onSave, editingRecord }) {
       <div className="md-modal">
         <div className="md-modal-content">
 
-          <h2>{form.id ? "Editar Chequeo" : "Nuevo Chequeo"}</h2>
+          <h2>{form._id ? "Editar Chequeo" : "Nuevo Chequeo"}</h2>
 
           <div className="md-form row-2">
             <div>

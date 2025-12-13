@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from "react";
 import "./AreaDialog.css";
 
-export default function SedeDialog({ onClose, onSave, editingRecord }) {
+export default function AreaDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
-    id: null,
+    _id: null,
     nombre: "",
     estado: true,
   });
 
   useEffect(() => {
-    if (editingRecord) setForm(editingRecord);
+    if (editingRecord) {
+      setForm(editingRecord);
+    } else {
+      setForm({
+        _id: null,
+        nombre: "",
+        estado: true,
+      });
+    }
   }, [editingRecord]);
 
   const handleChange = (e) => {
@@ -23,9 +31,9 @@ export default function SedeDialog({ onClose, onSave, editingRecord }) {
   };
 
   const handleSubmit = () => {
-    let updated = { ...form };
+    const updated = { ...form };
 
-    if (form.id) {
+    if (form._id) {
       updated.fecha_modificacion = new Date().toISOString();
       updated.usuario_modifica = "admin";
     }
@@ -39,7 +47,7 @@ export default function SedeDialog({ onClose, onSave, editingRecord }) {
       <div className="md-modal">
         <div className="md-modal-content">
 
-          <h2>{form.id ? "Editar Area" : "Nueva Area"}</h2>
+          <h2>{form._id ? "Editar Área" : "Nueva Área"}</h2>
 
           <div className="md-form row-2">
             <div>
@@ -50,10 +58,9 @@ export default function SedeDialog({ onClose, onSave, editingRecord }) {
                 name="nombre"
                 value={form.nombre}
                 onChange={handleChange}
+                placeholder="Nombre del área"
               />
             </div>
-
-         
           </div>
 
           <div className="md-actions">

@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./ChequeoPage.css";
 import ChequeoDialog from "./ChequeoDialog.jsx";
+
+const API_URL = "http://localhost:3001/api/listas-chequeo";
 
 export default function ChequeoPage() {
   const [items, setItems] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setItems(Array.isArray(data) ? data : []))
+      .catch(() => setItems([]));
+  }, []);
 
   const openCreateDialog = () => {
     setEditingRecord(null);
@@ -17,16 +26,27 @@ export default function ChequeoPage() {
     setDialogOpen(true);
   };
 
-  const saveRecord = (record) => {
-    if (record.id) {
-      setItems((prev) => prev.map((e) => (e.id === record.id ? record : e)));
-    } else {
-      record.id = Date.now();
-      record.estado = true;
-      record.fecha_creacion = new Date().toISOString();
-      record.usuario_creacion = "admin";
+  const saveRecord = async (record) => {
+    if (record._id) {
+      const res = await fetch(`${API_URL}/${record._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
 
-      setItems((prev) => [record, ...prev]);
+      const updated = await res.json();
+      setItems((prev) =>
+        prev.map((i) => (i._id === updated._id ? updated : i))
+      );
+    } else {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
+
+      const created = await res.json();
+      setItems((prev) => [created, ...prev]);
     }
   };
 
@@ -34,7 +54,7 @@ export default function ChequeoPage() {
     <div className="mui-container">
       <h1 className="mui-title">Checklist de Chequeo</h1>
 
-      <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
+      <div className="mui-card" style={{ padding: 16, marginBottom: 20 }}>
         <button className="mui-btn mui-btn-primary" onClick={openCreateDialog}>
           + Crear Chequeo
         </button>
@@ -49,48 +69,43 @@ export default function ChequeoPage() {
           {items.length === 0 ? (
             <div className="muted">Aún no hay registros creados.</div>
           ) : (
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Estado</th>
-                    <th>Fecha Creación</th>
-                    <th>Usuario</th>
-                    <th>Acciones</th>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Usuario</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={item._id ?? index}>
+                    <td>{item._id ? item._id.slice(-6) : "-"}</td>
+                    <td>{item.nombre || "-"}</td>
+                    <td>{item.estado ? "Activo" : "Inactivo"}</td>
+                    <td>
+                      {item.fecha_creacion
+                        ? new Date(item.fecha_creacion).toLocaleDateString()
+                        : "-"}
+                    </td>
+                    <td>{item.usuario_creacion || "-"}</td>
+                    <td>
+                      <button
+                        className="small btn neutral"
+                        onClick={() => openEditDialog(item)}
+                      >
+                        Editar
+                      </button>
+                    </td>
                   </tr>
-                </thead>
+                ))}
+              </tbody>
 
-                <tbody>
-                  {items.map((item) => (
-                    <tr key={item.id}>
-                      <td>{String(item.id).slice(-6)}</td>
-                      <td>{item.nombre}</td>
-                      <td>{item.estado ? "Activo" : "Inactivo"}</td>
-                      <td>{new Date(item.fecha_creacion).toLocaleDateString()}</td>
-                      <td>{item.usuario_creacion}</td>
-
-                      <td>
-                        <button
-                          className="small btn neutral"
-                          onClick={() => openEditDialog(item)}
-                        >
-                          Editar
-                        </button>
-
-                        <button
-                          className="small btn primary"
-                          onClick={() => alert(JSON.stringify(item, null, 2))}
-                        >
-                          Ver
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            </table>
           )}
         </div>
       </div>

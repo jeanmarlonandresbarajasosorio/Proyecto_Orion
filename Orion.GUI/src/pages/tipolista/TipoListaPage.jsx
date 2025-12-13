@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./TipoListaPage.css";
 import TipoListaDialog from "./TipoListaDialog";
+
+const API_URL = "http://localhost:3001/api/tipos-lista";
 
 export default function TipoListaPage() {
   const [tipos, setTipos] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setTipos(Array.isArray(data) ? data : []))
+      .catch(() => setTipos([]));
+  }, []);
 
   const openCreateDialog = () => {
     setEditingRecord(null);
@@ -17,28 +26,36 @@ export default function TipoListaPage() {
     setDialogOpen(true);
   };
 
-  const saveRecord = (record) => {
-    if (record.id) {
-      // Editar registro
-      setTipos((prev) => prev.map((t) => (t.id === record.id ? record : t)));
-    } else {
-      // Crear registro nuevo
-      record.id = Date.now();
-      record.fecha_creacion = new Date().toISOString();
-      record.usuario_creacion = "admin";
-      record.fecha_modificacion = null;
-      record.usuario_modifica = null;
+  const saveRecord = async (record) => {
+    if (record._id) {
+      const res = await fetch(`${API_URL}/${record._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
 
-      setTipos((prev) => [record, ...prev]);
+      const updated = await res.json();
+
+      setTipos((prev) =>
+        prev.map((t) => (t._id === updated._id ? updated : t))
+      );
+    } else {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
+
+      const created = await res.json();
+      setTipos((prev) => [created, ...prev]);
     }
   };
 
   return (
     <div className="mui-container">
-
       <h1 className="mui-title">Tipos de Lista</h1>
 
-      <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
+      <div className="mui-card" style={{ padding: 16, marginBottom: 20 }}>
         <button className="mui-btn mui-btn-primary" onClick={openCreateDialog}>
           + Crear Tipo de Lista
         </button>
@@ -67,9 +84,9 @@ export default function TipoListaPage() {
                 </thead>
 
                 <tbody>
-                  {tipos.map((t) => (
-                    <tr key={t.id}>
-                      <td>{String(t.id).slice(-6)}</td>
+                  {tipos.map((t, index) => (
+                    <tr key={t._id ?? index}>
+                      <td>{t._id ? t._id.slice(-6) : "-"}</td>
                       <td>{t.nombre}</td>
                       <td>{t.estado ? "Activo" : "Inactivo"}</td>
                       <td>
@@ -77,21 +94,13 @@ export default function TipoListaPage() {
                           ? new Date(t.fecha_creacion).toLocaleDateString()
                           : "-"}
                       </td>
-                      <td>{t.usuario_creacion}</td>
-
+                      <td>{t.usuario_creacion || "-"}</td>
                       <td>
                         <button
                           className="small btn neutral"
                           onClick={() => openEditDialog(t)}
                         >
                           Editar
-                        </button>
-
-                        <button
-                          className="small btn primary"
-                          onClick={() => alert(JSON.stringify(t, null, 2))}
-                        >
-                          Ver
                         </button>
                       </td>
                     </tr>

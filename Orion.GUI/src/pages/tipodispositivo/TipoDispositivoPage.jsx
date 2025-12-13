@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./TipoDispositivoPage.css";
 import TipoDispositivoDialog from "./TipoDispositivoDialog.jsx";
+
+const API_URL = "http://localhost:3001/api/tipos-dispositivos";
 
 export default function TipoDispositivoPage() {
   const [tipos, setTipos] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setTipos(Array.isArray(data) ? data : []))
+      .catch(() => setTipos([]));
+  }, []);
 
   const openCreateDialog = () => {
     setEditingRecord(null);
@@ -17,18 +26,32 @@ export default function TipoDispositivoPage() {
     setDialogOpen(true);
   };
 
-  const saveRecord = (record) => {
-    if (record.id) {
-      // Editar
-      setTipos((prev) => prev.map((t) => (t.id === record.id ? record : t)));
-    } else {
-      // Crear
-      record.id = Date.now();
-      record.estado = true;
-      record.fecha_creacion = new Date().toISOString();
-      record.usuario_creacion = "admin";
+  const saveRecord = async (record) => {
+    if (record._id) {
+      const res = await fetch(`${API_URL}/${record._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
 
-      setTipos((prev) => [record, ...prev]);
+      const updated = await res.json();
+
+      setTipos((prev) =>
+        prev.map((t) => (t._id === updated._id ? updated : t))
+      );
+    } else {
+      const payload = { ...record };
+      delete payload._id;
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const created = await res.json();
+
+      setTipos((prev) => [created, ...prev]);
     }
   };
 
@@ -36,7 +59,7 @@ export default function TipoDispositivoPage() {
     <div className="mui-container">
       <h1 className="mui-title">Tipo Dispositivo</h1>
 
-      <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
+      <div className="mui-card" style={{ padding: 16, marginBottom: 20 }}>
         <button className="mui-btn mui-btn-primary" onClick={openCreateDialog}>
           + Crear Tipo de Dispositivo
         </button>
@@ -51,45 +74,42 @@ export default function TipoDispositivoPage() {
           {tipos.length === 0 ? (
             <div className="muted">Aún no hay registros creados.</div>
           ) : (
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Estado</th>
-                    <th>Fecha Creación</th>
-                    <th>Usuario</th>
-                    <th>Acciones</th>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Usuario</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {tipos.map((t, index) => (
+                  <tr key={t._id ?? index}>
+                    <td>{t._id ? t._id.slice(-6) : "-"}</td>
+                    <td>{t.nombre || "-"}</td>
+                    <td>{t.estado ? "Activo" : "Inactivo"}</td>
+                    <td>
+                      {t.fecha_creacion
+                        ? new Date(t.fecha_creacion).toLocaleDateString()
+                        : "-"}
+                    </td>
+                    <td>{t.usuario_creacion || "-"}</td>
+                    <td>
+                      <button
+                        className="small btn neutral"
+                        onClick={() => openEditDialog(t)}
+                      >
+                        Editar
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody>
-                  {tipos.map((t) => (
-                    <tr key={t.id}>
-                      <td>{String(t.id).slice(-6)}</td>
-                      <td>{t.nombre}</td>
-                      <td>{t.estado ? "Activo" : "Inactivo"}</td>
-                      <td>{new Date(t.fecha_creacion).toLocaleDateString()}</td>
-                      <td>{t.usuario_creacion}</td>
-
-                      <td>
-                        <button className="small btn neutral" onClick={() => openEditDialog(t)}>
-                          Editar
-                        </button>
-
-                        <button
-                          className="small btn primary"
-                          onClick={() => alert(JSON.stringify(t, null, 2))}
-                        >
-                          Ver
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
       </div>

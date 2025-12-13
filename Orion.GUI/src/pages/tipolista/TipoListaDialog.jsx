@@ -3,7 +3,7 @@ import "./TipoListaDialog.css";
 
 export default function TipoListaDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
-    id: null,
+    _id: null,
     nombre: "",
     estado: true,
   });
@@ -23,14 +23,7 @@ export default function TipoListaDialog({ onClose, onSave, editingRecord }) {
   };
 
   const handleSubmit = () => {
-    let updated = { ...form };
-
-    if (form.id) {
-      updated.fecha_modificacion = new Date().toISOString();
-      updated.usuario_modifica = "admin";
-    }
-
-    onSave(updated);
+    onSave(form);
     onClose();
   };
 
@@ -39,7 +32,9 @@ export default function TipoListaDialog({ onClose, onSave, editingRecord }) {
       <div className="md-modal">
         <div className="md-modal-content">
 
-          <h2>{form.id ? "Editar Tipo de Lista" : "Nuevo Tipo de Lista"}</h2>
+          <h2>
+            {form._id ? "Editar Tipo de Lista" : "Nuevo Tipo de Lista"}
+          </h2>
 
           <div className="md-form row-2">
             <div>
@@ -52,7 +47,6 @@ export default function TipoListaDialog({ onClose, onSave, editingRecord }) {
                 onChange={handleChange}
               />
             </div>
-         
           </div>
 
           <div className="md-actions">
