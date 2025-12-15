@@ -163,7 +163,7 @@ export default function App() {
             className={activePage === "dashboard" ? "active" : ""}
             onClick={() => setActivePage("dashboard")}
           >
-            Mantenimientos
+            Inicio
           </a>
 
           <a
