@@ -123,16 +123,7 @@ export default function MantenimientosPage() {
                           onClick={() => openEditDialog(r)}
                         >
                           Editar
-                        </button>
-
-                        <button
-                          className="small btn primary"
-                          onClick={() => alert(JSON.stringify(r, null, 2))}
-                        >
-                          Ver
-                        </button>
-
-                        
+                        </button>    
                       
                       </td>
                     </tr>
