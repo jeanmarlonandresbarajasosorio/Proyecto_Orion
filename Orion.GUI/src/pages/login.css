@@ -1,0 +1,119 @@
+/* =====================================================
+   🔐 LOGIN ORION - ESTILO EMPRESARIAL
+   ===================================================== */
+:root {
+  --orion-blue-dark: #1e3a8a;
+  --orion-blue: #2748B3;
+  --orion-blue-light: #4f6fdc;
+
+  --orion-bg-gradient: linear-gradient(
+    180deg,
+    #1e3a8a 0%,
+    #2748B3 45%,
+    #4f6fdc 100%
+  );
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* CONTENEDOR */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--orion-bg-gradient);
+}
+
+/* TARJETA */
+.login-card {
+  background: #ffffff;
+  width: 380px;
+  padding: 2.8rem 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.25);
+  animation: scaleIn 0.35s ease-in-out;
+}
+
+/* TITULOS */
+.login-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--orion-blue-dark);
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+
+.login-subtitle {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 2.2rem;
+}
+
+/* FORM */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.3rem;
+}
+
+.login-form input {
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 1.4rem;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form input:focus {
+  border-color: var(--orion-blue);
+  box-shadow: 0 0 0 2px rgba(39, 72, 179, 0.15);
+}
+
+/* BOTON */
+.login-button {
+  margin-top: 0.6rem;
+  padding: 0.75rem;
+  background-color: var(--orion-blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.login-button:hover {
+  background-color: var(--orion-blue-dark);
+  transform: translateY(-1px);
+}
+
+/* ANIMACIONES */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -5,6 +5,9 @@ import {
 } from "recharts";
 import "./styles.css";
 
+// 🔐 LOGIN
+import Login from "./pages/Login.jsx";
+
 // Páginas
 import MantenimientoList from "./pages/MantenimientosPage.jsx";
 import SedePage from "./pages/sedes/SedePage.jsx";
@@ -17,17 +20,73 @@ import SistemaOperativoPage from "./pages/sistemaoperativo/SistemaOperativoPage.
 
 export default function App() {
 
+  /* ===================== */
+  /* 🔐 AUTH + LOADER      */
+  /* ===================== */
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  /* ===================== */
+  /* 🧭 UI STATES          */
+  /* ===================== */
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
-  const [userName] = useState("Jean Marlon");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [maestrosOpen, setMaestrosOpen] = useState(false);
 
-  const [maestrosOpen, setMaestrosOpen] = useState(false); // <<--- NUEVO
+  /* ===================== */
+  /* 🔐 LOGIN HANDLER      */
+  /* ===================== */
+  const handleLogin = (user) => {
+    setUserName(user.name);
+    setLoading(true);
 
-  const logout = () => {
-    alert("Sesión cerrada");
+    setTimeout(() => {
+      setIsAuthenticated(true);
+      setLoading(false);
+    }, 1500);
   };
 
+  /* ===================== */
+  /* 🔐 LOGOUT             */
+  /* ===================== */
+  const logout = () => {
+    setIsAuthenticated(false);
+    setUserName("");
+    setActivePage("dashboard");
+  };
+
+  /* ===================== */
+  /* 📱 RESPONSIVE SIDEBAR */
+  /* ===================== */
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth > 1100) setSidebarOpen(true);
+      else setSidebarOpen(false);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  /* ===================== */
+  /* 🚪 LOGIN VIEW         */
+  /* ===================== */
+  if (!isAuthenticated && !loading) {
+    return <Login onLogin={handleLogin} />;
+  }
+
+  /* ===================== */
+  /* ⏳ LOADER VIEW        */
+  /* ===================== */
+  if (loading) {
+    return <WelcomeSpinner />;
+  }
+
+  /* ===================== */
+  /* 📊 DATOS DASHBOARD    */
+  /* ===================== */
   const dataGarantias = [
     { name: "Ene", value: 10 },
     { name: "Feb", value: 40 },
@@ -48,16 +107,6 @@ export default function App() {
   ];
 
   const COLORS = ["#2563EB", "#1E3A8A", "#3B82F6", "#60A5FA"];
-
-  useEffect(() => {
-    const update = () => {
-      if (window.innerWidth > 1100) setSidebarOpen(true);
-      else setSidebarOpen(false);
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
 
   const Dashboard = () => (
     <>
@@ -81,7 +130,7 @@ export default function App() {
             <YAxis />
             <Tooltip />
             <Bar dataKey="value">
-              {dataMantenimientos.map((entry, index) => (
+              {dataMantenimientos.map((_, index) => (
                 <Cell key={index} fill={COLORS[index]} />
               ))}
             </Bar>
@@ -92,7 +141,7 @@ export default function App() {
           <h3>Checklist Hardware</h3>
           <PieChart width={320} height={240}>
             <Pie data={dataHardware} dataKey="value" nameKey="name" outerRadius={80} label>
-              {dataHardware.map((entry, i) => (
+              {dataHardware.map((_, i) => (
                 <Cell key={i} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
@@ -103,18 +152,13 @@ export default function App() {
       </section>
 
       <div className="filtro-container-grande">
-        <h3>Buscar Mantenimientos Pendientes</h3>
-
+        <h3>Buscar Mantenimientos</h3>
         <input
           type="text"
           placeholder="Ingrese el nombre del diseño..."
           className="filtro-input-grande"
-          onChange={(e) => console.log("Buscar:", e.target.value)}
         />
-
-        <button className="filtro-btn-grande">
-          Buscar
-        </button>
+        <button className="filtro-btn-grande">Buscar</button>
       </div>
     </>
   );
@@ -125,18 +169,12 @@ export default function App() {
       {/* TOPBAR */}
       <header className="topbar">
         <div className="left">
-          <button className="menu-btn" onClick={() => setSidebarOpen((s) => !s)}>
-            ☰
-          </button>
+          <button className="menu-btn" onClick={() => setSidebarOpen(s => !s)}>☰</button>
           <div className="brand">ORION</div>
         </div>
 
         <div className="right" style={{ position: "relative" }}>
-          <div
-            className="user-box"
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
-            style={{ cursor: "pointer" }}
-          >
+          <div className="user-box" onClick={() => setUserMenuOpen(!userMenuOpen)}>
             {userName}
           </div>
 
@@ -150,32 +188,18 @@ export default function App() {
 
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
-
-        <button className="close-arrow" onClick={() => setSidebarOpen(false)}>
-          ‹
-        </button>
-
+        <button className="close-arrow" onClick={() => setSidebarOpen(false)}>‹</button>
         <h2 className="sidebar-title">Menú</h2>
 
         <nav className="menu">
-
-          <a
-            className={activePage === "dashboard" ? "active" : ""}
-            onClick={() => setActivePage("dashboard")}
-          >
-            Inicio
+          <a className={activePage === "dashboard" ? "active" : ""} onClick={() => setActivePage("dashboard")}>
+          Inicio
           </a>
 
-          <a
-            className={activePage === "listamantenimientos" ? "active" : ""}
-            onClick={() => setActivePage("listamantenimientos")}
-          >
+          <a className={activePage === "listamantenimientos" ? "active" : ""} onClick={() => setActivePage("listamantenimientos")}>
             Mantenimientos
           </a>
 
-          {/* ------------------------ */}
-          {/*       MODULO MAESTROS     */}
-          {/* ------------------------ */}
           <div className="submenu">
             <a onClick={() => setMaestrosOpen(!maestrosOpen)}>
               Maestros {maestrosOpen ? "▲" : "▼"}
@@ -183,53 +207,22 @@ export default function App() {
 
             {maestrosOpen && (
               <div className="submenu-items">
-
-                <a onClick={() => setActivePage("tipodispositivo")}>
-                  Tipo Dispositivo
-                </a>
-
-                <a onClick={() => setActivePage("sistemaoperativo")}>
-                  Sistema Operativo
-                </a>
-
-                <a onClick={() => setActivePage("tipolista")}>
-                  Tipo Lista
-                </a>
-
-                <a onClick={() => setActivePage("chequeo")}>
-                  Lista Chequeo
-                </a>
-
-                <a onClick={() => setActivePage("funcionarios")}>
-                  Funcionario
-                </a>
-
-                <a onClick={() => setActivePage("sedes")}>
-                  Sede
-                </a>
-
-                <a onClick={() => setActivePage("area")}>
-                  Área
-                </a>
-
+                <a onClick={() => setActivePage("tipodispositivo")}>Tipo Dispositivo</a>
+                <a onClick={() => setActivePage("sistemaoperativo")}>Sistema Operativo</a>
+                <a onClick={() => setActivePage("tipolista")}>Tipo Lista</a>
+                <a onClick={() => setActivePage("chequeo")}>Lista Chequeo</a>
+                <a onClick={() => setActivePage("funcionarios")}>Funcionario</a>
+                <a onClick={() => setActivePage("sedes")}>Sede</a>
+                <a onClick={() => setActivePage("area")}>Área</a>
               </div>
             )}
           </div>
         </nav>
       </aside>
 
-      {/* OVERLAY MOBILE */}
-      <div
-        className={`overlay ${sidebarOpen && window.innerWidth <= 1100 ? "visible" : ""}`}
-        onClick={() => setSidebarOpen(false)}
-      />
-
-      {/* MAIN */}
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
         {activePage === "listamantenimientos" && <MantenimientoList />}
-
-        {/* MAESTROS */}
         {activePage === "tipodispositivo" && <TipoDispositivoPage />}
         {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
         {activePage === "tipolista" && <TipoListaPage />}
@@ -238,6 +231,23 @@ export default function App() {
         {activePage === "sedes" && <SedePage />}
         {activePage === "area" && <AreaPage />}
       </main>
+    </div>
+  );
+}
+
+/* ===================== */
+/* 🌟 LOADER ORION       */
+/* ===================== */
+function WelcomeSpinner() {
+  return (
+    <div className="orion-loader-overlay">
+      <div className="orion-loader-content">
+        <h1 className="orion-loader-title">
+          Bienvenido a <span>ORION</span>
+        </h1>
+        <p className="orion-loader-text">Cargando sistema…</p>
+        <div className="orion-spinner"></div>
+      </div>
     </div>
   );
 }

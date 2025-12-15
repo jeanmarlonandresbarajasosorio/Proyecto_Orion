@@ -100,6 +100,7 @@ export default function MantenimientosPage() {
               <table className="table">
                 <thead>
                   <tr>
+                    <th>Acciones</th>
                     <th>ID</th>
                     <th>Sede</th>
                     <th>Área</th>
@@ -120,13 +121,22 @@ export default function MantenimientosPage() {
                     <th>Realiza</th>
                     <th>Aprueba</th>
                     <th>Orden SAP</th>
-                    <th>Acciones</th>
                   </tr>
                 </thead>
 
-                <tbody>
+                <tbody> 
+                  
                   {records.map((r) => (
+                    
                     <tr key={r._id}>
+                            <td>
+                        <button
+                          className="small btn neutral"
+                          onClick={() => openEditDialog(r)}
+                        >
+                          Editar
+                        </button>
+                      </td>
                       <td>{r._id.slice(-6)}</td>
                       <td>{r.sede}</td>
                       <td>{r.area}</td>
@@ -156,13 +166,7 @@ export default function MantenimientosPage() {
                       <td>{r.funcionarioAprueba}</td>
                       <td>{r.noOrdenSAP}</td>
                       <td>
-                        <button
-                          className="small btn neutral"
-                          onClick={() => openEditDialog(r)}
-                        >
-                          Editar
-                        </button>
-                      </td>
+                    </td>
                     </tr>
                   ))}
                 </tbody>
