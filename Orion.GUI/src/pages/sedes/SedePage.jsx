@@ -99,12 +99,6 @@ export default function SedePage() {
                           Editar
                         </button>
 
-                        <button
-                          className="small btn primary"
-                          onClick={() => alert(JSON.stringify(s, null, 2))}
-                        >
-                          Ver
-                        </button>
                       </td>
                     </tr>
                   ))}
