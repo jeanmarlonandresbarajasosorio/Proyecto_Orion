@@ -19,11 +19,26 @@ const MantenimientoSchema = new mongoose.Schema(
     fechaEntrega: Date,
     recibe: String,
 
-    softwareChecks: Object,
-    hardwareChecks: Object,
+    softwareChecks: {
+      Antivirus: String,
+      "Nombre del computador": String,
+      "Actualizaciones de Windows": String,
+      "Dominio Foscal.loc": String,
+      "OCS Inventory": String,
+      SAP: String,
+    },
 
     garantia: String,
     vencimientoGarantia: Date,
+
+    hardwareChecks: {
+      "Limpieza CPU/AIO": String,
+      "Limpieza Monitor": String,
+      "Limpieza Periféricos": String,
+      "Cambio Crema Disipadora": String,
+      "Limpieza board y componentes": String,
+      "Limpieza Portátil": String,
+    },
 
     observaciones: String,
 
