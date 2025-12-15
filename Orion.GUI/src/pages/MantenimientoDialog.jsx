@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./MantenimientoDialog.css";
 
 const initialForm = {
-  sede: "",         
+  sede: "",
+  area: "",
   ubicacion: "",
   dispositivo: "",
   inventario: "",
@@ -47,11 +48,24 @@ const initialForm = {
 export default function MantenimientoDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState(initialForm);
 
+  // 🔹 datos maestros
+  const [sedes, setSedes] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [dispositivos, setDispositivos] = useState([]);
+  const [funcionarios, setFuncionarios] = useState([]);
+  const [sistemasOperativos, setSistemasOperativos] = useState([]);
+
   useEffect(() => {
-    if (editingRecord) {
-      setForm(editingRecord);
-    }
+    if (editingRecord) setForm(editingRecord);
   }, [editingRecord]);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/api/sedes").then(r => r.json()).then(setSedes);
+    fetch("http://localhost:3001/api/areas").then(r => r.json()).then(setAreas);
+    fetch("http://localhost:3001/api/tipos-dispositivos").then(r => r.json()).then(setDispositivos);
+    fetch("http://localhost:3001/api/funcionarios").then(r => r.json()).then(setFuncionarios);
+    fetch("http://localhost:3001/api/sistemas-operativos").then(r => r.json()).then(setSistemasOperativos);
+  }, []);
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -81,54 +95,52 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             <div className="md-section">
               <h3>Datos del Área</h3>
-
               <div className="row-3">
+
                 <div className="field">
                   <label>Sede</label>
-                  <input
-                    name="sede"
-                    value={form.sede}
-                    onChange={handleChange}
-                    placeholder="Ej: Foscal, Foscal Internacional"
-                  />
+                  <select name="sede" value={form.sede} onChange={handleChange}>
+                    <option value="">Seleccionar</option>
+                    {sedes.map(s => (
+                      <option key={s.id} value={s.nombre}>{s.nombre}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="field">
                   <label>Área</label>
-                  <input
-                    name="area"
-                    value={form.area}
-                    onChange={handleChange}
-                  />
+                  <select name="area" value={form.area} onChange={handleChange}>
+                    <option value="">Seleccionar</option>
+                    {areas.map(a => (
+                      <option key={a.id} value={a.nombre}>{a.nombre}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="field">
                   <label>Ubicación</label>
-                  <input
-                    name="ubicacion"
-                    value={form.ubicacion}
-                    onChange={handleChange}
-                  />
+                  <input name="ubicacion" value={form.ubicacion} onChange={handleChange} />
                 </div>
+
               </div>
             </div>
 
             <div className="md-section">
               <h3>Datos del Equipo</h3>
 
-                <div className="field">
-                  <label>Nombre del Equipo</label>
-                  <input name="nombreEquipo" value={form.nombreEquipo} onChange={handleChange} />
-                </div>
+              <div className="field">
+                <label>Nombre del Equipo</label>
+                <input name="nombreEquipo" value={form.nombreEquipo} onChange={handleChange} />
+              </div>
 
               <div className="row-3">
                 <div className="field">
                   <label>Dispositivo</label>
                   <select name="dispositivo" value={form.dispositivo} onChange={handleChange}>
                     <option value="">Seleccionar</option>
-                    <option>Monitor</option>
-                    <option>CPU/AIO</option>
-                    <option>Portátil</option>
+                    {dispositivos.map(d => (
+                      <option key={d.id} value={d.nombre}>{d.nombre}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -136,12 +148,11 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <label>No. Inventario</label>
                   <input name="inventario" value={form.inventario} onChange={handleChange} />
                 </div>
-                      <div className="field">
+
+                <div className="field">
                   <label>Procesador</label>
                   <input name="procesador" value={form.procesador} onChange={handleChange} />
                 </div>
-
-              
               </div>
 
               <div className="row-3 mt">
@@ -154,15 +165,16 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <label>Memoria RAM</label>
                   <input name="ram" value={form.ram} onChange={handleChange} />
                 </div>
-                 <div className="field">
+
+                <div className="field">
                   <label>Sistema Operativo</label>
-                  <input name="so" value={form.so} onChange={handleChange} />
+                  <select name="so" value={form.so} onChange={handleChange}>
+                    <option value="">Seleccionar</option>
+                    {sistemasOperativos.map(so => (
+                      <option key={so.id} value={so.nombre}>{so.nombre}</option>
+                    ))}
+                  </select>
                 </div>
-
-              </div>
-
-              <div className="row-1 mt">
-               
               </div>
             </div>
 
@@ -174,9 +186,15 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <label>Fecha y Hora Retiro</label>
                   <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
                 </div>
+
                 <div className="field">
                   <label>Funcionario que Autoriza</label>
-                  <input name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange} />
+                  <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
+                    <option value="">Seleccionar</option>
+                    {funcionarios.map(f => (
+                      <option key={f.id} value={f.nombre}>{f.nombre}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -185,14 +203,79 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <label>Fecha y Hora Entrega</label>
                   <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
                 </div>
+
                 <div className="field">
                   <label>Funcionario que Recibe</label>
-                  <input name="recibe" value={form.recibe} onChange={handleChange} />
+                  <select name="recibe" value={form.recibe} onChange={handleChange}>
+                    <option value="">Seleccionar</option>
+                    {funcionarios.map(f => (
+                      <option key={f.id} value={f.nombre}>{f.nombre}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
-
             <div className="md-section">
+              <h3>Funcionarios</h3>
+
+              <div className="row-2">
+                <div className="field">
+                  <label>Funcionario Realiza</label>
+                  <select
+                    name="funcionarioRealiza"
+                    value={form.funcionarioRealiza}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar</option>
+                    {funcionarios.map(f => (
+                      <option key={f.id} value={f.nombre}>
+                        {f.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="field">
+                  <label>Fecha Realiza</label>
+                  <input
+                    type="datetime-local"
+                    name="fechaRealiza"
+                    value={form.fechaRealiza}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="row-2 mt">
+                <div className="field">
+                  <label>Funcionario Aprueba</label>
+                  <select
+                    name="funcionarioAprueba"
+                    value={form.funcionarioAprueba}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar</option>
+                    {funcionarios.map(f => (
+                      <option key={f.id} value={f.nombre}>
+                        {f.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="field">
+                  <label>Fecha Aprueba</label>
+                  <input
+                    type="datetime-local"
+                    name="fechaAprueba"
+                    value={form.fechaAprueba}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </div>
+            
+             <div className="md-section">
               <h3>Lista de Chequeo de Software</h3>
 
               <div className="grid-2">
@@ -211,6 +294,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 ))}
               </div>
             </div>
+
 
             <div className="md-section">
               <h3>Garantía</h3>
@@ -234,8 +318,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-           
-            <div className="md-section">
+               <div className="md-section">
               <h3>Lista de Chequeo de Hardware</h3>
 
               <div className="grid-2">
@@ -264,36 +347,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-
-
-            <div className="md-section">
-              <h3>Funcionarios</h3>
-
-              <div className="row-2">
-                <div className="field">
-                  <label>Funcionario Realiza</label>
-                  <input name="funcionarioRealiza" value={form.funcionarioRealiza} onChange={handleChange} />
-                </div>
-
-                <div className="field">
-                  <label>Fecha Realiza</label>
-                  <input type="datetime-local" name="fechaRealiza" value={form.fechaRealiza} onChange={handleChange} />
-                </div>
-              </div>
-
-              <div className="row-2 mt">
-                <div className="field">
-                  <label>Funcionario Aprueba</label>
-                  <input name="funcionarioAprueba" value={form.funcionarioAprueba} onChange={handleChange} />
-                </div>
-
-                <div className="field">
-                  <label>Fecha Aprueba</label>
-                  <input type="datetime-local" name="fechaAprueba" value={form.fechaAprueba} onChange={handleChange} />
-                </div>
-              </div>
-            </div>
-
              <div className="md-section">
               <h3>Tiempo de Parada</h3>
 
@@ -317,14 +370,10 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 </div>
             </div>
 
-            <div className="md-actions">
-              <button type="button" className="btn-cancel" onClick={onClose}>
-                Cancelar
-              </button>
 
-              <button type="submit" className="btn-save">
-                Guardar
-              </button>
+            <div className="md-actions">
+              <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn-save">Guardar</button>
             </div>
 
           </form>
