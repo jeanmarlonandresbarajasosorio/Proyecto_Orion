@@ -54,7 +54,6 @@ export default function App() {
     setUserName(user.name);
     setLoading(true);
 
-    // ✅ AGREGADO (persistir sesión)
     localStorage.setItem("orion_user", JSON.stringify(user));
 
     setTimeout(() => {
