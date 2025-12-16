@@ -71,7 +71,6 @@ export default function App() {
     setUserName("");
     setActivePage("dashboard");
 
-    // ✅ AGREGADO (limpiar sesión)
     localStorage.removeItem("orion_user");
   };
 
@@ -274,7 +273,6 @@ const logout = () => {
   localStorage.removeItem("orion_user");
   localStorage.removeItem("orion_token");
 
-  // 🔥 Forzar logout de Google
   if (window.google?.accounts?.id) {
     google.accounts.id.disableAutoSelect();
   }
