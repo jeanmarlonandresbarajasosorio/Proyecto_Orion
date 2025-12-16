@@ -6,7 +6,7 @@ export default function Login({ onLogin }) {
   const [password, setPassword] = useState("");
 
   /* ===================== */
-  /* 🔐 LOGIN NORMAL       */
+  /*  LOGIN NORMAL       */
   /* ===================== */
   const submit = (e) => {
     e.preventDefault();
@@ -20,7 +20,7 @@ export default function Login({ onLogin }) {
   };
 
   /* ===================== */
-  /* 🔑 GOOGLE LOGIN       */
+  /*  GOOGLE LOGIN       */
   /* ===================== */
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -42,7 +42,7 @@ export default function Login({ onLogin }) {
 
       window.google.accounts.id.prompt();
 
-      // 🎯 Render botón
+      //  Render botón
       window.google.accounts.id.renderButton(
         document.getElementById("google-login"),
         {
@@ -64,7 +64,7 @@ export default function Login({ onLogin }) {
   }, []);
 
   /* ===================== */
-  /* 🔐 RESPUESTA GOOGLE   */
+  /*  RESPUESTA GOOGLE   */
   /* ===================== */
   const handleGoogleLogin = (response) => {
     if (!response?.credential) return;
@@ -87,7 +87,7 @@ export default function Login({ onLogin }) {
         <h1 className="login-title">Bienvenido a ORION</h1>
         <p className="login-subtitle">Gestión de Mantenimiento</p>
 
-        {/* 🔐 LOGIN NORMAL */}
+        {/*  LOGIN NORMAL */}
         <form onSubmit={submit} className="login-form">
           <label htmlFor="email">Email</label>
           <input
@@ -114,7 +114,7 @@ export default function Login({ onLogin }) {
           </button>
         </form>
 
-        {/* 🔽 GOOGLE BUTTON */}
+        {/*  GOOGLE BUTTON */}
         <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
           <div id="google-login"></div>
         </div>
