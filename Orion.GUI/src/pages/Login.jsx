@@ -19,7 +19,7 @@ export default function Login({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1 className="login-title">Bienvenido ORION</h1>
+        <h1 className="login-title">Bienvenido a ORION</h1>
         <p className="login-subtitle">Gestión de Mantenimientos</p>
 
         <form onSubmit={submit} className="login-form">
