@@ -36,11 +36,26 @@ export default function App() {
   const [maestrosOpen, setMaestrosOpen] = useState(false);
 
   /* ===================== */
+  /* 🧠 RESTAURAR SESIÓN   */
+  /* ===================== */
+  useEffect(() => {
+    const savedUser = localStorage.getItem("orion_user");
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      setUserName(user.name);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  /* ===================== */
   /* 🔐 LOGIN HANDLER      */
   /* ===================== */
   const handleLogin = (user) => {
     setUserName(user.name);
     setLoading(true);
+
+    // ✅ AGREGADO (persistir sesión)
+    localStorage.setItem("orion_user", JSON.stringify(user));
 
     setTimeout(() => {
       setIsAuthenticated(true);
@@ -55,6 +70,9 @@ export default function App() {
     setIsAuthenticated(false);
     setUserName("");
     setActivePage("dashboard");
+
+    // ✅ AGREGADO (limpiar sesión)
+    localStorage.removeItem("orion_user");
   };
 
   /* ===================== */
@@ -193,7 +211,7 @@ export default function App() {
 
         <nav className="menu">
           <a className={activePage === "dashboard" ? "active" : ""} onClick={() => setActivePage("dashboard")}>
-          Inicio
+            Inicio
           </a>
 
           <a className={activePage === "listamantenimientos" ? "active" : ""} onClick={() => setActivePage("listamantenimientos")}>
@@ -251,3 +269,17 @@ function WelcomeSpinner() {
     </div>
   );
 }
+
+const logout = () => {
+  localStorage.removeItem("orion_user");
+  localStorage.removeItem("orion_token");
+
+  // 🔥 Forzar logout de Google
+  if (window.google?.accounts?.id) {
+    google.accounts.id.disableAutoSelect();
+  }
+
+  setIsAuthenticated(false);
+  setUserName("");
+  setActivePage("dashboard");
+};

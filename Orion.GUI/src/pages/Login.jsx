@@ -1,18 +1,86 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./login.css";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  /* ===================== */
+  /* 🔐 LOGIN NORMAL       */
+  /* ===================== */
   const submit = (e) => {
     e.preventDefault();
-
-    // 🔐 LOGIN SIMULADO
     if (!email || !password) return;
 
     onLogin({
       name: "Jean Marlon",
+      email,
+      provider: "local",
+    });
+  };
+
+  /* ===================== */
+  /* 🔑 GOOGLE LOGIN       */
+  /* ===================== */
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (!clientId) {
+      console.error("❌ GOOGLE CLIENT ID no definido en .env");
+      return;
+    }
+
+    const initGoogle = () => {
+      if (!window.google || !window.google.accounts?.id) return;
+
+      // 🔥 INICIALIZACIÓN SEGURA (NO AUTO LOGIN)
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleLogin,
+        auto_select: false,               // ⛔ No seleccionar cuenta automática
+        cancel_on_tap_outside: true,      // ⛔ No login silencioso
+      });
+
+      // 🔐 Forzar selector SIEMPRE
+      window.google.accounts.id.prompt();
+
+      // 🎯 Render botón
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-login"),
+        {
+          theme: "outline",
+          size: "large",
+          width: 300,
+        }
+      );
+    };
+
+    // ⏳ Esperar a que cargue Google
+    const interval = setInterval(() => {
+      if (window.google?.accounts?.id) {
+        initGoogle();
+        clearInterval(interval);
+      }
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  /* ===================== */
+  /* 🔐 RESPUESTA GOOGLE   */
+  /* ===================== */
+  const handleGoogleLogin = (response) => {
+    if (!response?.credential) return;
+
+    const user = JSON.parse(
+      atob(response.credential.split(".")[1])
+    );
+
+    onLogin({
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+      provider: "google",
     });
   };
 
@@ -22,6 +90,7 @@ export default function Login({ onLogin }) {
         <h1 className="login-title">Bienvenido a ORION</h1>
         <p className="login-subtitle">Gestión de Mantenimiento</p>
 
+        {/* 🔐 LOGIN NORMAL */}
         <form onSubmit={submit} className="login-form">
           <label htmlFor="email">Email</label>
           <input
@@ -47,6 +116,11 @@ export default function Login({ onLogin }) {
             Iniciar sesión
           </button>
         </form>
+
+        {/* 🔽 GOOGLE BUTTON */}
+        <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+          <div id="google-login"></div>
+        </div>
       </div>
     </div>
   );
