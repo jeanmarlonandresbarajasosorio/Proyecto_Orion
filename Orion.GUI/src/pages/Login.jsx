@@ -33,15 +33,13 @@ export default function Login({ onLogin }) {
     const initGoogle = () => {
       if (!window.google || !window.google.accounts?.id) return;
 
-      // 🔥 INICIALIZACIÓN SEGURA (NO AUTO LOGIN)
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: handleGoogleLogin,
-        auto_select: false,               // ⛔ No seleccionar cuenta automática
-        cancel_on_tap_outside: true,      // ⛔ No login silencioso
+        auto_select: false,               
+        cancel_on_tap_outside: true,      
       });
 
-      // 🔐 Forzar selector SIEMPRE
       window.google.accounts.id.prompt();
 
       // 🎯 Render botón
@@ -55,7 +53,6 @@ export default function Login({ onLogin }) {
       );
     };
 
-    // ⏳ Esperar a que cargue Google
     const interval = setInterval(() => {
       if (window.google?.accounts?.id) {
         initGoogle();
