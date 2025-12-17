@@ -48,7 +48,6 @@ const initialForm = {
 export default function MantenimientoDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState(initialForm);
 
-  // 🔹 datos maestros
   const [sedes, setSedes] = useState([]);
   const [areas, setAreas] = useState([]);
   const [dispositivos, setDispositivos] = useState([]);
@@ -93,10 +92,10 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
           <form onSubmit={handleSubmit} className="md-form">
 
+            {/* ================= DATOS ÁREA ================= */}
             <div className="md-section">
               <h3>Datos del Área</h3>
               <div className="row-3">
-
                 <div className="field">
                   <label>Sede</label>
                   <select name="sede" value={form.sede} onChange={handleChange}>
@@ -121,10 +120,10 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                   <label>Ubicación</label>
                   <input name="ubicacion" value={form.ubicacion} onChange={handleChange} />
                 </div>
-
               </div>
             </div>
 
+            {/* ================= DATOS EQUIPO ================= */}
             <div className="md-section">
               <h3>Datos del Equipo</h3>
 
@@ -178,7 +177,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            <div className="md-section">
+                        <div className="md-section">
               <h3>Autorización de Retiro y Recibo</h3>
 
               <div className="row-2">
@@ -274,10 +273,11 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 </div>
               </div>
             </div>
-            
-             <div className="md-section">
-              <h3>Lista de Chequeo de Software</h3>
 
+
+            {/* ================= SOFTWARE ================= */}
+            <div className="md-section">
+              <h3>Lista de Chequeo de Software</h3>
               <div className="grid-2">
                 {Object.keys(form.softwareChecks).map(k => (
                   <div className="field" key={k}>
@@ -295,10 +295,9 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-
+            {/* ================= GARANTÍA ================= */}
             <div className="md-section">
               <h3>Garantía</h3>
-
               <div className="row-3">
                 <div className="field">
                   <label>¿Equipo en garantía?</label>
@@ -311,69 +310,98 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
                 <div className="field">
                   <label>Fecha Vencimiento</label>
-                  <input type="date" name="vencimientoGarantia" value={form.vencimientoGarantia} onChange={handleChange} />
-                </div>
-
-              
-              </div>
-            </div>
-
-               <div className="md-section">
-              <h3>Lista de Chequeo de Hardware</h3>
-
-              <div className="grid-2">
-                {Object.keys(form.hardwareChecks).map(k => (
-                  <div className="field" key={k}>
-                    <label>{k}</label>
-                    <select
-                      value={form.hardwareChecks[k]}
-                      onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}
-                    >
-                      <option value="">Seleccionar</option>
-                      <option>Realizado</option>
-                      <option>No aplica</option>
-                    </select>
-                  </div>
-                ))}
-
-                <div className="field full">
-                  <label>Observaciones</label>
-                  <textarea
-                    name="observaciones"
-                    value={form.observaciones}
+                  <input
+                    type="date"
+                    name="vencimientoGarantia"
+                    value={form.vencimientoGarantia}
                     onChange={handleChange}
                   />
                 </div>
               </div>
             </div>
 
-             <div className="md-section">
+            {/* ================= HARDWARE ================= */}
+            {form.garantia === "NO" && (
+              <div className="md-section">
+                <h3>Lista de Chequeo de Hardware</h3>
+                <div className="grid-2">
+                  {Object.keys(form.hardwareChecks).map(k => (
+                    <div className="field" key={k}>
+                      <label>{k}</label>
+                      <select
+                        value={form.hardwareChecks[k]}
+                        onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}
+                      >
+                        <option value="">Seleccionar</option>
+                        <option>Realizado</option>
+                        <option>No aplica</option>
+                      </select>
+                    </div>
+                  ))}
+
+                  <div className="field full">
+                    <label>Observaciones</label>
+                    <textarea
+                      name="observaciones"
+                      value={form.observaciones}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ================= TIEMPO DE PARADA (AGREGADO AL FINAL) ================= */}
+            <div className="md-section">
               <h3>Tiempo de Parada</h3>
 
               <div className="row-3">
                 <div className="field">
                   <label>Minutos Parada</label>
-                  <input name="minutosParada" value={form.minutosParada} onChange={handleChange} />
+                  <input
+                    name="minutosParada"
+                    value={form.minutosParada}
+                    onChange={handleChange}
+                  />
                 </div>
+
                 <div className="field">
                   <label>Proporción (%)</label>
-                  <input name="proporcionParada" value={form.proporcionParada} onChange={handleChange} />
+                  <input
+                    name="proporcionParada"
+                    value={form.proporcionParada}
+                    onChange={handleChange}
+                  />
                 </div>
+
                 <div className="field">
                   <label>Total Minutos Disponibles</label>
-                  <input name="totalDisponibilidad" value={form.totalDisponibilidad} onChange={handleChange} />
+                  <input
+                    name="totalDisponibilidad"
+                    value={form.totalDisponibilidad}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
-                <div className="field">
-                  <label>No. Orden SAP</label>
-                  <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
-                </div>
+
+              <div className="field">
+                <label>No. Orden SAP</label>
+                <input
+                  name="noOrdenSAP"
+                  value={form.noOrdenSAP}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
-
+            {/* ================= ACCIONES ================= */}
             <div className="md-actions">
-              <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
-              <button type="submit" className="btn-save">Guardar</button>
+              <button type="button" className="btn-cancel" onClick={onClose}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn-save">
+                Guardar
+              </button>
             </div>
 
           </form>

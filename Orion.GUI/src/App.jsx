@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import "./styles.css";
 
-// 🔐 LOGIN
+//  LOGIN
 import Login from "./pages/Login.jsx";
 
 // Páginas
@@ -21,14 +21,14 @@ import SistemaOperativoPage from "./pages/sistemaoperativo/SistemaOperativoPage.
 export default function App() {
 
   /* ===================== */
-  /* 🔐 AUTH + LOADER      */
+  /*  AUTH + LOADER      */
   /* ===================== */
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
 
   /* ===================== */
-  /* 🧭 UI STATES          */
+  /*  UI STATES          */
   /* ===================== */
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
@@ -36,7 +36,7 @@ export default function App() {
   const [maestrosOpen, setMaestrosOpen] = useState(false);
 
   /* ===================== */
-  /* 🧠 RESTAURAR SESIÓN   */
+  /*  RESTAURAR SESIÓN   */
   /* ===================== */
   useEffect(() => {
     const savedUser = localStorage.getItem("orion_user");
@@ -48,7 +48,7 @@ export default function App() {
   }, []);
 
   /* ===================== */
-  /* 🔐 LOGIN HANDLER      */
+  /*  LOGIN HANDLER      */
   /* ===================== */
   const handleLogin = (user) => {
     setUserName(user.name);
@@ -63,7 +63,7 @@ export default function App() {
   };
 
   /* ===================== */
-  /* 🔐 LOGOUT             */
+  /*  LOGOUT             */
   /* ===================== */
   const logout = () => {
     setIsAuthenticated(false);
@@ -74,7 +74,7 @@ export default function App() {
   };
 
   /* ===================== */
-  /* 📱 RESPONSIVE SIDEBAR */
+  /*  RESPONSIVE SIDEBAR */
   /* ===================== */
   useEffect(() => {
     const update = () => {
@@ -87,21 +87,21 @@ export default function App() {
   }, []);
 
   /* ===================== */
-  /* 🚪 LOGIN VIEW         */
+  /*  LOGIN VIEW         */
   /* ===================== */
   if (!isAuthenticated && !loading) {
     return <Login onLogin={handleLogin} />;
   }
 
   /* ===================== */
-  /* ⏳ LOADER VIEW        */
+  /*  LOADER VIEW        */
   /* ===================== */
   if (loading) {
     return <WelcomeSpinner />;
   }
 
   /* ===================== */
-  /* 📊 DATOS DASHBOARD    */
+  /*  DATOS DASHBOARD    */
   /* ===================== */
   const dataGarantias = [
     { name: "Ene", value: 10 },
@@ -252,7 +252,7 @@ export default function App() {
 }
 
 /* ===================== */
-/* 🌟 LOADER ORION       */
+/*  LOADER ORION       */
 /* ===================== */
 function WelcomeSpinner() {
   return (
