@@ -278,7 +278,7 @@
   justify-content: center;
   height: 220px;
   gap: 10px;
-  color: #2748B3;
+  color: #2d5dfa;
   font-weight: 500;
 }
 
@@ -286,7 +286,7 @@
   width: 36px;
   height: 36px;
   border: 4px solid rgba(39, 72, 179, 0.2);
-  border-top: 4px solid #2748B3;
+  border-top: 4px solid #7c8dc2;
   border-radius: 50%;
   animation: spin 0.9s linear infinite;
 }
