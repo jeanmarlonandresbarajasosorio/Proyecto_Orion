@@ -14,6 +14,8 @@ import funcionarioRoutes from "./src/routes/funcionario.routes.js";
 import areaRoutes from "./src/routes/area.routes.js";
 import mantenimientosRoutes from "./src/routes/mantenimientos.routes.js";
 import discoDuroRoutes from "./src/routes/discoDuro.routes.js";
+import memoriaRamRoutes from "./src/routes/memoriaRam.routes.js";
+
 
 
 dotenv.config();
@@ -37,6 +39,8 @@ app.use("/api/funcionarios", funcionarioRoutes);
 app.use("/api/areas", areaRoutes);
 app.use("/api/mantenimientos", mantenimientosRoutes);
 app.use("/api/discos-duros", discoDuroRoutes);
+app.use("/api/memorias-ram", memoriaRamRoutes);
+
 
 
 const PORT = process.env.PORT || 4000;
