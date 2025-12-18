@@ -1,18 +1,28 @@
 import mongoose from "mongoose";
 
+/* ================= SUBSCHEMA EQUIPO ================= */
+const EquipoSchema = new mongoose.Schema(
+  {
+    nombreEquipo: String,
+    dispositivo: String,
+    inventario: String,
+    procesador: String,
+    disco: String,
+    ram: String,
+    so: String,
+  },
+  { _id: false }
+);
+
+/* ================= MANTENIMIENTO ================= */
 const MantenimientoSchema = new mongoose.Schema(
   {
     sede: String,
     area: String,
     ubicacion: String,
 
-    dispositivo: String,
-    inventario: String,
-    nombreEquipo: String,
-    disco: String,
-    ram: String,
-    procesador: String,
-    so: String,
+    // 🔥 CLAVE: MÚLTIPLES EQUIPOS
+    equipos: [EquipoSchema],
 
     fechaRetiro: Date,
     autorizaRetiro: String,

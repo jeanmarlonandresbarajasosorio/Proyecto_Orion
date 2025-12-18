@@ -1,21 +1,30 @@
 import React, { useState, useEffect } from "react";
 import "./MantenimientoDialog.css";
 
+/* ================= EQUIPO BASE ================= */
+const emptyEquipo = {
+  nombreEquipo: "",
+  dispositivo: "",
+  inventario: "",
+  procesador: "",
+  disco: "",
+  ram: "",
+  so: "",
+};
+
+/* ================= FORM BASE ================= */
 const initialForm = {
   sede: "",
   area: "",
   ubicacion: "",
-  dispositivo: "",
-  inventario: "",
-  nombreEquipo: "",
-  disco: "",
-  ram: "",
-  procesador: "",
-  so: "",
+
+  equipos: [{ ...emptyEquipo }],
+
   fechaRetiro: "",
   autorizaRetiro: "",
   fechaEntrega: "",
   recibe: "",
+
   softwareChecks: {
     Antivirus: "",
     "Nombre del computador": "",
@@ -24,8 +33,10 @@ const initialForm = {
     "OCS Inventory": "",
     SAP: "",
   },
+
   garantia: "",
   vencimientoGarantia: "",
+
   hardwareChecks: {
     "Limpieza CPU/AIO": "",
     "Limpieza Monitor": "",
@@ -34,15 +45,18 @@ const initialForm = {
     "Limpieza board y componentes": "",
     "Limpieza Portátil": "",
   },
+
   observaciones: "",
+
   minutosParada: "",
   proporcionParada: "",
   totalDisponibilidad: "",
+  noOrdenSAP: "",
+
   funcionarioRealiza: "",
   fechaRealiza: "",
   funcionarioAprueba: "",
   fechaAprueba: "",
-  noOrdenSAP: "",
 };
 
 export default function MantenimientoDialog({ onClose, onSave, editingRecord }) {
@@ -54,10 +68,32 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
   const [funcionarios, setFuncionarios] = useState([]);
   const [sistemasOperativos, setSistemasOperativos] = useState([]);
 
+  /* ================= 🔒 BLOQUEAR SCROLL BODY ================= */
   useEffect(() => {
-    if (editingRecord) setForm(editingRecord);
+    document.body.classList.add("modal-open");
+    return () => document.body.classList.remove("modal-open");
+  }, []);
+
+  /* ================= 🔥 FIX EDICIÓN ================= */
+  useEffect(() => {
+    if (editingRecord) {
+      setForm({
+        ...initialForm,
+        ...editingRecord,
+        equipos:
+          editingRecord.equipos && editingRecord.equipos.length > 0
+            ? editingRecord.equipos
+            : [{ ...emptyEquipo }],
+      });
+    } else {
+      setForm({
+        ...initialForm,
+        equipos: [{ ...emptyEquipo }],
+      });
+    }
   }, [editingRecord]);
 
+  /* ================= CARGA CATÁLOGOS ================= */
   useEffect(() => {
     fetch("http://localhost:3001/api/sedes").then(r => r.json()).then(setSedes);
     fetch("http://localhost:3001/api/areas").then(r => r.json()).then(setAreas);
@@ -66,23 +102,47 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
     fetch("http://localhost:3001/api/sistemas-operativos").then(r => r.json()).then(setSistemasOperativos);
   }, []);
 
+  /* ================= HANDLERS ================= */
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleEquipoChange = (index, field, value) => {
+    const equipos = [...form.equipos];
+    equipos[index] = { ...equipos[index], [field]: value };
+    setForm(prev => ({ ...prev, equipos }));
+  };
+
+  const addEquipo = () => {
+    setForm(prev => ({
+      ...prev,
+      equipos: [...prev.equipos, { ...emptyEquipo }],
+    }));
+  };
+
+  const removeEquipo = (index) => {
+    const equipos = form.equipos.filter((_, i) => i !== index);
+    setForm(prev => ({
+      ...prev,
+      equipos: equipos.length ? equipos : [{ ...emptyEquipo }],
+    }));
   };
 
   const handleNestedChange = (group, key, value) => {
     setForm(prev => ({
       ...prev,
-      [group]: { ...prev[group], [key]: value }
+      [group]: { ...prev[group], [key]: value },
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("FORM A GUARDAR:", form);
     onSave(form);
     onClose();
   };
 
+  /* ================= UI ================= */
   return (
     <div className="md-overlay">
       <div className="md-modal">
@@ -123,60 +183,102 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* ================= DATOS EQUIPO ================= */}
+            {/* ================= EQUIPOS ================= */}
             <div className="md-section">
               <h3>Datos del Equipo</h3>
 
-              <div className="field">
-                <label>Nombre del Equipo</label>
-                <input name="nombreEquipo" value={form.nombreEquipo} onChange={handleChange} />
-              </div>
+              {form.equipos.map((eq, index) => (
+                <div key={index} className="equipo-box">
+                  <h4>Equipo #{index + 1}</h4>
 
-              <div className="row-3">
-                <div className="field">
-                  <label>Dispositivo</label>
-                  <select name="dispositivo" value={form.dispositivo} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {dispositivos.map(d => (
-                      <option key={d.id} value={d.nombre}>{d.nombre}</option>
-                    ))}
-                  </select>
-                </div>
+                  <div className="field">
+                    <label>Nombre del Equipo</label>
+                    <input
+                      value={eq.nombreEquipo}
+                      onChange={e => handleEquipoChange(index, "nombreEquipo", e.target.value)}
+                    />
+                  </div>
 
-                <div className="field">
-                  <label>No. Inventario</label>
-                  <input name="inventario" value={form.inventario} onChange={handleChange} />
-                </div>
+                  <div className="row-3">
+                    <div className="field">
+                      <label>Dispositivo</label>
+                      <select
+                        value={eq.dispositivo}
+                        onChange={e => handleEquipoChange(index, "dispositivo", e.target.value)}
+                      >
+                        <option value="">Seleccionar</option>
+                        {dispositivos.map(d => (
+                          <option key={d.id} value={d.nombre}>{d.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div className="field">
-                  <label>Procesador</label>
-                  <input name="procesador" value={form.procesador} onChange={handleChange} />
-                </div>
-              </div>
+                    <div className="field">
+                      <label>No. Inventario</label>
+                      <input
+                        value={eq.inventario}
+                        onChange={e => handleEquipoChange(index, "inventario", e.target.value)}
+                      />
+                    </div>
 
-              <div className="row-3 mt">
-                <div className="field">
-                  <label>Disco Duro</label>
-                  <input name="disco" value={form.disco} onChange={handleChange} />
-                </div>
+                    <div className="field">
+                      <label>Procesador</label>
+                      <input
+                        value={eq.procesador}
+                        onChange={e => handleEquipoChange(index, "procesador", e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-                <div className="field">
-                  <label>Memoria RAM</label>
-                  <input name="ram" value={form.ram} onChange={handleChange} />
-                </div>
+                  <div className="row-3 mt">
+                    <div className="field">
+                      <label>Disco</label>
+                      <input
+                        value={eq.disco}
+                        onChange={e => handleEquipoChange(index, "disco", e.target.value)}
+                      />
+                    </div>
 
-                <div className="field">
-                  <label>Sistema Operativo</label>
-                  <select name="so" value={form.so} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {sistemasOperativos.map(so => (
-                      <option key={so.id} value={so.nombre}>{so.nombre}</option>
-                    ))}
-                  </select>
+                    <div className="field">
+                      <label>RAM</label>
+                      <input
+                        value={eq.ram}
+                        onChange={e => handleEquipoChange(index, "ram", e.target.value)}
+                      />
+                    </div>
+
+                    <div className="field">
+                      <label>Sistema Operativo</label>
+                      <select
+                        value={eq.so}
+                        onChange={e => handleEquipoChange(index, "so", e.target.value)}
+                      >
+                        <option value="">Seleccionar</option>
+                        {sistemasOperativos.map(so => (
+                          <option key={so.id} value={so.nombre}>{so.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {form.equipos.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn-cancel mt"
+                      onClick={() => removeEquipo(index)}
+                    >
+                      Eliminar Equipo
+                    </button>
+                  )}
                 </div>
-              </div>
+              ))}
+
+              <button type="button" className="btn-save mt" onClick={addEquipo}>
+                + Agregar otro equipo
+              </button>
             </div>
 
+            
                         <div className="md-section">
               <h3>Autorización de Retiro y Recibo</h3>
 
@@ -393,6 +495,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 />
               </div>
             </div>
+
 
             {/* ================= ACCIONES ================= */}
             <div className="md-actions">

@@ -3,22 +3,44 @@ import "./MantenimientoForm.css";
 import MantenimientoDialog from "./MantenimientoDialog";
 
 const API_URL = "http://localhost:3001/api/mantenimientos";
+const PAGE_SIZE = 10;
+
 export default function MantenimientosPage() {
   const [records, setRecords] = useState([]);
+  const [visibleRecords, setVisibleRecords] = useState([]);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
-  const [loading, setLoading] = useState(false);
 
+  const [equiposDialogOpen, setEquiposDialogOpen] = useState(false);
+  const [equiposSeleccionados, setEquiposSeleccionados] = useState([]);
+
+  const [loadingInitial, setLoadingInitial] = useState(false);
+  const [loadingTable, setLoadingTable] = useState(false);
+  const [filtroInventario, setFiltroInventario] = useState("");
+
+  /* ================= BLOQUEO SCROLL ================= */
+  useEffect(() => {
+    document.body.style.overflow =
+      dialogOpen || equiposDialogOpen ? "hidden" : "auto";
+    return () => (document.body.style.overflow = "auto");
+  }, [dialogOpen, equiposDialogOpen]);
+
+  /* ================= DATA ================= */
   const loadRecords = async () => {
     try {
-      setLoading(true);
+      setLoadingInitial(true);
       const res = await fetch(API_URL);
       const data = await res.json();
-      setRecords(data);
+
+      setTimeout(() => {
+        setRecords(data);
+        setVisibleRecords(data.slice(0, PAGE_SIZE));
+        setLoadingInitial(false);
+      }, 500);
     } catch (err) {
-      console.error("Error cargando mantenimientos", err);
-    } finally {
-      setLoading(false);
+      console.error(err);
+      setLoadingInitial(false);
     }
   };
 
@@ -26,163 +48,216 @@ export default function MantenimientosPage() {
     loadRecords();
   }, []);
 
-  const openCreateDialog = () => {
-    setEditingRecord(null);
-    setDialogOpen(true);
-  };
+  /* ================= FILTRO ================= */
+  useEffect(() => {
+    setLoadingTable(true);
+    const t = setTimeout(() => {
+      const base = filtroInventario
+        ? records.filter(r =>
+            r.equipos?.some(eq =>
+              eq.inventario
+                ?.toLowerCase()
+                .includes(filtroInventario.toLowerCase())
+            )
+          )
+        : records;
 
-  const openEditDialog = (record) => {
-    setEditingRecord(record);
-    setDialogOpen(true);
-  };
+      setVisibleRecords(base.slice(0, PAGE_SIZE));
+      setLoadingTable(false);
+    }, 300);
 
-  const saveRecord = async (record) => {
-    try {
-      const isEdit = Boolean(record._id);
+    return () => clearTimeout(t);
+  }, [filtroInventario, records]);
 
-      const res = await fetch(
-        isEdit ? `${API_URL}/${record._id}` : API_URL,
-        {
-          method: isEdit ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(record),
-        }
-      );
+  /* ================= HELPERS ================= */
+  const f = v => (v ? v : "-");
+  const d = v => (v ? new Date(v).toLocaleString() : "-");
 
-      if (!res.ok) throw new Error("Error guardando mantenimiento");
-
-      await loadRecords();
-      setDialogOpen(false);
-    } catch (err) {
-      console.error(err);
-      alert("Error guardando mantenimiento");
-    }
-  };
-
-  const deleteRecord = async (id) => {
-    if (!window.confirm("¿Eliminar mantenimiento?")) return;
-
-    try {
-      await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-      });
-      await loadRecords();
-    } catch (err) {
-      console.error(err);
-      alert("Error eliminando mantenimiento");
-    }
-  };
-
+  /* ================= UI ================= */
   return (
     <div className="mui-container">
       <h1 className="mui-title">Mantenimientos</h1>
 
-      <div className="mui-card" style={{ padding: "16px", marginBottom: "20px" }}>
-        <button className="mui-btn mui-btn-primary" onClick={openCreateDialog}>
+      <div className="mui-card" style={{ padding: 16 }}>
+        <button
+          className="mui-btn mui-btn-primary"
+          onClick={() => {
+            setEditingRecord(null);
+            setDialogOpen(true);
+          }}
+        >
           + Crear Mantenimiento
         </button>
       </div>
 
+      <div className="mui-card" style={{ padding: 16 }}>
+        <input
+          className="mui-input"
+          placeholder="Buscar por número de inventario..."
+          value={filtroInventario}
+          onChange={e => setFiltroInventario(e.target.value)}
+        />
+      </div>
+
       <div className="mui-card">
         <div className="mui-card-header">
-          Registros Guardados ({records.length})
+          Registros ({visibleRecords.length})
         </div>
 
-        <div className="mui-card-body">
-          {loading ? (
-            <div className="muted">Cargando...</div>
-          ) : records.length === 0 ? (
-            <div className="muted">Aún no hay mantenimientos creados.</div>
+        <div className="mui-card-body table-container">
+          {(loadingInitial || loadingTable) ? (
+            <div className="orion-table-loader">
+              <div className="orion-spinner" />
+              <span>Cargando registros...</span>
+            </div>
           ) : (
             <div className="table-responsive">
               <table className="table">
                 <thead>
                   <tr>
                     <th>Acciones</th>
-                    <th>ID</th>
+
                     <th>Sede</th>
                     <th>Área</th>
                     <th>Ubicación</th>
-                    <th>Dispositivo</th>
-                    <th>Inventario</th>
-                    <th>Equipo</th>
-                    <th>Disco</th>
-                    <th>RAM</th>
-                    <th>Procesador</th>
-                    <th>SO</th>
-                    <th>Fecha Retiro</th>
-                    <th>Fecha Entrega</th>
-                    <th>Garantía</th>
-                    <th>Vencimiento</th>
-                    <th>Min. Parada</th>
-                    <th>Disponibilidad</th>
-                    <th>Realiza</th>
-                    <th>Aprueba</th>
-                    <th>Orden SAP</th>
+                    <th>Datos del Equipo</th>
+
+                    <th>Fecha y Hora Retiro</th>
+                    <th>Funcionario que Autoriza</th>
+                    <th>Fecha y Hora Entrega</th>
+                    <th>Funcionario que Recibe</th>
+
+                    <th>Funcionario Realiza</th>
+                    <th>Fecha Realiza</th>
+                    <th>Funcionario Aprueba</th>
+                    <th>Fecha Aprueba</th>
+
+                    <th>Antivirus</th>
+                    <th>Nombre del computador</th>
+                    <th>Actualizaciones de Windows</th>
+                    <th>Dominio Foscal.loc</th>
+                    <th>OCS Inventory</th>
+                    <th>SAP</th>
+
+                    <th>¿Equipo en garantía?</th>
+                    <th>Fecha Vencimiento</th>
+
+                    <th>Minutos Parada</th>
+                    <th>Proporción (%)</th>
+                    <th>Total Minutos Disponibles</th>
+
+                    <th>No. Orden SAP</th>
                   </tr>
                 </thead>
 
-                <tbody> 
-                  
-                  {records.map((r) => (
-                    
+                <tbody>
+                  {visibleRecords.map(r => (
                     <tr key={r._id}>
-                            <td>
+                      <td>
                         <button
                           className="small btn neutral"
-                          onClick={() => openEditDialog(r)}
+                          onClick={() => {
+                            setEditingRecord(r);
+                            setDialogOpen(true);
+                          }}
                         >
                           Editar
                         </button>
                       </td>
-                      <td>{r._id.slice(-6)}</td>
-                      <td>{r.sede}</td>
-                      <td>{r.area}</td>
-                      <td>{r.ubicacion}</td>
-                      <td>{r.dispositivo}</td>
-                      <td>{r.inventario}</td>
-                      <td>{r.nombreEquipo}</td>
-                      <td>{r.disco}</td>
-                      <td>{r.ram}</td>
-                      <td>{r.procesador}</td>
-                      <td>{r.so}</td>
+
+                      <td>{f(r.sede)}</td>
+                      <td>{f(r.area)}</td>
+                      <td>{f(r.ubicacion)}</td>
+
                       <td>
-                        {r.fechaRetiro
-                          ? new Date(r.fechaRetiro).toLocaleDateString()
-                          : "-"}
+                        <button
+                          className="orion-eye-btn"
+                          onClick={() => {
+                            setEquiposSeleccionados(r.equipos || []);
+                            setEquiposDialogOpen(true);
+                          }}
+                        />
                       </td>
-                      <td>
-                        {r.fechaEntrega
-                          ? new Date(r.fechaEntrega).toLocaleDateString()
-                          : "-"}
-                      </td>
-                      <td>{r.garantia}</td>
-                      <td>{r.vencimientoGarantia}</td>
-                      <td>{r.minutosParada}</td>
-                      <td>{r.totalDisponibilidad}</td>
-                      <td>{r.funcionarioRealiza}</td>
-                      <td>{r.funcionarioAprueba}</td>
-                      <td>{r.noOrdenSAP}</td>
-                      <td>
-                    </td>
+
+                      <td>{d(r.fechaRetiro)}</td>
+                      <td>{f(r.autorizaRetiro)}</td>
+                      <td>{d(r.fechaEntrega)}</td>
+                      <td>{f(r.recibe)}</td>
+
+                      <td>{f(r.funcionarioRealiza)}</td>
+                      <td>{d(r.fechaRealiza)}</td>
+                      <td>{f(r.funcionarioAprueba)}</td>
+                      <td>{d(r.fechaAprueba)}</td>
+
+                      <td>{f(r.antivirus)}</td>
+                      <td>{f(r.nombreComputador)}</td>
+                      <td>{f(r.actualizacionesWindows)}</td>
+                      <td>{f(r.dominioFoscal)}</td>
+                      <td>{f(r.ocsInventory)}</td>
+                      <td>{f(r.sap)}</td>
+
+                      <td>{f(r.garantia)}</td>
+                      <td>{d(r.vencimientoGarantia)}</td>
+
+                      <td>{f(r.minutosParada)}</td>
+                      <td>{f(r.proporcionParada)}</td>
+                      <td>{f(r.totalMinutosDisponibles)}</td>
+
+                      <td>{f(r.noOrdenSAP)}</td>
                     </tr>
                   ))}
                 </tbody>
-
               </table>
             </div>
           )}
         </div>
       </div>
 
+      {/* ================= DIALOG CREAR / EDITAR ================= */}
       {dialogOpen && (
         <MantenimientoDialog
           onClose={() => setDialogOpen(false)}
-          onSave={saveRecord}
+          onSave={loadRecords}
           editingRecord={editingRecord}
         />
+      )}
+
+      {/* ================= DIALOG DETALLE EQUIPOS (NO TOCADO) ================= */}
+      {equiposDialogOpen && (
+        <div className="md-overlay">
+          <div className="md-modal" style={{ maxWidth: 800 }}>
+            <div className="md-modal-content">
+              <h2>Datos del Equipo</h2>
+
+              {equiposSeleccionados.map((eq, i) => (
+                <div key={i} className="mui-card mb">
+                  <div className="mui-card-header">
+                    Equipo #{i + 1}
+                  </div>
+
+                  <div className="mui-card-body grid-2">
+                    <div><b>Nombre del Equipo:</b> {f(eq.nombreEquipo)}</div>
+                    <div><b>Dispositivo:</b> {f(eq.dispositivo)}</div>
+                    <div><b>No. Inventario:</b> {f(eq.inventario)}</div>
+                    <div><b>Procesador:</b> {f(eq.procesador)}</div>
+                    <div><b>Disco:</b> {f(eq.disco)}</div>
+                    <div><b>RAM:</b> {f(eq.ram)}</div>
+                    <div><b>Sistema Operativo:</b> {f(eq.sistemaOperativo)}</div>
+                  </div>
+                </div>
+              ))}
+
+              <div className="mui-actions">
+                <button
+                  className="mui-btn mui-btn-secondary"
+                  onClick={() => setEquiposDialogOpen(false)}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,162 +1,234 @@
-
-.md-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  z-index: 9999;
+/* ===============================
+   🎨 VARIABLES ORION
+   =============================== */
+:root {
+  --blue: #2748B3;
+  --blue-dark: #1E3A8A;
+  --blue-light: #3B82F6;
+  --bg-light: #f8faff;
+  --card-bg: #ffffff;
+  --muted: #6b7280;
+  --radius: 12px;
+  --shadow-1: 0 6px 20px rgba(16,24,40,0.06);
+  --shadow-2: 0 12px 30px rgba(16,24,40,0.08);
 }
 
-.md-modal {
-  background: white;
-  width: 900px;
-  max-width: 95%;
-  max-height: 95%;
-  border-radius: 18px;         
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  overflow: hidden;           
+/* ===============================
+   👁️ BOTÓN ORION (SIN ICONOS)
+   =============================== */
+.orion-eye-btn {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--blue-dark);
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  box-shadow: var(--shadow-1);
+}
+
+.orion-eye-btn:hover {
+  background: var(--blue);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+/* Ojo exterior */
+.orion-eye-btn::before {
+  content: "";
+  width: 14px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* Pupila */
+.orion-eye-btn::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* ===============================
+   🔒 BLOQUEO SCROLL FONDO
+   =============================== */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* ===============================
+   MODAL OVERLAY
+   =============================== */
+.md-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 9999;
+
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   MODAL
+   =============================== */
+.md-modal {
+  background: var(--card-bg);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-2);
 }
 
 .md-modal-content {
-  padding: 24px;
-  overflow-y: auto;             
+  padding: 20px 24px 26px;
 }
 
-/* Título */
-.md-modal-content h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 22px;
-  font-weight: 700;
-  border-bottom: 2px solid #e5e5e5;
-  padding-bottom: 10px;
+/* ===============================
+   TITULOS
+   =============================== */
+.md-modal h2 {
+  margin-bottom: 14px;
+  color: var(--blue-dark);
 }
 
+.md-section {
+  margin-bottom: 22px;
+}
 
+.md-section h3 {
+  margin-bottom: 10px;
+  color: var(--blue-dark);
+  font-size: 16px;
+}
+
+/* ===============================
+   FORMULARIO
+   =============================== */
 .md-form label {
-  display: block;
+  font-size: 13px;
+  color: #334155;
   font-weight: 600;
-  margin-bottom: 4px;
-  font-size: 14px;
 }
 
 .md-form input,
 .md-form select,
 .md-form textarea {
   width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border-radius: 8px;            
-  border: 1px solid #ccc;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e6edf7;
+  background: #fbfdff;
+  outline: none;
   font-size: 14px;
-  resize: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.md-form textarea {
-  min-height: 80px;
+.md-form input:focus,
+.md-form select:focus,
+.md-form textarea:focus {
+  border-color: var(--blue-dark);
+  box-shadow: 0 4px 14px rgba(30,58,138,0.15);
+  background: white;
 }
 
-
-.row-1,
-.row-2,
+/* ===============================
+   GRID
+   =============================== */
 .row-3 {
   display: grid;
-  gap: 16px;
-}
-
-.row-1 { grid-template-columns: 1fr; }
-.row-2 { grid-template-columns: 1fr 1fr; }
-.row-3 { grid-template-columns: 1fr 1fr 1fr; }
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.full {
-  grid-column: 1 / -1;
-}
-
-.mt {
-  margin-top: 16px;
-}
-
-
-
-.md-section {
-  border: 1px solid #e5e5e5;
-  border-radius: 14px;           
-  padding: 18px;
-  margin-top: 24px;
-  background: #fafafa;
-}
-
-.md-section h3 {
-  margin-top: 0;
-  margin-bottom: 14px;
-  font-size: 18px;
-  color: #1E40AF;
-  font-weight: 700;
-}
-
-
-
-.md-actions {
-  margin-top: 25px;
-  display: flex;
-  justify-content: flex-end;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
-.btn-cancel,
+.mt {
+  margin-top: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ===============================
+   EQUIPO BOX
+   =============================== */
+.equipo-box {
+  border: 1px solid #eef3ff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  background: #fbfdff;
+}
+
+.equipo-box h4 {
+  margin-bottom: 10px;
+  color: var(--blue-dark);
+}
+
+/* ===============================
+   BOTONES
+   =============================== */
+.md-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 .btn-save {
-  padding: 10px 16px;
+  background: var(--blue-dark);
+  color: white;
   border: none;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: var(--shadow-1);
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+.btn-cancel {
+  background: white;
+  color: var(--blue-dark);
+  border: 1px solid #e6edf7;
+  padding: 10px 18px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
 }
 
-.btn-cancel {
-  background: #bbb;
+.btn-cancel:hover {
+  background: var(--bg-light);
 }
 
-.btn-save {
-  background: #1E40AF;
-  color: white;
-}
-
-.btn-cancel:hover { background: #a2a2a2; }
-.btn-save:hover { background: #16338a; }
-
-
-
-@media (max-width: 768px) {
-  .md-modal {
-    width: 100%;
-    border-radius: 0;
-  }
-
-  .md-modal-content {
-    padding: 16px;
-  }
-
-  .row-2,
-  .row-3,
-  .grid-2 {
+/* ===============================
+   RESPONSIVE
+   =============================== */
+@media (max-width: 900px) {
+  .row-3 {
     grid-template-columns: 1fr;
   }
 
-  .md-section {
-    padding: 12px;
+  .md-modal {
+    max-width: 95%;
   }
 }

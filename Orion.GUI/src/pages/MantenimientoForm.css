@@ -211,3 +211,90 @@
   --radius: 14px;
   --shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
+/* ===============================
+   👁️ BOTÓN OJO ORION (100% CSS)
+   =============================== */
+
+.orion-eye-btn {
+  all: unset;
+
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+
+  background-color: #07328f; 
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+/* Hover */
+.orion-eye-btn:hover {
+  background-color: #1e40af;
+}
+
+/* ===============================
+     OJO
+   =============================== */
+
+/* Ojo exterior */
+.orion-eye-btn::before {
+  content: "";
+  width: 14px;
+  height: 8px;
+
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+
+  position: absolute;
+}
+
+/* Pupila */
+.orion-eye-btn::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+
+  background-color: #ffffff;
+  border-radius: 50%;
+
+  position: absolute;
+}
+/* ================= SPINNER SOLO EN TABLA ================= */
+.table-container {
+  position: relative;
+  min-height: 220px;
+}
+
+.orion-table-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  gap: 10px;
+  color: #2748B3;
+  font-weight: 500;
+}
+
+.orion-spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid rgba(39, 72, 179, 0.2);
+  border-top: 4px solid #2748B3;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
