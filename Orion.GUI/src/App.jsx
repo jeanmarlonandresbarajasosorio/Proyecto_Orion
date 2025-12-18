@@ -19,6 +19,8 @@ import TipoDispositivoPage from "./pages/tipodispositivo/TipoDispositivoPage.jsx
 import SistemaOperativoPage from "./pages/sistemaoperativo/SistemaOperativoPage.jsx";
 import DiscoDuroPage from "./pages/discoduro/DiscoDuroPage.jsx";
 import MemoriaRamPage from "./pages/memoriaram/MemoriaRamPage.jsx";
+import ProcesadorPage from "./pages/procesador/ProcesadorPage.jsx";
+
 
 export default function App() {
 
@@ -231,6 +233,7 @@ export default function App() {
                 <a onClick={() => setActivePage("chequeo")}>Lista Chequeo</a>
                 <a onClick={() => setActivePage("discoduro")}>Disco Duro</a> 
                 <a onClick={() => setActivePage("memoriaram")}>Memoria RAM</a>
+                <a onClick={() => setActivePage("procesador")}>Procesador</a>
                 <a onClick={() => setActivePage("funcionarios")}>Funcionario</a>
                 <a onClick={() => setActivePage("sedes")}>Sede</a>
                 <a onClick={() => setActivePage("area")}>Área</a>
@@ -248,6 +251,7 @@ export default function App() {
         {activePage === "tipolista" && <TipoListaPage />}
         {activePage === "discoduro" && <DiscoDuroPage />}
         {activePage === "memoriaram" && <MemoriaRamPage />} 
+        {activePage === "procesador" && <ProcesadorPage />}
         {activePage === "chequeo" && <ChequeoPage />}
         {activePage === "funcionarios" && <FuncionarioPage />}
         {activePage === "sedes" && <SedePage />}
