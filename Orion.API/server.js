@@ -13,6 +13,8 @@ import listaChequeoRoutes from "./src/routes/listaChequeo.routes.js";
 import funcionarioRoutes from "./src/routes/funcionario.routes.js";
 import areaRoutes from "./src/routes/area.routes.js";
 import mantenimientosRoutes from "./src/routes/mantenimientos.routes.js";
+import discoDuroRoutes from "./src/routes/discoDuro.routes.js";
+
 
 dotenv.config();
 
@@ -22,10 +24,10 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// 🔐 AUTH
+//  AUTH
 app.use("/api/auth", authRoutes);
 
-// 📦 MÓDULOS
+//  MÓDULOS
 app.use("/api/sedes", sedeRoutes);
 app.use("/api/sistemas-operativos", sistemaOperativoRoutes);
 app.use("/api/tipos-dispositivos", tipoDispositivoRoutes);
@@ -34,6 +36,8 @@ app.use("/api/listas-chequeo", listaChequeoRoutes);
 app.use("/api/funcionarios", funcionarioRoutes);
 app.use("/api/areas", areaRoutes);
 app.use("/api/mantenimientos", mantenimientosRoutes);
+app.use("/api/discos-duros", discoDuroRoutes);
+
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>
