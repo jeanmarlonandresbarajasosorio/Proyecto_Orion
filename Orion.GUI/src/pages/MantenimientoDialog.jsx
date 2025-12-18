@@ -68,13 +68,13 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
   const [funcionarios, setFuncionarios] = useState([]);
   const [sistemasOperativos, setSistemasOperativos] = useState([]);
 
-  /* ================= 🔒 BLOQUEAR SCROLL BODY ================= */
+  /* =================  BLOQUEAR SCROLL BODY ================= */
   useEffect(() => {
     document.body.classList.add("modal-open");
     return () => document.body.classList.remove("modal-open");
   }, []);
 
-  /* ================= 🔥 FIX EDICIÓN ================= */
+  /* =================  FIX EDICIÓN ================= */
   useEffect(() => {
     if (editingRecord) {
       setForm({
