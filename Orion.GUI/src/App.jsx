@@ -5,10 +5,10 @@ import {
 } from "recharts";
 import "./styles.css";
 
-//  LOGIN
+/* LOGIN */
 import Login from "./pages/Login.jsx";
 
-// Páginas
+/* PÁGINAS */
 import MantenimientoList from "./pages/MantenimientosPage.jsx";
 import SedePage from "./pages/sedes/SedePage.jsx";
 import AreaPage from "./pages/area/areapage.jsx";
@@ -21,44 +21,71 @@ import DiscoDuroPage from "./pages/discoduro/DiscoDuroPage.jsx";
 import MemoriaRamPage from "./pages/memoriaram/MemoriaRamPage.jsx";
 import ProcesadorPage from "./pages/procesador/ProcesadorPage.jsx";
 
+/* ICONOS */
+import { FiBell, FiLogOut, FiUser, FiX } from "react-icons/fi";
+
+const API_MANTENIMIENTOS = "http://localhost:3001/api/mantenimientos";
 
 export default function App() {
 
   /* ===================== */
-  /*  AUTH + LOADER      */
+  /* AUTH + LOADER         */
   /* ===================== */
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [user, setUser] = useState(null);
 
   /* ===================== */
-  /*  UI STATES          */
+  /* UI STATES             */
   /* ===================== */
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [maestrosOpen, setMaestrosOpen] = useState(false);
+  const [notificaciones, setNotificaciones] = useState(0);
 
   /* ===================== */
-  /*  RESTAURAR SESIÓN   */
+  /* FILTRO BÚSQUEDA       */
+  /* ===================== */
+  const [searchText, setSearchText] = useState("");
+
+  /* ===================== */
+  /* RESTAURAR SESIÓN      */
   /* ===================== */
   useEffect(() => {
     const savedUser = localStorage.getItem("orion_user");
     if (savedUser) {
-      const user = JSON.parse(savedUser);
-      setUserName(user.name);
+      setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
     }
   }, []);
 
   /* ===================== */
-  /*  LOGIN HANDLER      */
+  /* NOTIFICACIONES 🔔     */
   /* ===================== */
-  const handleLogin = (user) => {
-    setUserName(user.name);
-    setLoading(true);
+  useEffect(() => {
+    const cargar = async () => {
+      try {
+        const res = await fetch(API_MANTENIMIENTOS);
+        const data = await res.json();
+        setNotificaciones(Array.isArray(data) ? data.length : 0);
+      } catch {
+        setNotificaciones(0);
+      }
+    };
 
-    localStorage.setItem("orion_user", JSON.stringify(user));
+    cargar();
+    const interval = setInterval(cargar, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  /* ===================== */
+  /* LOGIN / LOGOUT        */
+  /* ===================== */
+  const handleLogin = (u) => {
+    setLoading(true);
+    localStorage.setItem("orion_user", JSON.stringify(u));
+    setUser(u);
 
     setTimeout(() => {
       setIsAuthenticated(true);
@@ -66,46 +93,31 @@ export default function App() {
     }, 1500);
   };
 
-  /* ===================== */
-  /*  LOGOUT             */
-  /* ===================== */
   const logout = () => {
+    localStorage.clear();
     setIsAuthenticated(false);
-    setUserName("");
+    setUser(null);
     setActivePage("dashboard");
-
-    localStorage.removeItem("orion_user");
   };
 
   /* ===================== */
-  /*  RESPONSIVE SIDEBAR */
+  /* RESPONSIVE SIDEBAR    */
   /* ===================== */
   useEffect(() => {
-    const update = () => {
-      if (window.innerWidth > 1100) setSidebarOpen(true);
-      else setSidebarOpen(false);
-    };
+    const update = () => setSidebarOpen(window.innerWidth > 1100);
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
 
   /* ===================== */
-  /*  LOGIN VIEW         */
+  /* LOGIN / LOADER VIEW   */
   /* ===================== */
-  if (!isAuthenticated && !loading) {
-    return <Login onLogin={handleLogin} />;
-  }
+  if (!isAuthenticated && !loading) return <Login onLogin={handleLogin} />;
+  if (loading) return <WelcomeSpinner />;
 
   /* ===================== */
-  /*  LOADER VIEW        */
-  /* ===================== */
-  if (loading) {
-    return <WelcomeSpinner />;
-  }
-
-  /* ===================== */
-  /*  DATOS DASHBOARD    */
+  /* DASHBOARD DATA        */
   /* ===================== */
   const dataGarantias = [
     { name: "Ene", value: 10 },
@@ -128,11 +140,14 @@ export default function App() {
 
   const COLORS = ["#2563EB", "#1E3A8A", "#3B82F6", "#60A5FA"];
 
+  /* ===================== */
+  /* DASHBOARD VIEW        */
+  /* ===================== */
   const Dashboard = () => (
     <>
       <section className="grid">
         <div className="card">
-          <h3>Garantías (últimos meses)</h3>
+          <h3>Garantías</h3>
           <LineChart width={320} height={200} data={dataGarantias}>
             <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} />
             <CartesianGrid stroke="#e5e7eb" />
@@ -150,8 +165,8 @@ export default function App() {
             <YAxis />
             <Tooltip />
             <Bar dataKey="value">
-              {dataMantenimientos.map((_, index) => (
-                <Cell key={index} fill={COLORS[index]} />
+              {dataMantenimientos.map((_, i) => (
+                <Cell key={i} fill={COLORS[i]} />
               ))}
             </Bar>
           </BarChart>
@@ -160,7 +175,7 @@ export default function App() {
         <div className="card">
           <h3>Checklist Hardware</h3>
           <PieChart width={320} height={240}>
-            <Pie data={dataHardware} dataKey="value" nameKey="name" outerRadius={80} label>
+            <Pie data={dataHardware} dataKey="value" outerRadius={80} label>
               {dataHardware.map((_, i) => (
                 <Cell key={i} fill={COLORS[i % COLORS.length]} />
               ))}
@@ -171,43 +186,88 @@ export default function App() {
         </div>
       </section>
 
+      {/* 🔍 FILTRO */}
       <div className="filtro-container-grande">
         <h3>Buscar Mantenimientos</h3>
         <input
           type="text"
-          placeholder="Ingrese el nombre del diseño..."
           className="filtro-input-grande"
+          placeholder="Buscar por nombre..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
-        <button className="filtro-btn-grande">Buscar</button>
+        <button
+          className="filtro-btn-grande"
+          onClick={() => setActivePage("listamantenimientos")}
+        >
+          Buscar
+        </button>
       </div>
     </>
   );
 
+  const navigate = (page) => {
+    setActivePage(page);
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  };
+
   return (
     <div className={`app-root ${sidebarOpen ? "" : "sidebar-closed"}`}>
 
-      {/* TOPBAR */}
+      {/* ================= TOPBAR ================= */}
       <header className="topbar">
         <div className="left">
           <button className="menu-btn" onClick={() => setSidebarOpen(s => !s)}>☰</button>
           <div className="brand">ORION</div>
         </div>
 
-        <div className="right" style={{ position: "relative" }}>
-          <div className="user-box" onClick={() => setUserMenuOpen(!userMenuOpen)}>
-            {userName}
+        <div className="right topbar-actions">
+
+          {/* 🔔 NOTIFICACIONES */}
+          <button
+            className="notification-btn"
+            onClick={() => navigate("listamantenimientos")}
+          >
+            <FiBell size={22} />
+            {notificaciones > 0 && (
+              <span className="notification-badge">
+                {notificaciones > 99 ? "99+" : notificaciones}
+              </span>
+            )}
+          </button>
+
+          {/* 👤 USER */}
+          <div className="user-panel" onClick={() => setUserMenuOpen(o => !o)}>
+            <div className="user-avatar">
+              {user?.name?.charAt(0).toUpperCase()}
+            </div>
+
+            <div className="user-info">
+              <span className="user-name">{user?.name}</span>
+              <span className="user-role">consulta</span>
+            </div>
           </div>
 
           {userMenuOpen && (
-            <div className="user-dropdown">
-              <button onClick={logout}>Cerrar sesión</button>
+            <div className="user-dropdown-modern">
+              <div className="dropdown-header">
+                <FiUser />
+                <div>
+                  <strong>{user?.name}</strong>
+                  <small>Rol: consulta</small>
+                </div>
+              </div>
+
+              <button className="logout-btn" onClick={logout}>
+                <FiLogOut /> Cerrar sesión
+              </button>
             </div>
           )}
         </div>
       </header>
 
-      {/* SIDEBAR */}
-      <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
+      {/* ================= SIDEBAR ================= */}
+            <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>‹</button>
         <h2 className="sidebar-title">Menú</h2>
 
@@ -243,14 +303,18 @@ export default function App() {
         </nav>
       </aside>
 
+
+      {/* ================= MAIN ================= */}
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
-        {activePage === "listamantenimientos" && <MantenimientoList />}
+        {activePage === "listamantenimientos" && (
+          <MantenimientoList search={searchText} />
+        )}
         {activePage === "tipodispositivo" && <TipoDispositivoPage />}
         {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
         {activePage === "tipolista" && <TipoListaPage />}
         {activePage === "discoduro" && <DiscoDuroPage />}
-        {activePage === "memoriaram" && <MemoriaRamPage />} 
+        {activePage === "memoriaram" && <MemoriaRamPage />}
         {activePage === "procesador" && <ProcesadorPage />}
         {activePage === "chequeo" && <ChequeoPage />}
         {activePage === "funcionarios" && <FuncionarioPage />}
@@ -277,16 +341,3 @@ function WelcomeSpinner() {
     </div>
   );
 }
-
-const logout = () => {
-  localStorage.removeItem("orion_user");
-  localStorage.removeItem("orion_token");
-
-  if (window.google?.accounts?.id) {
-    google.accounts.id.disableAutoSelect();
-  }
-
-  setIsAuthenticated(false);
-  setUserName("");
-  setActivePage("dashboard");
-};
