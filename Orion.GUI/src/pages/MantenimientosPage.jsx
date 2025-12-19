@@ -100,29 +100,51 @@ export default function MantenimientosPage() {
     <div className="mui-container">
       <h1 className="mui-title">Mantenimientos</h1>
 
-      <div className="mui-card" style={{ padding: 16 }}>
-        <button
-          className="mui-btn mui-btn-primary"
-          onClick={() => {
-            setEditingRecord(null);
-            setDialogOpen(true);
+      {/* ================= BUSCADOR + BOTÓN (MISMA ALTURA) ================= */}
+      <div
+        className="mui-card"
+        style={{
+          padding: 20,
+          marginTop: 24
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 16
           }}
         >
-          + Crear Mantenimiento
-        </button>
+          {/* Input */}
+          <input
+            className="mui-input"
+            placeholder="Buscar por número de inventario"
+            value={filtroInventario}
+            onChange={e => setFiltroInventario(e.target.value)}
+            style={{
+              flex: 1
+            }}
+          />
+
+          {/* Botón */}
+          <button
+            className="mui-btn mui-btn-primary"
+            style={{
+              whiteSpace: "nowrap",
+              height: 40
+            }}
+            onClick={() => {
+              setEditingRecord(null);
+              setDialogOpen(true);
+            }}
+          >
+            + Crear Mantenimiento
+          </button>
+        </div>
       </div>
 
-      <div className="mui-card" style={{ padding: 16 }}>
-        
-        <input
-          className="mui-input"
-          placeholder="Buscar por número de inventario..."
-          value={filtroInventario}
-          onChange={e => setFiltroInventario(e.target.value)}
-        />
-      </div>
-
-      <div className="mui-card">
+      {/* ================= TABLA ================= */}
+      <div className="mui-card" style={{ marginTop: 24 }}>
         <div className="mui-card-header">
           Registros ({visibleRecords.length})
         </div>
@@ -143,30 +165,24 @@ export default function MantenimientosPage() {
                     <th>Área</th>
                     <th>Ubicación</th>
                     <th>Equipo</th>
-
                     <th>Fecha Retiro</th>
                     <th>Autoriza</th>
                     <th>Fecha Entrega</th>
                     <th>Recibe</th>
-
                     <th>Realiza</th>
                     <th>Fecha</th>
                     <th>Aprueba</th>
                     <th>Fecha</th>
-
                     <th>Antivirus</th>
                     <th>Nombre PC</th>
                     <th>Windows</th>
                     <th>OCS</th>
                     <th>SAP</th>
-
                     <th>Garantía</th>
                     <th>Vencimiento</th>
-
                     <th>Min Parada</th>
                     <th>%</th>
                     <th>Total</th>
-
                     <th>Orden SAP</th>
                   </tr>
                 </thead>
