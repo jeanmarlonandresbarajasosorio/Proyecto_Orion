@@ -18,12 +18,17 @@ const initialForm = {
   area: "",
   ubicacion: "",
 
-  equipos: [{ ...emptyEquipo }],
+  equipos: [],
 
   fechaRetiro: "",
   autorizaRetiro: "",
   fechaEntrega: "",
   recibe: "",
+
+  funcionarioRealiza: "",
+  fechaRealiza: "",
+  funcionarioAprueba: "",
+  fechaAprueba: "",
 
   softwareChecks: {
     Antivirus: "",
@@ -52,92 +57,98 @@ const initialForm = {
   proporcionParada: "",
   totalDisponibilidad: "",
   noOrdenSAP: "",
-
-  funcionarioRealiza: "",
-  fechaRealiza: "",
-  funcionarioAprueba: "",
-  fechaAprueba: "",
 };
 
 export default function MantenimientoDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState(initialForm);
+  const [equipoTemp, setEquipoTemp] = useState(emptyEquipo);
 
   const [sedes, setSedes] = useState([]);
   const [areas, setAreas] = useState([]);
   const [dispositivos, setDispositivos] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
+  const [procesadores, setProcesadores] = useState([]);
+  const [discos, setDiscos] = useState([]);
+  const [rams, setRams] = useState([]);
   const [sistemasOperativos, setSistemasOperativos] = useState([]);
 
-  /* =================  BLOQUEAR SCROLL BODY ================= */
+  /* ================= BLOQUEAR SCROLL ================= */
   useEffect(() => {
     document.body.classList.add("modal-open");
     return () => document.body.classList.remove("modal-open");
   }, []);
 
-  /* =================  FIX EDICIÓN ================= */
-  useEffect(() => {
-    if (editingRecord) {
-      setForm({
-        ...initialForm,
-        ...editingRecord,
-        equipos:
-          editingRecord.equipos && editingRecord.equipos.length > 0
-            ? editingRecord.equipos
-            : [{ ...emptyEquipo }],
-      });
-    } else {
-      setForm({
-        ...initialForm,
-        equipos: [{ ...emptyEquipo }],
-      });
-    }
-  }, [editingRecord]);
-
-  /* ================= CARGA CATÁLOGOS ================= */
+  /* ================= CARGA APIS ================= */
   useEffect(() => {
     fetch("http://localhost:3001/api/sedes").then(r => r.json()).then(setSedes);
     fetch("http://localhost:3001/api/areas").then(r => r.json()).then(setAreas);
     fetch("http://localhost:3001/api/tipos-dispositivos").then(r => r.json()).then(setDispositivos);
     fetch("http://localhost:3001/api/funcionarios").then(r => r.json()).then(setFuncionarios);
+    fetch("http://localhost:3001/api/procesadores").then(r => r.json()).then(setProcesadores);
+    fetch("http://localhost:3001/api/discos-duros").then(r => r.json()).then(setDiscos);
+    fetch("http://localhost:3001/api/memorias-ram").then(r => r.json()).then(setRams);
     fetch("http://localhost:3001/api/sistemas-operativos").then(r => r.json()).then(setSistemasOperativos);
   }, []);
 
+  /* ======================================================
+      CORRECCIÓN CLAVE — CARGAR DATOS AL EDITAR
+     ====================================================== */
+  useEffect(() => {
+    if (editingRecord) {
+      setForm({
+        ...initialForm,
+        ...editingRecord,
+        equipos: editingRecord.equipos || [],
+        softwareChecks: {
+          ...initialForm.softwareChecks,
+          ...(editingRecord.softwareChecks || {}),
+        },
+        hardwareChecks: {
+          ...initialForm.hardwareChecks,
+          ...(editingRecord.hardwareChecks || {}),
+        },
+      });
+    } else {
+      setForm(initialForm);
+    }
+  }, [editingRecord]);
+  /* ====================================================== */
+
   /* ================= HANDLERS ================= */
-  const handleChange = (e) => {
+  const handleChange = e =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
-  const handleEquipoChange = (index, field, value) => {
-    const equipos = [...form.equipos];
-    equipos[index] = { ...equipos[index], [field]: value };
-    setForm(prev => ({ ...prev, equipos }));
-  };
-
-  const addEquipo = () => {
-    setForm(prev => ({
-      ...prev,
-      equipos: [...prev.equipos, { ...emptyEquipo }],
-    }));
-  };
-
-  const removeEquipo = (index) => {
-    const equipos = form.equipos.filter((_, i) => i !== index);
-    setForm(prev => ({
-      ...prev,
-      equipos: equipos.length ? equipos : [{ ...emptyEquipo }],
-    }));
-  };
-
-  const handleNestedChange = (group, key, value) => {
+  const handleNestedChange = (group, key, value) =>
     setForm(prev => ({
       ...prev,
       [group]: { ...prev[group], [key]: value },
     }));
+
+  const handleEquipoTempChange = (field, value) =>
+    setEquipoTemp(prev => ({ ...prev, [field]: value }));
+
+  const agregarEquipo = () => {
+    if (!equipoTemp.nombreEquipo.trim()) {
+      alert("Nombre del equipo requerido");
+      return;
+    }
+
+    setForm(prev => ({
+      ...prev,
+      equipos: [...prev.equipos, { ...equipoTemp }],
+    }));
+
+    setEquipoTemp({ ...emptyEquipo });
   };
 
-  const handleSubmit = (e) => {
+  const quitarEquipo = index =>
+    setForm(prev => ({
+      ...prev,
+      equipos: prev.equipos.filter((_, i) => i !== index),
+    }));
+
+  const handleSubmit = e => {
     e.preventDefault();
-    console.log("FORM A GUARDAR:", form);
     onSave(form);
     onClose();
   };
@@ -147,7 +158,6 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
     <div className="md-overlay">
       <div className="md-modal">
         <div className="md-modal-content">
-
           <h2>{editingRecord ? "Editar Mantenimiento" : "Crear Mantenimiento"}</h2>
 
           <form onSubmit={handleSubmit} className="md-form">
@@ -156,172 +166,158 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
             <div className="md-section">
               <h3>Datos del Área</h3>
               <div className="row-3">
-                <div className="field">
-                  <label>Sede</label>
-                  <select name="sede" value={form.sede} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {sedes.map(s => (
-                      <option key={s.id} value={s.nombre}>{s.nombre}</option>
-                    ))}
-                  </select>
-                </div>
+                <select name="sede" value={form.sede} onChange={handleChange}>
+                  <option value="">Sede</option>
+                  {sedes.map(s => <option key={s.id} value={s.nombre}>{s.nombre}</option>)}
+                </select>
 
-                <div className="field">
-                  <label>Área</label>
-                  <select name="area" value={form.area} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {areas.map(a => (
-                      <option key={a.id} value={a.nombre}>{a.nombre}</option>
-                    ))}
-                  </select>
-                </div>
+                <select name="area" value={form.area} onChange={handleChange}>
+                  <option value="">Área</option>
+                  {areas.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
+                </select>
 
-                <div className="field">
-                  <label>Ubicación</label>
-                  <input name="ubicacion" value={form.ubicacion} onChange={handleChange} />
-                </div>
+                <input name="ubicacion" placeholder="Ubicación" value={form.ubicacion} onChange={handleChange} />
               </div>
             </div>
 
-            {/* ================= EQUIPOS ================= */}
+
+             {/* ================= DATOS DEL EQUIPO ================= */}
             <div className="md-section">
               <h3>Datos del Equipo</h3>
 
-              {form.equipos.map((eq, index) => (
-                <div key={index} className="equipo-box">
-                  <h4>Equipo #{index + 1}</h4>
+              <div className="row-3">
+                <input placeholder="Nombre Equipo"
+                  value={equipoTemp.nombreEquipo}
+                  onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
+                
+                <select value={equipoTemp.dispositivo}
+                  onChange={e => handleEquipoTempChange("dispositivo", e.target.value)}>
+                  <option value="">Dispositivo</option>
+                  {dispositivos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
+                </select>
 
-                  <div className="field">
-                    <label>Nombre del Equipo</label>
-                    <input
-                      value={eq.nombreEquipo}
-                      onChange={e => handleEquipoChange(index, "nombreEquipo", e.target.value)}
-                    />
-                  </div>
+                <input placeholder="Inventario"
+                  value={equipoTemp.inventario}
+                  onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
+              </div>
 
-                  <div className="row-3">
-                    <div className="field">
-                      <label>Dispositivo</label>
-                      <select
-                        value={eq.dispositivo}
-                        onChange={e => handleEquipoChange(index, "dispositivo", e.target.value)}
-                      >
-                        <option value="">Seleccionar</option>
-                        {dispositivos.map(d => (
-                          <option key={d.id} value={d.nombre}>{d.nombre}</option>
-                        ))}
-                      </select>
-                    </div>
+              <div className="row-3 mt">
+                <select value={equipoTemp.procesador}
+                  onChange={e => handleEquipoTempChange("procesador", e.target.value)}>
+                  <option value="">Procesador</option>
+                  {procesadores.map(p => <option key={p.id} value={p.nombre}>{p.nombre}</option>)}
+                </select>
 
-                    <div className="field">
-                      <label>No. Inventario</label>
-                      <input
-                        value={eq.inventario}
-                        onChange={e => handleEquipoChange(index, "inventario", e.target.value)}
-                      />
-                    </div>
+                <select value={equipoTemp.disco}
+                  onChange={e => handleEquipoTempChange("disco", e.target.value)}>
+                  <option value="">Disco</option>
+                  {discos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
+                </select>
 
-                    <div className="field">
-                      <label>Procesador</label>
-                      <input
-                        value={eq.procesador}
-                        onChange={e => handleEquipoChange(index, "procesador", e.target.value)}
-                      />
-                    </div>
-                  </div>
+                <select value={equipoTemp.ram}
+                  onChange={e => handleEquipoTempChange("ram", e.target.value)}>
+                  <option value="">RAM</option>
+                  {rams.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
+                </select>
+              </div>
 
-                  <div className="row-3 mt">
-                    <div className="field">
-                      <label>Disco</label>
-                      <input
-                        value={eq.disco}
-                        onChange={e => handleEquipoChange(index, "disco", e.target.value)}
-                      />
-                    </div>
+              <div className="row-3 mt">
+                <select value={equipoTemp.so}
+                  onChange={e => handleEquipoTempChange("so", e.target.value)}>
+                  <option value="">Sistema Operativo</option>
+                  {sistemasOperativos.map(so => (
+                    <option key={so.id} value={so.nombre}>{so.nombre}</option>
+                  ))}
+                </select>
+              </div>
 
-                    <div className="field">
-                      <label>RAM</label>
-                      <input
-                        value={eq.ram}
-                        onChange={e => handleEquipoChange(index, "ram", e.target.value)}
-                      />
-                    </div>
-
-                    <div className="field">
-                      <label>Sistema Operativo</label>
-                      <select
-                        value={eq.so}
-                        onChange={e => handleEquipoChange(index, "so", e.target.value)}
-                      >
-                        <option value="">Seleccionar</option>
-                        {sistemasOperativos.map(so => (
-                          <option key={so.id} value={so.nombre}>{so.nombre}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {form.equipos.length > 1 && (
-                    <button
-                      type="button"
-                      className="btn-cancel mt"
-                      onClick={() => removeEquipo(index)}
-                    >
-                      Eliminar Equipo
-                    </button>
-                  )}
-                </div>
-              ))}
-
-              <button type="button" className="btn-save mt" onClick={addEquipo}>
-                + Agregar otro equipo
+              <button type="button" className="btn-save mt" onClick={agregarEquipo}>
+                + Agregar Equipo
               </button>
-            </div>
 
+           {form.equipos.length > 0 && (
+  <div className="equipos-table-wrapper mt">
+    <table className="md-table equipos-table">
+      <thead>
+        <tr>
+          <th className="col-equipo">Equipo</th>
+          <th className="col-dispositivo">Dispositivo</th>
+          <th className="col-inventario">Inventario</th>
+          <th className="col-hw">Procesador</th>
+          <th className="col-hw">Disco</th>
+          <th className="col-hw">RAM</th>
+          <th className="col-so">SO</th>
+        </tr>
+      </thead>
+       
+      <tbody>
+        
+        {form.equipos.map((eq, i) => (
+          <tr key={i}>
+            <td className="col-equipo">
+              <strong>{eq.nombreEquipo}</strong>
+            </td>
+
+            <td className="col-dispositivo">
+              {eq.dispositivo}
+            </td>
+
+            <td className="col-inventario">
+              <span className="badge-inv">{eq.inventario}</span>
+            </td>
+
+            <td className="col-hw">{eq.procesador}</td>
+            <td className="col-hw">{eq.disco}</td>
+            <td className="col-hw">{eq.ram}</td>
+            <td className="col-so">{eq.so}</td>
             
-                        <div className="md-section">
+
+            <td className="col-accion">
+              <button
+                type="button"
+                className="btn-cancel btn-small"
+                onClick={() => quitarEquipo(i)}
+              >
+                Quitar
+              </button>
+             </td>
+            </tr>
+           ))}
+         </tbody>
+       </table>
+      </div>
+      )}
+
+   </div>
+
+            {/* ================= AUTORIZACIÓN RETIRO ================= */}
+            <div className="md-section">
               <h3>Autorización de Retiro y Recibo</h3>
 
               <div className="row-2">
-                <div className="field">
-                  <label>Fecha y Hora Retiro</label>
-                  <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
-                </div>
-
-                <div className="field">
-                  <label>Funcionario que Autoriza</label>
-                  <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => (
-                      <option key={f.id} value={f.nombre}>{f.nombre}</option>
-                    ))}
-                  </select>
-                </div>
+                <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
+                <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
+                  <option value="">Seleccionar</option>
+                  {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                </select>
               </div>
 
               <div className="row-2 mt">
-                <div className="field">
-                  <label>Fecha y Hora Entrega</label>
-                  <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
-                </div>
-
-                <div className="field">
-                  <label>Funcionario que Recibe</label>
-                  <select name="recibe" value={form.recibe} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => (
-                      <option key={f.id} value={f.nombre}>{f.nombre}</option>
-                    ))}
-                  </select>
-                </div>
+                <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
+                <select name="recibe" value={form.recibe} onChange={handleChange}>
+                  <option value="">Seleccionar</option>
+                  {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                </select>
               </div>
             </div>
-            <div className="md-section">
+
+            {/* ================= FUNCIONARIOS ================= */}
+         <div className="md-section">
               <h3>Funcionarios</h3>
 
               <div className="row-2">
                 <div className="field">
-                  <label>Funcionario Realiza</label>
+                  <label>Seleccionar</label>
                   <select
                     name="funcionarioRealiza"
                     value={form.funcionarioRealiza}
@@ -382,17 +378,12 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               <h3>Lista de Chequeo de Software</h3>
               <div className="grid-2">
                 {Object.keys(form.softwareChecks).map(k => (
-                  <div className="field" key={k}>
-                    <label>{k}</label>
-                    <select
-                      value={form.softwareChecks[k]}
-                      onChange={e => handleNestedChange("softwareChecks", k, e.target.value)}
-                    >
-                      <option value="">Seleccionar</option>
-                      <option>Verificado</option>
-                      <option>No aplica</option>
-                    </select>
-                  </div>
+                  <select key={k} value={form.softwareChecks[k]}
+                    onChange={e => handleNestedChange("softwareChecks", k, e.target.value)}>
+                    <option value="">{k}</option>
+                    <option>Verificado</option>
+                    <option>No aplica</option>
+                  </select>
                 ))}
               </div>
             </div>
@@ -400,25 +391,15 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
             {/* ================= GARANTÍA ================= */}
             <div className="md-section">
               <h3>Garantía</h3>
-              <div className="row-3">
-                <div className="field">
-                  <label>¿Equipo en garantía?</label>
-                  <select name="garantia" value={form.garantia} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    <option>SI</option>
-                    <option>NO</option>
-                  </select>
-                </div>
+              <div className="row-2">
+                <select name="garantia" value={form.garantia} onChange={handleChange}>
+                  <option value="">¿Equipo en garantía?</option>
+                  <option>SI</option>
+                  <option>NO</option>
+                </select>
 
-                <div className="field">
-                  <label>Fecha Vencimiento</label>
-                  <input
-                    type="date"
-                    name="vencimientoGarantia"
-                    value={form.vencimientoGarantia}
-                    onChange={handleChange}
-                  />
-                </div>
+                <input type="date" name="vencimientoGarantia"
+                  value={form.vencimientoGarantia} onChange={handleChange} />
               </div>
             </div>
 
@@ -428,32 +409,25 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 <h3>Lista de Chequeo de Hardware</h3>
                 <div className="grid-2">
                   {Object.keys(form.hardwareChecks).map(k => (
-                    <div className="field" key={k}>
-                      <label>{k}</label>
-                      <select
-                        value={form.hardwareChecks[k]}
-                        onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}
-                      >
-                        <option value="">Seleccionar</option>
-                        <option>Realizado</option>
-                        <option>No aplica</option>
-                      </select>
-                    </div>
+                    <select key={k}
+                      value={form.hardwareChecks[k]}
+                      onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}>
+                      <option value="">{k}</option>
+                      <option>Realizado</option>
+                      <option>No aplica</option>
+                    </select>
                   ))}
-
-                  <div className="field full">
-                    <label>Observaciones</label>
-                    <textarea
-                      name="observaciones"
-                      value={form.observaciones}
-                      onChange={handleChange}
-                    />
-                  </div>
                 </div>
+
+                <textarea
+                  placeholder="Observaciones"
+                  value={form.observaciones}
+                  onChange={e => setForm(p => ({ ...p, observaciones: e.target.value }))}
+                />
               </div>
             )}
 
-            {/* ================= TIEMPO DE PARADA (AGREGADO AL FINAL) ================= */}
+             {/* ================= TIEMPO DE PARADA (AGREGADO AL FINAL) ================= */}
             <div className="md-section">
               <h3>Tiempo de Parada</h3>
 
@@ -496,15 +470,10 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-
             {/* ================= ACCIONES ================= */}
             <div className="md-actions">
-              <button type="button" className="btn-cancel" onClick={onClose}>
-                Cancelar
-              </button>
-              <button type="submit" className="btn-save">
-                Guardar
-              </button>
+              <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn-save">Guardar</button>
             </div>
 
           </form>

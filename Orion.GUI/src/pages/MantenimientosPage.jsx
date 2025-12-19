@@ -26,7 +26,7 @@ export default function MantenimientosPage() {
     return () => (document.body.style.overflow = "auto");
   }, [dialogOpen, equiposDialogOpen]);
 
-  /* ================= DATA ================= */
+  /* ================= LOAD DATA ================= */
   const loadRecords = async () => {
     try {
       setLoadingInitial(true);
@@ -37,7 +37,7 @@ export default function MantenimientosPage() {
         setRecords(data);
         setVisibleRecords(data.slice(0, PAGE_SIZE));
         setLoadingInitial(false);
-      }, 500);
+      }, 400);
     } catch (err) {
       console.error(err);
       setLoadingInitial(false);
@@ -47,6 +47,28 @@ export default function MantenimientosPage() {
   useEffect(() => {
     loadRecords();
   }, []);
+
+  /* ================= SAVE ================= */
+  const handleSave = async (form) => {
+    try {
+      const method = editingRecord ? "PUT" : "POST";
+      const url = editingRecord
+        ? `${API_URL}/${editingRecord._id}`
+        : API_URL;
+
+      await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      setDialogOpen(false);
+      setEditingRecord(null);
+      loadRecords();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   /* ================= FILTRO ================= */
   useEffect(() => {
@@ -91,6 +113,7 @@ export default function MantenimientosPage() {
       </div>
 
       <div className="mui-card" style={{ padding: 16 }}>
+        
         <input
           className="mui-input"
           placeholder="Buscar por número de inventario..."
@@ -116,37 +139,35 @@ export default function MantenimientosPage() {
                 <thead>
                   <tr>
                     <th>Acciones</th>
-
                     <th>Sede</th>
                     <th>Área</th>
                     <th>Ubicación</th>
-                    <th>Datos del Equipo</th>
+                    <th>Equipo</th>
 
-                    <th>Fecha y Hora Retiro</th>
-                    <th>Funcionario que Autoriza</th>
-                    <th>Fecha y Hora Entrega</th>
-                    <th>Funcionario que Recibe</th>
+                    <th>Fecha Retiro</th>
+                    <th>Autoriza</th>
+                    <th>Fecha Entrega</th>
+                    <th>Recibe</th>
 
-                    <th>Funcionario Realiza</th>
-                    <th>Fecha Realiza</th>
-                    <th>Funcionario Aprueba</th>
-                    <th>Fecha Aprueba</th>
+                    <th>Realiza</th>
+                    <th>Fecha</th>
+                    <th>Aprueba</th>
+                    <th>Fecha</th>
 
                     <th>Antivirus</th>
-                    <th>Nombre del computador</th>
-                    <th>Actualizaciones de Windows</th>
-                    <th>Dominio Foscal.loc</th>
-                    <th>OCS Inventory</th>
+                    <th>Nombre PC</th>
+                    <th>Windows</th>
+                    <th>OCS</th>
                     <th>SAP</th>
 
-                    <th>¿Equipo en garantía?</th>
-                    <th>Fecha Vencimiento</th>
+                    <th>Garantía</th>
+                    <th>Vencimiento</th>
 
-                    <th>Minutos Parada</th>
-                    <th>Proporción (%)</th>
-                    <th>Total Minutos Disponibles</th>
+                    <th>Min Parada</th>
+                    <th>%</th>
+                    <th>Total</th>
 
-                    <th>No. Orden SAP</th>
+                    <th>Orden SAP</th>
                   </tr>
                 </thead>
 
@@ -189,19 +210,18 @@ export default function MantenimientosPage() {
                       <td>{f(r.funcionarioAprueba)}</td>
                       <td>{d(r.fechaAprueba)}</td>
 
-                      <td>{f(r.antivirus)}</td>
-                      <td>{f(r.nombreComputador)}</td>
-                      <td>{f(r.actualizacionesWindows)}</td>
-                      <td>{f(r.dominioFoscal)}</td>
-                      <td>{f(r.ocsInventory)}</td>
-                      <td>{f(r.sap)}</td>
+                      <td>{f(r.softwareChecks?.Antivirus)}</td>
+                      <td>{f(r.softwareChecks?.["Nombre del computador"])}</td>
+                      <td>{f(r.softwareChecks?.["Actualizaciones de Windows"])}</td>
+                      <td>{f(r.softwareChecks?.["OCS Inventory"])}</td>
+                      <td>{f(r.softwareChecks?.SAP)}</td>
 
                       <td>{f(r.garantia)}</td>
                       <td>{d(r.vencimientoGarantia)}</td>
 
                       <td>{f(r.minutosParada)}</td>
                       <td>{f(r.proporcionParada)}</td>
-                      <td>{f(r.totalMinutosDisponibles)}</td>
+                      <td>{f(r.totalDisponibilidad)}</td>
 
                       <td>{f(r.noOrdenSAP)}</td>
                     </tr>
@@ -213,16 +233,16 @@ export default function MantenimientosPage() {
         </div>
       </div>
 
-      {/* ================= DIALOG CREAR / EDITAR ================= */}
+      {/* ================= DIALOG ================= */}
       {dialogOpen && (
         <MantenimientoDialog
           onClose={() => setDialogOpen(false)}
-          onSave={loadRecords}
+          onSave={handleSave}
           editingRecord={editingRecord}
         />
       )}
 
-      {/* ================= DIALOG DETALLE EQUIPOS (NO TOCADO) ================= */}
+      {/* ================= DIALOG EQUIPOS ================= */}
       {equiposDialogOpen && (
         <div className="md-overlay">
           <div className="md-modal" style={{ maxWidth: 800 }}>
@@ -236,13 +256,13 @@ export default function MantenimientosPage() {
                   </div>
 
                   <div className="mui-card-body grid-2">
-                    <div><b>Nombre del Equipo:</b> {f(eq.nombreEquipo)}</div>
+                    <div><b>Equipo:</b> {f(eq.nombreEquipo)}</div>
                     <div><b>Dispositivo:</b> {f(eq.dispositivo)}</div>
-                    <div><b>No. Inventario:</b> {f(eq.inventario)}</div>
+                    <div><b>Inventario:</b> {f(eq.inventario)}</div>
                     <div><b>Procesador:</b> {f(eq.procesador)}</div>
                     <div><b>Disco:</b> {f(eq.disco)}</div>
                     <div><b>RAM:</b> {f(eq.ram)}</div>
-                    <div><b>Sistema Operativo:</b> {f(eq.sistemaOperativo)}</div>
+                    <div><b>SO:</b> {f(eq.so)}</div>
                   </div>
                 </div>
               ))}

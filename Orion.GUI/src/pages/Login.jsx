@@ -93,7 +93,7 @@ export default function Login({ onLogin }) {
           <input
             id="email"
             type="email"
-            placeholder="usuario@orion.com"
+            placeholder=""
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -103,7 +103,7 @@ export default function Login({ onLogin }) {
           <input
             id="password"
             type="password"
-            placeholder="••••••••"
+            placeholder=""
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
