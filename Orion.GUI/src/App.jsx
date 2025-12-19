@@ -186,7 +186,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* 🔍 FILTRO */}
+      {/*  FILTRO */}
       <div className="filtro-container-grande">
         <h3>Buscar Mantenimientos</h3>
         <input
