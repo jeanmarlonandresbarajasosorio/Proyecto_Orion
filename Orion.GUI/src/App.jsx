@@ -61,7 +61,7 @@ export default function App() {
   }, []);
 
   /* ===================== */
-  /* NOTIFICACIONES 🔔     */
+  /* NOTIFICACIONES      */
   /* ===================== */
   useEffect(() => {
     const cargar = async () => {
@@ -223,7 +223,7 @@ export default function App() {
 
         <div className="right topbar-actions">
 
-          {/* 🔔 NOTIFICACIONES */}
+          {/*  NOTIFICACIONES */}
           <button
             className="notification-btn"
             onClick={() => navigate("listamantenimientos")}
@@ -236,7 +236,7 @@ export default function App() {
             )}
           </button>
 
-          {/* 👤 USER */}
+          {/*  USER */}
           <div className="user-panel" onClick={() => setUserMenuOpen(o => !o)}>
             <div className="user-avatar">
               {user?.name?.charAt(0).toUpperCase()}
