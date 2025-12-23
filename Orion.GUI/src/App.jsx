@@ -20,6 +20,12 @@ import SistemaOperativoPage from "./pages/sistemaoperativo/SistemaOperativoPage.
 import DiscoDuroPage from "./pages/discoduro/DiscoDuroPage.jsx";
 import MemoriaRamPage from "./pages/memoriaram/MemoriaRamPage.jsx";
 import ProcesadorPage from "./pages/procesador/ProcesadorPage.jsx";
+/* ADMIN */
+import AdminPanel from "./admin/AdminPanel.jsx";
+import UsersPage from "./admin/UsersPage.jsx";
+import RolesPage from "./admin/RolesPage.jsx";
+import PermissionsPage from "./admin/PermissionsPage.jsx";
+
 
 /* ICONOS */
 import { FiBell, FiLogOut, FiUser, FiX } from "react-icons/fi";
@@ -42,6 +48,7 @@ export default function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [maestrosOpen, setMaestrosOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const [notificaciones, setNotificaciones] = useState(0);
 
   /* ===================== */
@@ -244,7 +251,7 @@ export default function App() {
 
             <div className="user-info">
               <span className="user-name">{user?.name}</span>
-              <span className="user-role">consulta</span>
+               <span className="user-role">{user?.role}</span>
             </div>
           </div>
 
@@ -254,7 +261,7 @@ export default function App() {
                 <FiUser />
                 <div>
                   <strong>{user?.name}</strong>
-                  <small>Rol: consulta</small>
+                   <small>Rol: {user?.role}</small>
                 </div>
               </div>
 
@@ -299,6 +306,22 @@ export default function App() {
                 <a onClick={() => setActivePage("area")}>Área</a>
               </div>
             )}
+            {/* ================= ADMIN ================= */}
+            {user?.role === "ADMIN" && (
+            <div className="submenu">
+            <a onClick={() => setAdminOpen(!adminOpen)}>
+             Administración {adminOpen ? "▲" : "▼"}
+             </a>
+
+             {adminOpen && (
+             <div className="submenu-items">
+             <a onClick={() => setActivePage("admin-users")}>Usuarios</a>
+             <a onClick={() => setActivePage("admin-permissions")}>Permisos</a>
+             </div>
+         )}
+              </div>
+               )}
+
           </div>
         </nav>
       </aside>
@@ -320,6 +343,10 @@ export default function App() {
         {activePage === "funcionarios" && <FuncionarioPage />}
         {activePage === "sedes" && <SedePage />}
         {activePage === "area" && <AreaPage />}
+        {/* ================= ADMIN ================= */}
+        {activePage === "admin-users" && <UsersPage />}
+        {activePage === "admin-permissions" && <PermissionsPage />}
+
       </main>
     </div>
   );

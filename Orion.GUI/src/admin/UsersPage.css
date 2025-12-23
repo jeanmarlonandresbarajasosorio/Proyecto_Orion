@@ -1,0 +1,115 @@
+.users-page {
+  padding: 10px;
+}
+
+/* HEADER */
+.users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.users-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+/* BUTTON */
+.btn-primary {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(30,58,138,.25);
+}
+
+.btn-primary:hover {
+  background: #2748b3;
+}
+
+/* CARD */
+.users-card {
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+  overflow: hidden;
+}
+
+/* TABLE */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  font-size: 14px;
+}
+
+.users-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.users-table tr:hover {
+  background: #f1f5f9;
+}
+
+/* ROLE BADGE */
+.role-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-badge.admin {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.role-badge.tecnico {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.role-badge.lector {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* STATUS */
+.status {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.on {
+  color: #16a34a;
+}
+
+.status.off {
+  color: #dc2626;
+}
+
+/* LINK BUTTON */
+.btn-link {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}

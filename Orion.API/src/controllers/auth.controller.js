@@ -1,44 +1,57 @@
+import { Router } from "express";
 import jwt from "jsonwebtoken";
-import { OAuth2Client } from "google-auth-library";
 import User from "../models/User.js";
+import Permission from "../models/Permission.js";
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const router = Router();
 
-export const googleLogin = async (req, res) => {
+router.post("/google", async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { name, email, picture } = req.body;
 
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-
-    if (!payload.email.endsWith("@orion.com")) {
-      return res.status(403).json({ message: "Dominio no autorizado" });
+    if (!email) {
+      return res.status(400).json({ message: "Email requerido" });
     }
 
-    let user = await User.findOne({ email: payload.email });
+    /*  VALIDAR PERMISO */
+    const permission = await Permission.findOne({ email });
+
+    if (!permission || !permission.allowed) {
+      return res.status(401).json({ message: "Acceso no autorizado" });
+    }
+
+    let user = await User.findOne({ email });
 
     if (!user) {
       user = await User.create({
-        name: payload.name,
-        email: payload.email,
-        picture: payload.picture,
-        provider: "google",
+        name,
+        email,
+        picture,
+        role: "LECTOR",
+        active: true,
       });
     }
 
+    if (!user.active) {
+      return res.status(403).json({ message: "Usuario inactivo" });
+    }
+
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "8h" }
+      { expiresIn: "1h" }
     );
 
     res.json({ token, user });
 
   } catch (error) {
-    res.status(401).json({ message: "Login Google inválido" });
+    console.error("🔥 AUTH ERROR:", error);
+    res.status(500).json({ message: "Error autenticando" });
   }
-};
+});
+
+export default router;

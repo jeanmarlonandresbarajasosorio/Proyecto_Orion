@@ -21,7 +21,6 @@ const MantenimientoSchema = new mongoose.Schema(
     area: String,
     ubicacion: String,
 
-    // 🔥 CLAVE: MÚLTIPLES EQUIPOS
     equipos: [EquipoSchema],
 
     fechaRetiro: Date,
@@ -66,4 +65,9 @@ const MantenimientoSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Mantenimiento", MantenimientoSchema);
+/* 🔥 CLAVE ABSOLUTA */
+export default mongoose.model(
+  "Mantenimiento",
+  MantenimientoSchema,
+  "mantenimientos" // 👈 nombre EXACTO en MongoDB
+);
