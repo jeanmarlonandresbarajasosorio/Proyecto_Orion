@@ -79,16 +79,18 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
   }, []);
 
   /* ================= CARGA APIS ================= */
-  useEffect(() => {
-    fetch("http://localhost:3001/api/sedes").then(r => r.json()).then(setSedes);
-    fetch("http://localhost:3001/api/areas").then(r => r.json()).then(setAreas);
-    fetch("http://localhost:3001/api/tipos-dispositivos").then(r => r.json()).then(setDispositivos);
-    fetch("http://localhost:3001/api/funcionarios").then(r => r.json()).then(setFuncionarios);
-    fetch("http://localhost:3001/api/procesadores").then(r => r.json()).then(setProcesadores);
-    fetch("http://localhost:3001/api/discos-duros").then(r => r.json()).then(setDiscos);
-    fetch("http://localhost:3001/api/memorias-ram").then(r => r.json()).then(setRams);
-    fetch("http://localhost:3001/api/sistemas-operativos").then(r => r.json()).then(setSistemasOperativos);
-  }, []);
+ useEffect(() => {
+  const baseUrl = import.meta.env.VITE_API_URL;
+
+  fetch(`${baseUrl}/sedes`).then(r => r.json()).then(setSedes);
+  fetch(`${baseUrl}/areas`).then(r => r.json()).then(setAreas);
+  fetch(`${baseUrl}/tipos-dispositivos`).then(r => r.json()).then(setDispositivos);
+  fetch(`${baseUrl}/funcionarios`).then(r => r.json()).then(setFuncionarios);
+  fetch(`${baseUrl}/procesadores`).then(r => r.json()).then(setProcesadores);
+  fetch(`${baseUrl}/discos-duros`).then(r => r.json()).then(setDiscos);
+  fetch(`${baseUrl}/memorias-ram`).then(r => r.json()).then(setRams);
+  fetch(`${baseUrl}/sistemas-operativos`).then(r => r.json()).then(setSistemasOperativos);
+}, []);
 
   /* ======================================================
       CORRECCIÓN CLAVE — CARGAR DATOS AL EDITAR

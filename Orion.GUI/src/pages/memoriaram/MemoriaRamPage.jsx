@@ -3,7 +3,7 @@ import "./MemoriaRamPage.css";
 import MemoriaRamDialog from "./MemoriaRamDialog.jsx";
 
 
-const API_URL = "http://localhost:3001/api/memorias-ram";
+const API_URL = `${import.meta.env.VITE_API_URL}/memorias-ram`;
 
 export default function MemoriaRamPage() {
   const [memorias, setMemorias] = useState([]);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./AreaPage.css";
 import AreaDialog from "./AreaDialog.jsx";
 
-const API_URL = "http://localhost:3001/api/areas";
+const API_URL = `${import.meta.env.VITE_API_URL}/areas`;
 
 export default function AreaPage() {
   const [areas, setAreas] = useState([]);

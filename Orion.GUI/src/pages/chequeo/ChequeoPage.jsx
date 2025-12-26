@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./ChequeoPage.css";
 import ChequeoDialog from "./ChequeoDialog.jsx";
 
-const API_URL = "http://localhost:3001/api/listas-chequeo";
+const API_URL = `${import.meta.env.VITE_API_URL}/listas-chequeo`;
 
 export default function ChequeoPage() {
   const [items, setItems] = useState([]);

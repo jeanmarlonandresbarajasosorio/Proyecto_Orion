@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./SistemaOperativoPage.css";
 import SistemaOperativoDialog from "./SistemaOperativoDialog.jsx";
 
-const API_URL = "http://localhost:3001/api/sistemas-operativos";
+const API_URL = `${import.meta.env.VITE_API_URL}/sistemas-operativos`;
 
 export default function SistemaOperativoPage() {
   const [sistemas, setSistemas] = useState([]);

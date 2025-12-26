@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./TipoListaPage.css";
 import TipoListaDialog from "./TipoListaDialog";
 
-const API_URL = "http://localhost:3001/api/tipos-lista";
+// CAMBIO AQUÍ: Usamos la variable de entorno de Vite
+const API_URL = `${import.meta.env.VITE_API_URL}/tipos-lista`;
 
 export default function TipoListaPage() {
   const [tipos, setTipos] = useState([]);
@@ -106,7 +107,6 @@ export default function TipoListaPage() {
                     </tr>
                   ))}
                 </tbody>
-
               </table>
             </div>
           )}

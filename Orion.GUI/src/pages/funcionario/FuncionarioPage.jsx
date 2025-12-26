@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./FuncionarioPage.css";
 import FuncionarioDialog from "./FuncionarioDialog.jsx";
 
-const API_URL = "http://localhost:3001/api/funcionarios";
+const API_URL = `${import.meta.env.VITE_API_URL}/funcionarios`;
 
 export default function FuncionarioPage() {
   const [funcionarios, setFuncionarios] = useState([]);

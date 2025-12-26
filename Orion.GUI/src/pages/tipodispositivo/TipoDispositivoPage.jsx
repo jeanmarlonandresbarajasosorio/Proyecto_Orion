@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./TipoDispositivoPage.css";
 import TipoDispositivoDialog from "./TipoDispositivoDialog.jsx";
 
-const API_URL = "http://localhost:3001/api/tipos-dispositivos";
+const API_URL = `${import.meta.env.VITE_API_URL}/tipos-dispositivos`;
 
 export default function TipoDispositivoPage() {
   const [tipos, setTipos] = useState([]);

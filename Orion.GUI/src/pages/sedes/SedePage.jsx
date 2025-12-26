@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./SedePage.css";
 import SedeDialog from "./SedeDialog";
 
-const API_URL = "http://localhost:3001/api/sedes";
+const API_URL = `${import.meta.env.VITE_API_URL}/sedes`;
 
 export default function SedePage() {
   const [sedes, setSedes] = useState([]);

@@ -11,7 +11,7 @@ import Login from "./pages/Login.jsx";
 /* PÁGINAS */
 import MantenimientoList from "./pages/MantenimientosPage.jsx";
 import SedePage from "./pages/sedes/SedePage.jsx";
-import AreaPage from "./pages/area/areapage.jsx";
+import AreaPage from "./pages/area/AreaPage.jsx";
 import FuncionarioPage from "./pages/funcionario/FuncionarioPage.jsx";
 import ChequeoPage from "./pages/chequeo/ChequeoPage.jsx";
 import TipoListaPage from "./pages/tipolista/TipoListaPage.jsx";
@@ -26,11 +26,10 @@ import UsersPage from "./admin/UsersPage.jsx";
 import RolesPage from "./admin/RolesPage.jsx";
 import PermissionsPage from "./admin/PermissionsPage.jsx";
 
-
 /* ICONOS */
 import { FiBell, FiLogOut, FiUser, FiX } from "react-icons/fi";
 
-const API_MANTENIMIENTOS = "http://localhost:3001/api/mantenimientos";
+const API_MANTENIMIENTOS = "http://localhost:5000/api/mantenimientos";
 
 export default function App() {
 
@@ -50,6 +49,48 @@ export default function App() {
   const [maestrosOpen, setMaestrosOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [notificaciones, setNotificaciones] = useState(0);
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
+  const [descargando, setDescargando] = useState(false);
+
+  /* ===================== */
+  /* DESCARGA EXCEL        */
+  /* ===================== */
+  const descargarExcel = async () => {
+    if (!fechaDesde || !fechaHasta) {
+      alert("Selecciona un rango de fechas");
+      return;
+    }
+
+    try {
+      setDescargando(true);
+
+      // CORRECCIÓN: Se envía como query param "?export=excel" para que el backend lo reconozca
+      // y no se confunda con un ID de MongoDB.
+      const res = await fetch(
+        `${API_MANTENIMIENTOS}?export=excel&desde=${fechaDesde}&hasta=${fechaHasta}`
+      );
+
+      if (!res.ok) throw new Error("Error al descargar Excel");
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ORION_Mantenimientos_${fechaDesde}_a_${fechaHasta}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo descargar el Excel");
+    } finally {
+      setDescargando(false);
+    }
+  };
 
   /* ===================== */
   /* FILTRO BÚSQUEDA       */
@@ -68,7 +109,7 @@ export default function App() {
   }, []);
 
   /* ===================== */
-  /* NOTIFICACIONES      */
+  /* NOTIFICACIONES        */
   /* ===================== */
   useEffect(() => {
     const cargar = async () => {
@@ -152,6 +193,7 @@ export default function App() {
   /* ===================== */
   const Dashboard = () => (
     <>
+      {/* ====== GRÁFICAS ====== */}
       <section className="grid">
         <div className="card">
           <h3>Garantías</h3>
@@ -192,24 +234,40 @@ export default function App() {
           </PieChart>
         </div>
       </section>
+      
+       {/* ====== DESCARGA EXCEL ====== */}
+      <section className="card excel-card">
+        <h3>Descargar Mantenimientos</h3>
 
-      {/*  FILTRO */}
-      <div className="filtro-container-grande">
-        <h3>Buscar Mantenimientos</h3>
-        <input
-          type="text"
-          className="filtro-input-grande"
-          placeholder="Buscar por nombre..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-        <button
-          className="filtro-btn-grande"
-          onClick={() => setActivePage("listamantenimientos")}
-        >
-          Buscar
-        </button>
-      </div>
+        <div className="excel-filtros">
+          <div>
+            <label>Desde</label>
+            <input
+              type="date"
+              value={fechaDesde}
+              onChange={(e) => setFechaDesde(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label>Hasta</label>
+            <input
+              type="date"
+              value={fechaHasta}
+              onChange={(e) => setFechaHasta(e.target.value)}
+            />
+          </div>
+
+          <button
+            className="excel-btn"
+            onClick={descargarExcel}
+            disabled={descargando}
+          >
+            {descargando ? "Generando..." : "Descargar Excel"}
+          </button>
+        </div>
+      </section>
+
     </>
   );
 
@@ -230,7 +288,7 @@ export default function App() {
 
         <div className="right topbar-actions">
 
-          {/*  NOTIFICACIONES */}
+          {/* NOTIFICACIONES */}
           <button
             className="notification-btn"
             onClick={() => navigate("listamantenimientos")}
@@ -243,7 +301,7 @@ export default function App() {
             )}
           </button>
 
-          {/*  USER */}
+          {/* USER */}
           <div className="user-panel" onClick={() => setUserMenuOpen(o => !o)}>
             <div className="user-avatar">
               {user?.name?.charAt(0).toUpperCase()}
@@ -251,7 +309,7 @@ export default function App() {
 
             <div className="user-info">
               <span className="user-name">{user?.name}</span>
-               <span className="user-role">{user?.role}</span>
+              <span className="user-role">{user?.role}</span>
             </div>
           </div>
 
@@ -261,7 +319,7 @@ export default function App() {
                 <FiUser />
                 <div>
                   <strong>{user?.name}</strong>
-                   <small>Rol: {user?.role}</small>
+                  <small>Rol: {user?.role}</small>
                 </div>
               </div>
 
@@ -274,7 +332,7 @@ export default function App() {
       </header>
 
       {/* ================= SIDEBAR ================= */}
-            <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
+      <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>‹</button>
         <h2 className="sidebar-title">Menú</h2>
 
@@ -306,26 +364,26 @@ export default function App() {
                 <a onClick={() => setActivePage("area")}>Área</a>
               </div>
             )}
+            
             {/* ================= ADMIN ================= */}
             {user?.role === "ADMIN" && (
-            <div className="submenu">
-            <a onClick={() => setAdminOpen(!adminOpen)}>
-             Administración {adminOpen ? "▲" : "▼"}
-             </a>
+              <div className="submenu">
+                <a onClick={() => setAdminOpen(!adminOpen)}>
+                  Administración {adminOpen ? "▲" : "▼"}
+                </a>
 
-             {adminOpen && (
-             <div className="submenu-items">
-             <a onClick={() => setActivePage("admin-users")}>Usuarios</a>
-             <a onClick={() => setActivePage("admin-permissions")}>Permisos</a>
-             </div>
-         )}
+                {adminOpen && (
+                  <div className="submenu-items">
+                    <a onClick={() => setActivePage("admin-users")}>Usuarios</a>
+                    <a onClick={() => setActivePage("admin-permissions")}>Permisos</a>
+                  </div>
+                )}
               </div>
-               )}
+            )}
 
           </div>
         </nav>
       </aside>
-
 
       {/* ================= MAIN ================= */}
       <main className="main-area">
@@ -346,14 +404,13 @@ export default function App() {
         {/* ================= ADMIN ================= */}
         {activePage === "admin-users" && <UsersPage />}
         {activePage === "admin-permissions" && <PermissionsPage />}
-
       </main>
     </div>
   );
 }
 
 /* ===================== */
-/*  LOADER ORION       */
+/* LOADER ORION         */
 /* ===================== */
 function WelcomeSpinner() {
   return (

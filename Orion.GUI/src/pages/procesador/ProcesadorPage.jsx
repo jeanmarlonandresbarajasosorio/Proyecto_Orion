@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./ProcesadorPage.css";
 import ProcesadorDialog from "./ProcesadorDialog.jsx";
 
-const API_URL = "http://localhost:3001/api/procesadores";
+const API_URL = `${import.meta.env.VITE_API_URL}/procesadores`;
 
 export default function ProcesadorPage() {
   const [procesadores, setProcesadores] = useState([]);

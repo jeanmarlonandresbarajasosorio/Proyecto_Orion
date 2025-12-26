@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3001/api/mantenimientos";
+const API_URL = "http://localhost:5000/api/mantenimientos";
 
 export async function getMantenimientos() {
   const res = await fetch(API_URL);

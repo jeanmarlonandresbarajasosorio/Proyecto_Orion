@@ -1,10 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./src/config/db.js";
+import connectDB from "./src/Config/db.js";
 
 import authRoutes from "./src/routes/auth.routes.js"; 
-
 import sedeRoutes from "./src/routes/sede.routes.js";
 import sistemaOperativoRoutes from "./src/routes/sistemaOperativo.routes.js";
 import tipoDispositivoRoutes from "./src/routes/tipoDispositivo.routes.js";
@@ -21,25 +20,31 @@ import testRoutes from "./src/routes/test.routes.js";
 import usersRoutes from "./src/routes/users.routes.js";
 import permissionsRoutes from "./src/routes/permissions.routes.js";
 
-
 dotenv.config();
 
 const app = express();
+
+// Conectar a la base de datos
 connectDB();
 
-app.use(cors());
+// Middlewares
+// Se unificó la configuración de CORS y se colocó al inicio para que funcione correctamente
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:5000"],
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true
+}));
 app.use(express.json());
 
-//  AUTH
+// Rutas de AUTH
 app.use("/api/auth", authRoutes);
 app.set("mongoose", mongoose);
 app.use("/api/users", usersRoutes);
-app.use("/api/auth", authRoutes);
 
-// registra ruta
+// Rutas de prueba
 app.use("/api/test", testRoutes);
 
-//  MÓDULOS
+// Rutas de módulos
 app.use("/api/sedes", sedeRoutes);
 app.use("/api/sistemas-operativos", sistemaOperativoRoutes);
 app.use("/api/tipos-dispositivos", tipoDispositivoRoutes);
@@ -53,10 +58,11 @@ app.use("/api/memorias-ram", memoriaRamRoutes);
 app.use("/api/procesadores", procesadorRoutes);
 app.use("/api/permissions", permissionsRoutes);
 
+// Definir el puerto
+const PORT = process.env.PORT || 5000;
 
-
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () =>
-  console.log(`🚀 API Orion en puerto ${PORT}`)
-);
+// --- LO QUE FALTABA: Iniciar el servidor ---
+// Escuchamos en '0.0.0.0' para que Docker pueda mapear el puerto correctamente
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Servidor Orion API corriendo en http://localhost:${PORT}`);
+});

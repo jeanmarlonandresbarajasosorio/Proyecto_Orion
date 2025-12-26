@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./MantenimientoForm.css";
 import MantenimientoDialog from "./MantenimientoDialog";
 
-const API_URL = "http://localhost:3001/api/mantenimientos";
+const API_URL = `${import.meta.env.VITE_API_URL}/mantenimientos`; 
+
 const PAGE_SIZE = 10;
 
 export default function MantenimientosPage() {

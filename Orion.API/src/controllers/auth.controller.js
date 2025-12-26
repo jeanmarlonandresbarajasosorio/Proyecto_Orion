@@ -13,19 +13,31 @@ router.post("/google", async (req, res) => {
       return res.status(400).json({ message: "Email requerido" });
     }
 
-    /*  VALIDAR PERMISO */
-    const permission = await Permission.findOne({ email });
+    // ✅ NORMALIZAR EMAIL
+    const normalizedEmail = email.toLowerCase().trim();
 
-    if (!permission || !permission.allowed) {
-      return res.status(401).json({ message: "Acceso no autorizado" });
+    /* ============================= */
+    /*  VALIDAR PERMISO DE ACCESO   */
+    /* ============================= */
+    const permission = await Permission.findOne({
+      email: normalizedEmail,
+    });
+
+    if (!permission || permission.allowed === false) {
+      return res.status(403).json({
+        message: "Tu acceso ha sido bloqueado por el administrador",
+      });
     }
 
-    let user = await User.findOne({ email });
+    /* ============================= */
+    /*  BUSCAR / CREAR USUARIO      */
+    /* ============================= */
+    let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       user = await User.create({
         name,
-        email,
+        email: normalizedEmail,
         picture,
         role: "LECTOR",
         active: true,
@@ -36,6 +48,9 @@ router.post("/google", async (req, res) => {
       return res.status(403).json({ message: "Usuario inactivo" });
     }
 
+    /* ============================= */
+    /*  GENERAR TOKEN               */
+    /* ============================= */
     const token = jwt.sign(
       {
         id: user._id,
@@ -43,7 +58,7 @@ router.post("/google", async (req, res) => {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "3h" }
     );
 
     res.json({ token, user });

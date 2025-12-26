@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./DiscoDuroPage.css";
 import DiscoDuroDialog from "./DiscoDuroDialog.jsx";
 
-const API_URL = "http://localhost:3001/api/discos-duros";
+const API_URL = `${import.meta.env.VITE_API_URL}/discos-duros`;
 
 export default function DiscoDuroPage() {
   const [discos, setDiscos] = useState([]);
