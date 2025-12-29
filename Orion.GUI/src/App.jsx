@@ -56,37 +56,40 @@ export default function App() {
   /* ===================== */
   /* DESCARGA EXCEL        */
   /* ===================== */
-  const descargarExcel = async () => {
+const descargarExcel = async () => {
     if (!fechaDesde || !fechaHasta) {
-      alert("Selecciona un rango de fechas");
+      alert("Por favor, selecciona un rango de fechas.");
       return;
     }
 
     try {
       setDescargando(true);
+      
+      // Asegúrate de que esta URL coincida con tu Backend
+      const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      const url = `${baseUrl}/mantenimientos?format=excel&desde=${fechaDesde}&hasta=${fechaHasta}`;
 
-      // CORRECCIÓN: Se envía como query param "?export=excel" para que el backend lo reconozca
-      // y no se confunda con un ID de MongoDB.
-      const res = await fetch(
-        `${API_MANTENIMIENTOS}?export=excel&desde=${fechaDesde}&hasta=${fechaHasta}`
-      );
+      const response = await fetch(url, { method: "GET" });
 
-      if (!res.ok) throw new Error("Error al descargar Excel");
+      if (!response.ok) {
+        throw new Error("El servidor no pudo generar el archivo");
+      }
 
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
+      // IMPORTANTE: Manejar como BLOB
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", `Reporte_ORION_${fechaDesde}.xlsx`);
+      
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `ORION_Mantenimientos_${fechaDesde}_a_${fechaHasta}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-
-      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error(error);
-      alert("No se pudo descargar el Excel");
+      console.error("Error:", error);
+      alert("Error al descargar. Verifica que el Backend esté encendido y tenga instalada la librería exceljs.");
     } finally {
       setDescargando(false);
     }

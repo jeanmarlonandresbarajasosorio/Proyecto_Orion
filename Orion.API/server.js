@@ -28,12 +28,7 @@ const app = express();
 connectDB();
 
 // Middlewares
-// Se unificó la configuración de CORS y se colocó al inicio para que funcione correctamente
-app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:5000"],
-  methods: "GET,POST,PUT,DELETE",
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // Rutas de AUTH
@@ -61,8 +56,9 @@ app.use("/api/permissions", permissionsRoutes);
 // Definir el puerto
 const PORT = process.env.PORT || 5000;
 
-// --- LO QUE FALTABA: Iniciar el servidor ---
-// Escuchamos en '0.0.0.0' para que Docker pueda mapear el puerto correctamente
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Servidor Orion API corriendo en http://localhost:${PORT}`);
-});
+// Iniciar el servidor
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:5000"], // Agregamos el puerto de Vite por si acaso
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true
+}));
