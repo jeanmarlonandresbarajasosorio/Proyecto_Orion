@@ -1,75 +1,51 @@
-/* ===============================
-   VARIABLES GLOBALES ORION
-   =============================== */
 :root {
   --blue: #2748B3;
   --blue-dark: #1E3A8A;
-  --blue-light: #3B82F6;
-  --bg-light: #f8faff;
   --card-bg: #ffffff;
   --muted: #6b7280;
-  --radius: 14px;
+  --radius: 12px;
   --shadow-1: 0 6px 20px rgba(16,24,40,0.06);
   --shadow-2: 0 12px 30px rgba(16,24,40,0.08);
 }
 
-/* ===============================
-   RESET BASE
-   =============================== */
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: var(--bg-light);
-}
-
-/* ===============================
-   CONTENEDOR PRINCIPAL
-   =============================== */
+/* SOLUCIÓN RADICAL: 
+   Forzamos al contenedor a ignorar anchos máximos y ocupar el 100% 
+*/
 .mui-container {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 20px 24px;
-  color: #0f1724;
-  background: var(--bg-light);
-  min-height: 100vh;
+  width: 100% !important;
+  max-width: 100% !important; 
+  margin: 0 !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  display: block !important;
 }
 
-/* ===============================
-   GRID
-   =============================== */
 .mui-grid {
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 20px;
+  display: block !important; /* Cambiamos de grid a block para asegurar que no haya columnas invisibles */
+  width: 100% !important;
 }
 
-.mui-column {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+.mui-column { 
+  width: 100% !important;
+  display: flex; 
+  flex-direction: column; 
+  gap: 18px; 
 }
 
-/* ===============================
-   TARJETAS
-   =============================== */
+/* CARD DE REGISTROS 
+*/
 .mui-card {
   background: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow-1);
   border: 1px solid #eef3ff;
   overflow: hidden;
+  width: 100% !important; /* Ocupa todo el ancho disponible */
 }
 
 .mui-card-header {
   padding: 14px 18px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.95),
-    rgba(248,250,255,0.95)
-  );
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,255,0.9));
   font-weight: 700;
   color: var(--blue-dark);
   border-bottom: 1px solid #f1f5f9;
@@ -77,25 +53,20 @@ html, body {
 
 .mui-card-body {
   padding: 16px 18px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* ===============================
-   TÍTULOS
-   =============================== */
 .mui-title {
   font-size: 26px;
   font-weight: 700;
   color: var(--blue-dark);
-  margin-bottom: 6px;
-  text-align: left;
+  margin-bottom: 20px;
 }
 
-/* ===============================
-   INPUTS
-   =============================== */
-.mui-input,
-.mui-select,
-.mui-textarea {
+/* INPUTS Y BÚSQUEDA 
+*/
+.mui-input, .mui-select, .mui-textarea {
   width: 100%;
   padding: 12px 14px;
   border-radius: 10px;
@@ -103,181 +74,54 @@ html, body {
   background: #fbfdff;
   outline: none;
   font-size: 14px;
-  transition: all .18s ease;
 }
 
-.mui-textarea {
-  min-height: 110px;
-  resize: vertical;
-  padding-top: 10px;
+/* TABLA: Ajustes para que no se vea vacía en pantallas gigantes 
+*/
+.table-responsive { 
+  overflow-x: auto; 
+  width: 100% !important;
 }
 
-.mui-input:focus,
-.mui-select:focus,
-.mui-textarea:focus {
-  box-shadow: 0 6px 18px rgba(30,58,138,0.08);
-  border-color: var(--blue-dark);
-  background: #fff;
-  transform: translateY(-1px);
+.table { 
+  width: 100% !important; 
+  border-collapse: collapse; 
+  table-layout: auto; /* Permite que las columnas se expandan según el contenido */
 }
 
-/* ===============================
-   GRID DE CAMPOS
-   =============================== */
-.row-1 { display: block; }
-.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.mt { margin-top: 12px; }
-
-/* ===============================
-   BOTONES
-   =============================== */
-.mui-actions {
-  display: flex;
-  gap: 12px;
-  margin: 10px 0 24px;
-}
-
-.mui-btn {
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: var(--shadow-1);
-  transition: transform .12s ease, box-shadow .12s ease;
-}
-
-.mui-btn-primary {
-  background: var(--blue-dark);
-  color: #fff;
-}
-
-.mui-btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-2);
-}
-
-.mui-btn-secondary {
-  background: #fff;
-  color: var(--blue-dark);
-  border: 1px solid #e6edf7;
-}
-
-.mui-btn-secondary.enabled:hover {
-  background: var(--blue);
-  color: #fff;
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-2);
-}
-
-.mui-btn-ghost {
-  background: transparent;
-  color: var(--muted);
-  border: 1px dashed #eef3ff;
-}
-
-/* ===============================
-   TABLA
-   =============================== */
-.table-responsive {
-  overflow-x: auto;
-  margin-top: 8px;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th,
-.table td {
-  padding: 10px;
-  border-bottom: 1px solid #f0f4fb;
-  text-align: left;
+.table th, .table td { 
+  padding: 14px 10px; 
+  border-bottom: 1px solid #f0f4fb; 
+  text-align: left; 
   font-size: 14px;
 }
 
-.table th {
-  background: #fbfdff;
-  color: var(--blue-dark);
-  font-weight: 600;
+.table th { 
+  background: #fbfdff; 
+  color: var(--blue-dark); 
+  font-weight: 600; 
 }
 
-/* ===============================
-   BOTONES TABLA
-   =============================== */
-.small.btn {
-  padding: 6px 8px;
-  font-size: 13px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: 0;
-}
-
-.small.btn.neutral {
-  background: #eef3ff;
-  color: var(--blue-dark);
-}
-
-.small.btn.primary {
-  background: var(--blue-dark);
-  color: #fff;
-}
-
-.small.btn.danger {
-  background: #ef4444;
-  color: #fff;
-}
-
-/* ===============================
-   TEXTO
-   =============================== */
-.muted {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.error {
-  color: #b91c1c;
-  font-size: 13px;
-  margin-top: 6px;
-}
-
-/* ===============================
-   BOTÓN OJO ORION
-   =============================== */
+/* BOTÓN OJO (Mantenemos tu diseño) 
+*/
 .orion-eye-btn {
   all: unset;
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #07328f;
+  background-color: #07328f; 
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: background-color .2s ease;
-}
-
-.orion-eye-btn:hover {
-  background-color: #1e40af;
 }
 
 .orion-eye-btn::before {
   content: "";
   width: 14px;
   height: 8px;
-  border: 2px solid #fff;
+  border: 2px solid #ffffff;
   border-radius: 50%;
   position: absolute;
 }
@@ -286,48 +130,31 @@ html, body {
   content: "";
   width: 4px;
   height: 4px;
-  background: #fff;
+  background-color: #ffffff;
   border-radius: 50%;
   position: absolute;
 }
 
-/* ===============================
-   SPINNER TABLA
-   =============================== */
-.table-container {
-  position: relative;
-  min-height: 220px;
-}
-
-.orion-table-loader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 220px;
-  gap: 10px;
-  color: #2d5dfa;
-  font-weight: 500;
-}
-
+/* SPINNER 
+*/
 .orion-spinner {
   width: 36px;
   height: 36px;
-  border: 4px solid rgba(39,72,179,0.2);
-  border-top: 4px solid #9eb2ee;
+  border: 4px solid rgba(39, 72, 179, 0.2);
+  border-top: 4px solid #2748B3;
   border-radius: 50%;
-  animation: spin .9s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===============================
-   RESPONSIVE
-   =============================== */
-@media (max-width: 1000px) {
-  .mui-grid {
-    grid-template-columns: 1fr;
-  }
+/* UTILIDADES */
+.mui-btn-primary { 
+  background: var(--blue-dark); 
+  color: white; 
+  padding: 10px 16px; 
+  border-radius: 10px; 
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
 }

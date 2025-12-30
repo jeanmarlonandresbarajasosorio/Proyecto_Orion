@@ -52,7 +52,7 @@ body.modal-open {
 }
 
 /* ===============================
-   ❌ BOTÓN CERRAR (X)
+   ❌ BOTÓN CERRAR
    =============================== */
 .md-btn-close {
   position: absolute;
@@ -82,11 +82,10 @@ body.modal-open {
 }
 
 /* ===============================
-   TITULOS
+   TÍTULOS
    =============================== */
 .md-modal h2,
 .md-section h3,
-.md-form label,
 .equipos-table th {
   text-transform: capitalize;
 }
@@ -107,7 +106,7 @@ body.modal-open {
 }
 
 /* ===============================
-   FORMULARIO
+   FORMULARIO (🔥 AQUÍ ESTÁ LA CLAVE)
    =============================== */
 .field {
   display: flex;
@@ -120,8 +119,18 @@ body.modal-open {
   font-size: 13px;
   font-weight: 600;
   color: #334155;
+  text-transform: capitalize; /* ✅ Antivirus, Nombre del computador, etc */
 }
 
+/* 🔥 ACRÓNIMOS FORZADOS */
+.field label.label-acronym {
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* ===============================
+   INPUTS
+   =============================== */
 .md-form input,
 .md-form select,
 .md-form textarea {
@@ -241,8 +250,4 @@ body.modal-open {
   .md-modal {
     max-width: 95%;
   }
-}
-.label-acronym {
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
 }

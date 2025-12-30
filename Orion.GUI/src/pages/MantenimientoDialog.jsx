@@ -139,81 +139,151 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
           <form onSubmit={handleSubmit} className="md-form">
             
-            {/* ================= DATOS ÁREA ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Datos Area</h3>
-              <div className="row-3">
-                <div className="field">
-                  <label>Sede</label>
-                  <select name="sede" value={form.sede} onChange={handleChange}>
-                    <option value="">Sede</option>
-                    {sedes.map(s => <option key={s.id} value={s.nombre}>{s.nombre}</option>)}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Area</label>
-                  <select name="area" value={form.area} onChange={handleChange}>
-                    <option value="">Area</option>
-                    {areas.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Ubicación</label>
-                  <input name="Ubicacion" placeholder="Ubicación" value={form.ubicacion} onChange={handleChange} />
-                </div>
-              </div>
-            </div>
+           {/* ================= DATOS ÁREA ================= */}
+<div className="md-section">
+  <h3 className="section-title">Datos Area</h3>
+
+  <div className="row-3">
+    <div className="field">
+      <label>Sede</label>
+      <select name="sede" value={form.sede} onChange={handleChange}>
+        <option value="">Seleccionar</option>
+        {sedes.map(s => (
+          <option key={s.id} value={s.nombre}>
+            {s.nombre}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="field">
+      <label>Area</label>
+      <select name="area" value={form.area} onChange={handleChange}>
+        <option value="">Seleccionar</option>
+        {areas.map(a => (
+          <option key={a.id} value={a.nombre}>
+            {a.nombre}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="field">
+      <label>Ubicación</label>
+      <input
+        name="ubicacion"
+        placeholder="Ubicación"
+        value={form.ubicacion}
+        onChange={handleChange}
+      />
+    </div>
+  </div>
+</div>
+
 
             {/* ================= DATOS DEL EQUIPO ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Datos Equipo</h3>
-              <div className="row-3">
-                <div className="field">
-                  <label>Nombre Equipo</label>
-                  <input placeholder="Nombre Equipo" value={equipoTemp.nombreEquipo} onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
-                </div>
-                <div className="field">
-                  <label>Dispositivo</label>
-                  <select value={equipoTemp.dispositivo} onChange={e => handleEquipoTempChange("dispositivo", e.target.value)}>
-                    <option value="">Dispositivo</option>
-                    {dispositivos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Inventario</label>
-                  <input placeholder="Inventario" value={equipoTemp.inventario} onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
-                </div>
-              </div>
+<div className="md-section">
+  <h3 className="section-title">Datos Equipo</h3>
 
-              <div className="row-3 mt">
-                <div className="field">
-                  <label>Procesador</label>
-                  <select value={equipoTemp.procesador} onChange={e => handleEquipoTempChange("procesador", e.target.value)}>
-                    <option value="">Procesador</option>
-                    {procesadores.map(p => <option key={p.id} value={p.nombre}>{p.nombre}</option>)}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Disco</label>
-                  <select value={equipoTemp.disco} onChange={e => handleEquipoTempChange("disco", e.target.value)}>
-                    <option value="">Disco</option>
-                    {discos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Ram</label>
-                  <select value={equipoTemp.ram} onChange={e => handleEquipoTempChange("ram", e.target.value)}>
-                    <option value="">RAM</option>
-                    {rams.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
-                  </select>
-                </div>
-              </div>
+  <div className="row-3">
+    <div className="field">
+      <label>Nombre Equipo</label>
+      <input
+        placeholder="Nombre Equipo"
+        value={equipoTemp.nombreEquipo}
+        onChange={e =>
+          handleEquipoTempChange("nombreEquipo", e.target.value)
+        }
+      />
+    </div>
+
+    <div className="field">
+      <label>Dispositivo</label>
+      <select
+        value={equipoTemp.dispositivo}
+        onChange={e =>
+          handleEquipoTempChange("dispositivo", e.target.value)
+        }
+      >
+        <option value="">Seleccionar</option>
+        {dispositivos.map(d => (
+          <option key={d.id} value={d.nombre}>
+            {d.nombre}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="field">
+      <label>Inventario</label>
+      <input
+        placeholder="Inventario"
+        value={equipoTemp.inventario}
+        onChange={e =>
+          handleEquipoTempChange("inventario", e.target.value)
+        }
+      />
+    </div>
+  </div>
+
+  <div className="row-3 mt">
+    <div className="field">
+      <label>Procesador</label>
+      <select
+        value={equipoTemp.procesador}
+        onChange={e =>
+          handleEquipoTempChange("procesador", e.target.value)
+        }
+      >
+        <option value="">Seleccionar</option>
+        {procesadores.map(p => (
+          <option key={p.id} value={p.nombre}>
+            {p.nombre}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="field">
+      <label>Disco</label>
+      <select
+        value={equipoTemp.disco}
+        onChange={e =>
+          handleEquipoTempChange("disco", e.target.value)
+        }
+      >
+        <option value="">Seleccionar</option>
+        {discos.map(d => (
+          <option key={d.id} value={d.nombre}>
+            {d.nombre}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="field">
+      <label className="label-acronym">RAM</label>
+      <select
+        value={equipoTemp.ram}
+        onChange={e =>
+          handleEquipoTempChange("ram", e.target.value)
+        }
+      >
+        <option value="">Seleccionar</option>
+        {rams.map(r => (
+          <option key={r.id} value={r.nombre}>
+            {r.nombre}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
 
               <div className="row-3 mt">
                 <div className="field">
                   <label>Sistema Operativo</label>
                   <select value={equipoTemp.so} onChange={e => handleEquipoTempChange("so", e.target.value)}>
-                    <option value="">Sistema Operativo</option>
+                    <option value="">Seleccionar</option>
                     {sistemasOperativos.map(so => (<option key={so.id} value={so.nombre}>{so.nombre}</option>))}
                   </select>
                 </div>
@@ -391,22 +461,29 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
     <h3 className="section-title">Lista Chequeo Hardware</h3>
 
     <div className="grid-2">
-      {Object.keys(form.hardwareChecks).map(k => (
-        <div className="field" key={k}>
-          <label>{k.toLowerCase()}</label>
-          <select
-            value={form.hardwareChecks[k]}
-            onChange={e =>
-              handleNestedChange("hardwareChecks", k, e.target.value)
-            }
-          >
-            <option value="">Seleccionar</option>
-            <option>Realizado</option>
-            <option>No Aplica</option>
-          </select>
-        </div>
-      ))}
-    </div>
+      {Object.keys(form.hardwareChecks).map(k => {
+        const isAcronym = k.toUpperCase().includes("CPU/AIO");
+
+        return (
+          <div className="field" key={k}>
+            <label className={isAcronym ? "label-acronym" : ""}>
+              {k}
+            </label>
+
+            <select
+              value={form.hardwareChecks[k]}
+              onChange={e =>
+                handleNestedChange("hardwareChecks", k, e.target.value)
+              }
+            >
+              <option value="">Seleccionar</option>
+              <option>Realizado</option>
+              <option>No Aplica</option>
+            </select>
+          </div>
+        );
+      })}
+   </div>
 
     <div className="field mt">
       <label>Observaciones</label>
