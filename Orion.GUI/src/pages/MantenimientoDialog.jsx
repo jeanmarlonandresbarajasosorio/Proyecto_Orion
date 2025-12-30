@@ -159,7 +159,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 </div>
                 <div className="field">
                   <label>Ubicación</label>
-                  <input name="ubicacion" placeholder="ubicación" value={form.ubicacion} onChange={handleChange} />
+                  <input name="Ubicacion" placeholder="Ubicación" value={form.ubicacion} onChange={handleChange} />
                 </div>
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               <div className="row-3">
                 <div className="field">
                   <label>Nombre Equipo</label>
-                  <input placeholder="nombre equipo" value={equipoTemp.nombreEquipo} onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
+                  <input placeholder="Nombre Equipo" value={equipoTemp.nombreEquipo} onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
                 </div>
                 <div className="field">
                   <label>Dispositivo</label>
@@ -181,7 +181,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 </div>
                 <div className="field">
                   <label>Inventario</label>
-                  <input placeholder="inventario" value={equipoTemp.inventario} onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
+                  <input placeholder="Inventario" value={equipoTemp.inventario} onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
                 </div>
               </div>
 
@@ -203,7 +203,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 <div className="field">
                   <label>Ram</label>
                   <select value={equipoTemp.ram} onChange={e => handleEquipoTempChange("ram", e.target.value)}>
-                    <option value="">Ram</option>
+                    <option value="">RAM</option>
                     {rams.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
                   </select>
                 </div>
@@ -231,7 +231,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                         <th className="col-inventario">Inventario</th>
                         <th className="col-hw">Procesador</th>
                         <th className="col-hw">Disco</th>
-                        <th className="col-hw">Ram</th>
+                        <th className="col-hw">RAM</th>
                         <th className="col-so">So</th>
                         <th className="col-accion">Acción</th>
                       </tr>
@@ -319,22 +319,36 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               </div>
             </div>
 
-            {/* ================= SOFTWARE ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Lista Chequeo Software</h3>
-              <div className="grid-2">
-                {Object.keys(form.softwareChecks).map(k => (
-                  <div className="field" key={k}>
-                    <label>{k.toLowerCase()}</label>
-                    <select value={form.softwareChecks[k]} onChange={e => handleNestedChange("softwareChecks", k, e.target.value)}>
-                      <option value="">Seleccionar</option>
-                      <option>Verificado</option>
-                      <option>No Aplica</option>
-                    </select>
-                  </div>
-                ))}
-              </div>
-            </div>
+         {/* ================= SOFTWARE ================= */}
+<div className="md-section">
+  <h3 className="section-title">Lista Chequeo Software</h3>
+
+  <div className="grid-2">
+    {Object.keys(form.softwareChecks).map(k => {
+      const isAcronym = k === "SAP" || k === "OCS Inventory";
+
+      return (
+        <div className="field" key={k}>
+          <label className={isAcronym ? "label-acronym" : ""}>
+            {isAcronym ? k : k.toLowerCase()}
+          </label>
+
+          <select
+            value={form.softwareChecks[k]}
+            onChange={e =>
+              handleNestedChange("softwareChecks", k, e.target.value)
+            }
+          >
+            <option value="">Seleccionar</option>
+            <option>Verificado</option>
+            <option>No Aplica</option>
+          </select>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
 
             {/* ================= GARANTÍA ================= */}
             <div className="md-section">
@@ -380,10 +394,10 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             {/* =================  FUNCIONARIO TIC REALIZA ================= */}
             <div className="md-section">
-              <h3 className="section-title">Funcionario Tic Realiza Mantenimiento</h3>
+              <h3 className="section-title">Funcionario TIC Realiza Mantenimiento</h3>
               <div className="row-2">
                 <div className="field">
-                  <label>Funcionario tic</label>
+                  <label>Funcionario TIC</label>
                   <select 
                     name="funcionarioTicMantenimiento" 
                     value={form.funcionarioTicMantenimiento} 
@@ -425,7 +439,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 </div>
               </div>
               <div className="field mt">
-                <label>No. Orden Sap</label>
+                <label>No. Orden SAP</label>
                 <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
               </div>
             </div>

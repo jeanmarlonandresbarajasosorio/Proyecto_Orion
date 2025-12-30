@@ -242,3 +242,7 @@ body.modal-open {
     max-width: 95%;
   }
 }
+.label-acronym {
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
