@@ -17,19 +17,15 @@ const initialForm = {
   sede: "",
   area: "",
   ubicacion: "",
-
   equipos: [],
-
   fechaRetiro: "",
   autorizaRetiro: "",
   fechaEntrega: "",
   recibe: "",
-
   funcionarioRealiza: "",
   fechaRealiza: "",
   funcionarioAprueba: "",
   fechaAprueba: "",
-
   softwareChecks: {
     Antivirus: "",
     "Nombre del computador": "",
@@ -38,10 +34,8 @@ const initialForm = {
     "OCS Inventory": "",
     SAP: "",
   },
-
   garantia: "",
   vencimientoGarantia: "",
-
   hardwareChecks: {
     "Limpieza CPU/AIO": "",
     "Limpieza Monitor": "",
@@ -50,8 +44,11 @@ const initialForm = {
     "Limpieza board y componentes": "",
     "Limpieza Portátil": "",
   },
-
   observaciones: "",
+  
+  // Nuevo campo para la sección solicitada
+  funcionarioTicMantenimiento: "",
+  fechaTicMantenimiento: "",
 
   minutosParada: "",
   proporcionParada: "",
@@ -72,59 +69,41 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
   const [rams, setRams] = useState([]);
   const [sistemasOperativos, setSistemasOperativos] = useState([]);
 
-  /* ================= BLOQUEAR SCROLL ================= */
   useEffect(() => {
     document.body.classList.add("modal-open");
     return () => document.body.classList.remove("modal-open");
   }, []);
 
-  /* ================= CARGA APIS ================= */
- useEffect(() => {
-  const baseUrl = import.meta.env.VITE_API_URL;
+  useEffect(() => {
+    const baseUrl = import.meta.env.VITE_API_URL;
+    fetch(`${baseUrl}/sedes`).then(r => r.json()).then(setSedes);
+    fetch(`${baseUrl}/areas`).then(r => r.json()).then(setAreas);
+    fetch(`${baseUrl}/tipos-dispositivos`).then(r => r.json()).then(setDispositivos);
+    fetch(`${baseUrl}/funcionarios`).then(r => r.json()).then(setFuncionarios);
+    fetch(`${baseUrl}/procesadores`).then(r => r.json()).then(setProcesadores);
+    fetch(`${baseUrl}/discos-duros`).then(r => r.json()).then(setDiscos);
+    fetch(`${baseUrl}/memorias-ram`).then(r => r.json()).then(setRams);
+    fetch(`${baseUrl}/sistemas-operativos`).then(r => r.json()).then(setSistemasOperativos);
+  }, []);
 
-  fetch(`${baseUrl}/sedes`).then(r => r.json()).then(setSedes);
-  fetch(`${baseUrl}/areas`).then(r => r.json()).then(setAreas);
-  fetch(`${baseUrl}/tipos-dispositivos`).then(r => r.json()).then(setDispositivos);
-  fetch(`${baseUrl}/funcionarios`).then(r => r.json()).then(setFuncionarios);
-  fetch(`${baseUrl}/procesadores`).then(r => r.json()).then(setProcesadores);
-  fetch(`${baseUrl}/discos-duros`).then(r => r.json()).then(setDiscos);
-  fetch(`${baseUrl}/memorias-ram`).then(r => r.json()).then(setRams);
-  fetch(`${baseUrl}/sistemas-operativos`).then(r => r.json()).then(setSistemasOperativos);
-}, []);
-
-  /* ======================================================
-      CORRECCIÓN CLAVE — CARGAR DATOS AL EDITAR
-     ====================================================== */
   useEffect(() => {
     if (editingRecord) {
       setForm({
         ...initialForm,
         ...editingRecord,
         equipos: editingRecord.equipos || [],
-        softwareChecks: {
-          ...initialForm.softwareChecks,
-          ...(editingRecord.softwareChecks || {}),
-        },
-        hardwareChecks: {
-          ...initialForm.hardwareChecks,
-          ...(editingRecord.hardwareChecks || {}),
-        },
+        softwareChecks: { ...initialForm.softwareChecks, ...(editingRecord.softwareChecks || {}) },
+        hardwareChecks: { ...initialForm.hardwareChecks, ...(editingRecord.hardwareChecks || {}) },
       });
     } else {
       setForm(initialForm);
     }
   }, [editingRecord]);
-  /* ====================================================== */
 
-  /* ================= HANDLERS ================= */
-  const handleChange = e =>
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = e => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleNestedChange = (group, key, value) =>
-    setForm(prev => ({
-      ...prev,
-      [group]: { ...prev[group], [key]: value },
-    }));
+    setForm(prev => ({ ...prev, [group]: { ...prev[group], [key]: value } }));
 
   const handleEquipoTempChange = (field, value) =>
     setEquipoTemp(prev => ({ ...prev, [field]: value }));
@@ -134,348 +113,327 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
       alert("Nombre del equipo requerido");
       return;
     }
-
-    setForm(prev => ({
-      ...prev,
-      equipos: [...prev.equipos, { ...equipoTemp }],
-    }));
-
+    setForm(prev => ({ ...prev, equipos: [...prev.equipos, { ...equipoTemp }] }));
     setEquipoTemp({ ...emptyEquipo });
   };
 
   const quitarEquipo = index =>
-    setForm(prev => ({
-      ...prev,
-      equipos: prev.equipos.filter((_, i) => i !== index),
-    }));
+    setForm(prev => ({ ...prev, equipos: prev.equipos.filter((_, i) => i !== index) }));
 
   const handleSubmit = e => {
     e.preventDefault();
+    if (form.garantia === "SI" && !form.vencimientoGarantia) {
+      alert("Por favor ingrese la fecha de vencimiento de la garantía.");
+      return;
+    }
     onSave(form);
     onClose();
   };
 
-  /* ================= UI ================= */
   return (
     <div className="md-overlay">
       <div className="md-modal">
+        <button className="md-btn-close" onClick={onClose}>&times;</button>
+        
         <div className="md-modal-content">
-          <h2>{editingRecord ? "Editar Mantenimiento" : "Crear Mantenimiento"}</h2>
+          <h2 className="md-title">{editingRecord ? "editar mantenimiento" : "crear mantenimiento"}</h2>
 
           <form onSubmit={handleSubmit} className="md-form">
-
+            
             {/* ================= DATOS ÁREA ================= */}
             <div className="md-section">
-              <h3>Datos del Área</h3>
+              <h3 className="section-title">datos del área</h3>
               <div className="row-3">
-                <select name="sede" value={form.sede} onChange={handleChange}>
-                  <option value="">Sede</option>
-                  {sedes.map(s => <option key={s.id} value={s.nombre}>{s.nombre}</option>)}
-                </select>
-
-                <select name="area" value={form.area} onChange={handleChange}>
-                  <option value="">Área</option>
-                  {areas.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
-                </select>
-
-                <input name="ubicacion" placeholder="Ubicación" value={form.ubicacion} onChange={handleChange} />
+                <div className="field">
+                  <label>sede</label>
+                  <select name="sede" value={form.sede} onChange={handleChange}>
+                    <option value="">sede</option>
+                    {sedes.map(s => <option key={s.id} value={s.nombre}>{s.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>área</label>
+                  <select name="area" value={form.area} onChange={handleChange}>
+                    <option value="">área</option>
+                    {areas.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>ubicación</label>
+                  <input name="ubicacion" placeholder="ubicación" value={form.ubicacion} onChange={handleChange} />
+                </div>
               </div>
             </div>
 
-
-             {/* ================= DATOS DEL EQUIPO ================= */}
+            {/* ================= DATOS DEL EQUIPO ================= */}
             <div className="md-section">
-              <h3>Datos del Equipo</h3>
-
+              <h3 className="section-title">datos del equipo</h3>
               <div className="row-3">
-                <input placeholder="Nombre Equipo"
-                  value={equipoTemp.nombreEquipo}
-                  onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
-                
-                <select value={equipoTemp.dispositivo}
-                  onChange={e => handleEquipoTempChange("dispositivo", e.target.value)}>
-                  <option value="">Dispositivo</option>
-                  {dispositivos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
-                </select>
-
-                <input placeholder="Inventario"
-                  value={equipoTemp.inventario}
-                  onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
+                <div className="field">
+                  <label>nombre equipo</label>
+                  <input placeholder="nombre equipo" value={equipoTemp.nombreEquipo} onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>dispositivo</label>
+                  <select value={equipoTemp.dispositivo} onChange={e => handleEquipoTempChange("dispositivo", e.target.value)}>
+                    <option value="">dispositivo</option>
+                    {dispositivos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>inventario</label>
+                  <input placeholder="inventario" value={equipoTemp.inventario} onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
+                </div>
               </div>
 
               <div className="row-3 mt">
-                <select value={equipoTemp.procesador}
-                  onChange={e => handleEquipoTempChange("procesador", e.target.value)}>
-                  <option value="">Procesador</option>
-                  {procesadores.map(p => <option key={p.id} value={p.nombre}>{p.nombre}</option>)}
-                </select>
-
-                <select value={equipoTemp.disco}
-                  onChange={e => handleEquipoTempChange("disco", e.target.value)}>
-                  <option value="">Disco</option>
-                  {discos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
-                </select>
-
-                <select value={equipoTemp.ram}
-                  onChange={e => handleEquipoTempChange("ram", e.target.value)}>
-                  <option value="">RAM</option>
-                  {rams.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
-                </select>
+                <div className="field">
+                  <label>procesador</label>
+                  <select value={equipoTemp.procesador} onChange={e => handleEquipoTempChange("procesador", e.target.value)}>
+                    <option value="">procesador</option>
+                    {procesadores.map(p => <option key={p.id} value={p.nombre}>{p.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>disco</label>
+                  <select value={equipoTemp.disco} onChange={e => handleEquipoTempChange("disco", e.target.value)}>
+                    <option value="">disco</option>
+                    {discos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>ram</label>
+                  <select value={equipoTemp.ram} onChange={e => handleEquipoTempChange("ram", e.target.value)}>
+                    <option value="">ram</option>
+                    {rams.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
+                  </select>
+                </div>
               </div>
 
               <div className="row-3 mt">
-                <select value={equipoTemp.so}
-                  onChange={e => handleEquipoTempChange("so", e.target.value)}>
-                  <option value="">Sistema Operativo</option>
-                  {sistemasOperativos.map(so => (
-                    <option key={so.id} value={so.nombre}>{so.nombre}</option>
-                  ))}
-                </select>
+                <div className="field">
+                  <label>sistema operativo</label>
+                  <select value={equipoTemp.so} onChange={e => handleEquipoTempChange("so", e.target.value)}>
+                    <option value="">sistema operativo</option>
+                    {sistemasOperativos.map(so => (<option key={so.id} value={so.nombre}>{so.nombre}</option>))}
+                  </select>
+                </div>
               </div>
 
-              <button type="button" className="btn-save mt" onClick={agregarEquipo}>
-                + Agregar Equipo
-              </button>
+              <button type="button" className="btn-save mt" onClick={agregarEquipo}>+ agregar equipo</button>
 
-           {form.equipos.length > 0 && (
-  <div className="equipos-table-wrapper mt">
-    <table className="md-table equipos-table">
-      <thead>
-        <tr>
-          <th className="col-equipo">Equipo</th>
-          <th className="col-dispositivo">Dispositivo</th>
-          <th className="col-inventario">Inventario</th>
-          <th className="col-hw">Procesador</th>
-          <th className="col-hw">Disco</th>
-          <th className="col-hw">RAM</th>
-          <th className="col-so">SO</th>
-        </tr>
-      </thead>
-       
-      <tbody>
-        
-        {form.equipos.map((eq, i) => (
-          <tr key={i}>
-            <td className="col-equipo">
-              <strong>{eq.nombreEquipo}</strong>
-            </td>
-
-            <td className="col-dispositivo">
-              {eq.dispositivo}
-            </td>
-
-            <td className="col-inventario">
-              <span className="badge-inv">{eq.inventario}</span>
-            </td>
-
-            <td className="col-hw">{eq.procesador}</td>
-            <td className="col-hw">{eq.disco}</td>
-            <td className="col-hw">{eq.ram}</td>
-            <td className="col-so">{eq.so}</td>
-            
-
-            <td className="col-accion">
-              <button
-                type="button"
-                className="btn-cancel btn-small"
-                onClick={() => quitarEquipo(i)}
-              >
-                Quitar
-              </button>
-             </td>
-            </tr>
-           ))}
-         </tbody>
-       </table>
-      </div>
-      )}
-
-   </div>
+              {form.equipos.length > 0 && (
+                <div className="equipos-table-wrapper mt">
+                  <table className="md-table equipos-table">
+                    <thead>
+                      <tr>
+                        <th className="col-equipo">equipo</th>
+                        <th className="col-dispositivo">dispositivo</th>
+                        <th className="col-inventario">inventario</th>
+                        <th className="col-hw">procesador</th>
+                        <th className="col-hw">disco</th>
+                        <th className="col-hw">ram</th>
+                        <th className="col-so">so</th>
+                        <th className="col-accion">acción</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {form.equipos.map((eq, i) => (
+                        <tr key={i}>
+                          <td className="col-equipo"><strong>{eq.nombreEquipo}</strong></td>
+                          <td className="col-dispositivo">{eq.dispositivo}</td>
+                          <td className="col-inventario"><span className="badge-inv">{eq.inventario}</span></td>
+                          <td className="col-hw">{eq.procesador}</td>
+                          <td className="col-hw">{eq.disco}</td>
+                          <td className="col-hw">{eq.ram}</td>
+                          <td className="col-so">{eq.so}</td>
+                          <td className="col-accion">
+                            <button type="button" className="btn-cancel btn-small" onClick={() => quitarEquipo(i)}>quitar</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
 
             {/* ================= AUTORIZACIÓN RETIRO ================= */}
             <div className="md-section">
-              <h3>Autorización de Retiro y Recibo</h3>
-
-              <div className="row-2">
-                <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
-                <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
-                  <option value="">Seleccionar</option>
-                  {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
-                </select>
-              </div>
-
-              <div className="row-2 mt">
-                <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
-                <select name="recibe" value={form.recibe} onChange={handleChange}>
-                  <option value="">Seleccionar</option>
-                  {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
-                </select>
-              </div>
-            </div>
-
-            {/* ================= FUNCIONARIOS ================= */}
-         <div className="md-section">
-              <h3>Funcionarios</h3>
-
+              <h3 className="section-title">autorización de retiro y recibo</h3>
               <div className="row-2">
                 <div className="field">
-                  <label>Seleccionar</label>
-                  <select
-                    name="funcionarioRealiza"
-                    value={form.funcionarioRealiza}
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => (
-                      <option key={f.id} value={f.nombre}>
-                        {f.nombre}
-                      </option>
-                    ))}
-                  </select>
+                  <label>fecha retiro</label>
+                  <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
                 </div>
-
                 <div className="field">
-                  <label>Fecha Realiza</label>
-                  <input
-                    type="datetime-local"
-                    name="fechaRealiza"
-                    value={form.fechaRealiza}
-                    onChange={handleChange}
-                  />
+                  <label>autoriza retiro</label>
+                  <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
+                    <option value="">seleccionar</option>
+                    {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                  </select>
                 </div>
               </div>
-
               <div className="row-2 mt">
                 <div className="field">
-                  <label>Funcionario Aprueba</label>
-                  <select
-                    name="funcionarioAprueba"
-                    value={form.funcionarioAprueba}
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => (
-                      <option key={f.id} value={f.nombre}>
-                        {f.nombre}
-                      </option>
-                    ))}
-                  </select>
+                  <label>fecha entrega</label>
+                  <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
                 </div>
-
                 <div className="field">
-                  <label>Fecha Aprueba</label>
-                  <input
-                    type="datetime-local"
-                    name="fechaAprueba"
-                    value={form.fechaAprueba}
-                    onChange={handleChange}
-                  />
+                  <label>recibe</label>
+                  <select name="recibe" value={form.recibe} onChange={handleChange}>
+                    <option value="">seleccionar</option>
+                    {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                  </select>
                 </div>
               </div>
             </div>
 
+            {/* ================= Fucionarios ================= */}
+            <div className="md-section">
+              <h3 className="section-title">Funcionarios</h3>
+              <div className="row-2">
+                <div className="field">
+                  <label>funcionario realiza</label>
+                  <select name="funcionarioRealiza" value={form.funcionarioRealiza} onChange={handleChange}>
+                    <option value="">seleccionar</option>
+                    {funcionarios.map(f => (<option key={f.id} value={f.nombre}>{f.nombre}</option>))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>fecha realiza</label>
+                  <input type="datetime-local" name="fechaRealiza" value={form.fechaRealiza} onChange={handleChange} />
+                </div>
+              </div>
+              <div className="row-2 mt">
+                <div className="field">
+                  <label>funcionario aprueba</label>
+                  <select name="funcionarioAprueba" value={form.funcionarioAprueba} onChange={handleChange}>
+                    <option value="">seleccionar</option>
+                    {funcionarios.map(f => (<option key={f.id} value={f.nombre}>{f.nombre}</option>))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>fecha aprueba</label>
+                  <input type="datetime-local" name="fechaAprueba" value={form.fechaAprueba} onChange={handleChange} />
+                </div>
+              </div>
+            </div>
 
             {/* ================= SOFTWARE ================= */}
             <div className="md-section">
-              <h3>Lista de Chequeo de Software</h3>
+              <h3 className="section-title">lista de chequeo de software</h3>
               <div className="grid-2">
                 {Object.keys(form.softwareChecks).map(k => (
-                  <select key={k} value={form.softwareChecks[k]}
-                    onChange={e => handleNestedChange("softwareChecks", k, e.target.value)}>
-                    <option value="">{k}</option>
-                    <option>Verificado</option>
-                    <option>No aplica</option>
-                  </select>
+                  <div className="field" key={k}>
+                    <label>{k.toLowerCase()}</label>
+                    <select value={form.softwareChecks[k]} onChange={e => handleNestedChange("softwareChecks", k, e.target.value)}>
+                      <option value="">estado</option>
+                      <option>verificado</option>
+                      <option>no aplica</option>
+                    </select>
+                  </div>
                 ))}
               </div>
             </div>
 
             {/* ================= GARANTÍA ================= */}
             <div className="md-section">
-              <h3>Garantía</h3>
+              <h3 className="section-title">garantía</h3>
               <div className="row-2">
-                <select name="garantia" value={form.garantia} onChange={handleChange}>
-                  <option value="">¿Equipo en garantía?</option>
-                  <option>SI</option>
-                  <option>NO</option>
-                </select>
-
-                <input type="date" name="vencimientoGarantia"
-                  value={form.vencimientoGarantia} onChange={handleChange} />
+                <div className="field">
+                  <label>¿equipo en garantía?</label>
+                  <select name="garantia" value={form.garantia} onChange={handleChange}>
+                    <option value="">seleccionar</option>
+                    <option>SI</option>
+                    <option>NO</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label>fecha vencimiento {form.garantia === "SI" && <span style={{color: 'red'}}>*</span>}</label>
+                  <input type="date" name="vencimientoGarantia" value={form.vencimientoGarantia} onChange={handleChange} />
+                </div>
               </div>
             </div>
 
             {/* ================= HARDWARE ================= */}
             {form.garantia === "NO" && (
               <div className="md-section">
-                <h3>Lista de Chequeo de Hardware</h3>
+                <h3 className="section-title">lista de chequeo de hardware</h3>
                 <div className="grid-2">
                   {Object.keys(form.hardwareChecks).map(k => (
-                    <select key={k}
-                      value={form.hardwareChecks[k]}
-                      onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}>
-                      <option value="">{k}</option>
-                      <option>Realizado</option>
-                      <option>No aplica</option>
-                    </select>
+                    <div className="field" key={k}>
+                      <label>{k.toLowerCase()}</label>
+                      <select value={form.hardwareChecks[k]} onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}>
+                        <option value="">estado</option>
+                        <option>realizado</option>
+                        <option>no aplica</option>
+                      </select>
+                    </div>
                   ))}
                 </div>
-
-                <textarea
-                  placeholder="Observaciones"
-                  value={form.observaciones}
-                  onChange={e => setForm(p => ({ ...p, observaciones: e.target.value }))}
-                />
+                <div className="field mt">
+                  <label>observaciones</label>
+                  <textarea name="observaciones" value={form.observaciones} onChange={handleChange} />
+                </div>
               </div>
             )}
 
-             {/* ================= TIEMPO DE PARADA (AGREGADO AL FINAL) ================= */}
+            {/* =================  FUNCIONARIO TIC REALIZA ================= */}
             <div className="md-section">
-              <h3>Tiempo de Parada</h3>
-
-              <div className="row-3">
+              <h3 className="section-title">funcionario tic que realiza el mantenimiento</h3>
+              <div className="row-2">
                 <div className="field">
-                  <label>Minutos Parada</label>
-                  <input
-                    name="minutosParada"
-                    value={form.minutosParada}
+                  <label>funcionario tic</label>
+                  <select 
+                    name="funcionarioTicMantenimiento" 
+                    value={form.funcionarioTicMantenimiento} 
                     onChange={handleChange}
+                  >
+                    <option value="">seleccionar funcionario</option>
+                    {funcionarios.map(f => (
+                      <option key={f.id} value={f.nombre}>{f.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label>fecha</label>
+                  <input 
+                    type="datetime-local" 
+                    name="fechaTicMantenimiento" 
+                    value={form.fechaTicMantenimiento} 
+                    onChange={handleChange} 
                   />
                 </div>
-
-                <div className="field">
-                  <label>Proporción (%)</label>
-                  <input
-                    name="proporcionParada"
-                    value={form.proporcionParada}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="field">
-                  <label>Total Minutos Disponibles</label>
-                  <input
-                    name="totalDisponibilidad"
-                    value={form.totalDisponibilidad}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="field">
-                <label>No. Orden SAP</label>
-                <input
-                  name="noOrdenSAP"
-                  value={form.noOrdenSAP}
-                  onChange={handleChange}
-                />
               </div>
             </div>
 
-            {/* ================= ACCIONES ================= */}
+            {/* ================= TIEMPO DE PARADA ================= */}
+            <div className="md-section">
+              <h3 className="section-title">tiempo de parada</h3>
+              <div className="row-3">
+                <div className="field">
+                  <label>minutos parada</label>
+                  <input name="minutosParada" value={form.minutosParada} onChange={handleChange} />
+                </div>
+                <div className="field">
+                  <label>proporción (%)</label>
+                  <input name="proporcionParada" value={form.proporcionParada} onChange={handleChange} />
+                </div>
+                <div className="field">
+                  <label>total disponibilidad</label>
+                  <input name="totalDisponibilidad" value={form.totalDisponibilidad} onChange={handleChange} />
+                </div>
+              </div>
+              <div className="field mt">
+                <label>no. orden sap</label>
+                <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
+              </div>
+            </div>
+
             <div className="md-actions">
-              <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
-              <button type="submit" className="btn-save">Guardar</button>
+              <button type="button" className="btn-cancel" onClick={onClose}>cancelar</button>
+              <button type="submit" className="btn-save">guardar</button>
             </div>
 
           </form>

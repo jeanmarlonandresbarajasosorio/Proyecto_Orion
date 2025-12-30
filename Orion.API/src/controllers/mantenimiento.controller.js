@@ -6,123 +6,167 @@ export const getAllOrExcel = async (req, res) => {
     const { desde, hasta, export: exportType } = req.query;
     const query = {};
 
-    // 1️⃣ Filtro de fechas
+    // 1. FILTRO DE FECHAS
     if (desde && hasta) {
-      query.createdAt = {
-        $gte: new Date(desde + "T00:00:00.000Z"),
-        $lte: new Date(hasta + "T23:59:59.999Z"),
+      query.fechaEntrega = {
+        $gte: new Date(`${desde}T00:00:00.000Z`),
+        $lte: new Date(`${hasta}T23:59:59.999Z`),
       };
     }
 
-    const mantenimientos = await Mantenimiento
-      .find(query)
-      .sort({ createdAt: -1 })
-      .lean();
+    const mantenimientos = await Mantenimiento.find(query).lean();
 
-    // ================= EXPORTAR A EXCEL =================
-    if (exportType === "excel") {
+    // 2. LÓGICA DE EXPORTACIÓN A EXCEL
+    if (String(exportType).toLowerCase() === "excel") {
       const workbook = new ExcelJS.Workbook();
-      const sheet = workbook.addWorksheet("Mantenimientos");
+      const sheet = workbook.addWorksheet("Reporte Mantenimientos");
 
-      // 2️⃣ DEFINICIÓN DE COLUMNAS (APLANADAS)
+      // Definición de columnas exhaustiva (Todos los campos del diálogo)
       sheet.columns = [
-        { header: "Fecha", key: "fecha", width: 15 },
-        { header: "Sede", key: "sede", width: 25 },
-        { header: "Área", key: "area", width: 20 },
-        { header: "Ubicación", key: "ubicacion", width: 20 },
-
-        { header: "Equipo", key: "equipo", width: 20 },
+        // Datos del Área
+        { header: "Sede", key: "sede", width: 15 },
+        { header: "Área", key: "area", width: 15 },
+        { header: "Ubicación", key: "ubicacion", width: 15 },
+        
+        // Datos del Equipo (Iterados)
+        { header: "Nombre Equipo", key: "nombreEquipo", width: 18 },
         { header: "Dispositivo", key: "dispositivo", width: 15 },
-        { header: "Inventario", key: "inventario", width: 15 },
+        { header: "Inventario", key: "inventario", width: 12 },
+        { header: "Procesador", key: "procesador", width: 15 },
+        { header: "Disco", key: "disco", width: 10 },
+        { header: "RAM", key: "ram", width: 10 },
         { header: "SO", key: "so", width: 15 },
 
-        { header: "Dominio Foscal", key: "dominio", width: 20 },
-        { header: "Antivirus", key: "antivirus", width: 15 },
-        { header: "Nombre Computador", key: "nombrePc", width: 20 },
-        { header: "Actualizaciones Windows", key: "windows", width: 25 },
-        { header: "OCS Inventory", key: "ocs", width: 20 },
-        { header: "SAP", key: "sapSoftware", width: 15 },
+        // Autorización y Recibo
+        { header: "Fecha Retiro", key: "fechaRetiro", width: 18 },
+        { header: "Autoriza Retiro", key: "autorizaRetiro", width: 20 },
+        { header: "Fecha Entrega", key: "fechaEntrega", width: 18 },
+        { header: "Recibe", key: "recibe", width: 20 },
 
-        { header: "Limpieza CPU", key: "cpu", width: 20 },
-        { header: "Limpieza Monitor", key: "monitor", width: 20 },
-        { header: "Limpieza Periféricos", key: "perifericos", width: 25 },
-        { header: "Cambio Crema", key: "crema", width: 20 },
-        { header: "Limpieza Board", key: "board", width: 25 },
-        { header: "Limpieza Portátil", key: "portatil", width: 25 },
+        // Personal Técnico
+        { header: "Funcionario Realiza", key: "funcionarioRealiza", width: 20 },
+        { header: "Fecha Realiza", key: "fechaRealiza", width: 18 },
+        { header: "Funcionario Aprueba", key: "funcionarioAprueba", width: 20 },
+        { header: "Fecha Aprueba", key: "fechaAprueba", width: 18 },
 
-        { header: "Funcionario", key: "funcionario", width: 25 },
-        { header: "Orden SAP", key: "sapOrden", width: 15 },
-        { header: "Garantía", key: "garantia", width: 10 },
-        { header: "Observaciones", key: "obs", width: 30 },
+        // Software Checks (en minúsculas como en el diálogo)
+        { header: "SW: Antivirus", key: "sw_antivirus", width: 12 },
+        { header: "SW: Nombre PC", key: "sw_nombre", width: 12 },
+        { header: "SW: Windows Update", key: "sw_updates", width: 12 },
+        { header: "SW: Dominio", key: "sw_dominio", width: 12 },
+        { header: "SW: OCS", key: "sw_ocs", width: 12 },
+        { header: "SW: SAP", key: "sw_sap", width: 12 },
+
+        // Garantía
+        { header: "En Garantía", key: "garantia", width: 10 },
+        { header: "Vence Garantía", key: "vencimientoGarantia", width: 15 },
+
+        // Hardware Checks (en minúsculas como en el diálogo)
+        { header: "HW: Limpieza CPU", key: "hw_cpu", width: 12 },
+        { header: "HW: Monitor", key: "hw_monitor", width: 12 },
+        { header: "HW: Periféricos", key: "hw_perifericos", width: 12 },
+        { header: "HW: Crema Disipadora", key: "hw_crema", width: 12 },
+        { header: "HW: Board", key: "hw_board", width: 12 },
+        { header: "HW: Portátil", key: "hw_portatil", width: 12 },
+
+        // Mantenimiento TIC
+        { header: "Funcionario TIC", key: "funcionarioTicMantenimiento", width: 20 },
+        { header: "Fecha Mant. TIC", key: "fechaTicMantenimiento", width: 18 },
+
+        // Tiempos y Otros
+        { header: "Minutos Parada", key: "minutosParada", width: 12 },
+        { header: "Proporción %", key: "proporcionParada", width: 12 },
+        { header: "Disponibilidad Total", key: "totalDisponibilidad", width: 12 },
+        { header: "Orden SAP", key: "noOrdenSAP", width: 15 },
+        { header: "Observaciones", key: "observaciones", width: 30 }
       ];
 
-      // 3️⃣ LLENADO DE FILAS (APLANANDO JSON)
-      mantenimientos.forEach((m) => {
-        const fecha = m.createdAt
-          ? new Date(m.createdAt).toISOString().split("T")[0]
-          : "";
+      sheet.getRow(1).font = { bold: true };
 
-        const equipos = Array.isArray(m.equipos) && m.equipos.length
-          ? m.equipos
+      // 3. LLENADO DE DATOS
+      mantenimientos.forEach((m) => {
+        const listaEquipos = Array.isArray(m.equipos) && m.equipos.length > 0 
+          ? m.equipos 
           : [{}];
 
-        equipos.forEach((eq) => {
+        listaEquipos.forEach((eq) => {
           sheet.addRow({
-            fecha,
             sede: m.sede || "",
             area: m.area || "",
             ubicacion: m.ubicacion || "",
-
-            equipo: eq.nombreEquipo || "",
+            nombreEquipo: eq.nombreEquipo || "",
             dispositivo: eq.dispositivo || "",
             inventario: eq.inventario || "",
+            procesador: eq.procesador || "",
+            disco: eq.disco || "",
+            ram: eq.ram || "",
             so: eq.so || "",
 
-            dominio: m.softwareChecks?.["Dominio Foscal"]?.loc ?? "",
-            antivirus: m.softwareChecks?.Antivirus ?? "",
-            nombrePc: m.softwareChecks?.["Nombre del computador"] ?? "",
-            windows: m.softwareChecks?.["Actualizaciones de Windows"] ?? "",
-            ocs: m.softwareChecks?.["OCS Inventory"] ?? "",
-            sapSoftware: m.softwareChecks?.SAP ?? "",
+            fechaRetiro: m.fechaRetiro ? new Date(m.fechaRetiro).toLocaleString() : "",
+            autorizaRetiro: m.autorizaRetiro || "",
+            fechaEntrega: m.fechaEntrega ? new Date(m.fechaEntrega).toLocaleString() : "",
+            recibe: m.recibe || "",
 
-            cpu: m.hardwareChecks?.["Limpieza CPU/AIO"] ?? "",
-            monitor: m.hardwareChecks?.["Limpieza Monitor"] ?? "",
-            perifericos: m.hardwareChecks?.["Limpieza Periféricos"] ?? "",
-            crema: m.hardwareChecks?.["Cambio Crema Disipadora"] ?? "",
-            board: m.hardwareChecks?.["Limpieza board y componentes"] ?? "",
-            portatil: m.hardwareChecks?.["Limpieza Portátil"] ?? "",
+            funcionarioRealiza: m.funcionarioRealiza || "",
+            fechaRealiza: m.fechaRealiza ? new Date(m.fechaRealiza).toLocaleString() : "",
+            funcionarioAprueba: m.funcionarioAprueba || "",
+            fechaAprueba: m.fechaAprueba ? new Date(m.fechaAprueba).toLocaleString() : "",
 
-            funcionario: m.funcionarioRealiza || "",
-            sapOrden: m.noOrdenSAP || "",
+            // Mapeo Software (Usando minúsculas como quedó el diálogo)
+            sw_antivirus: m.softwareChecks?.antivirus || "",
+            sw_nombre: m.softwareChecks?.["nombre del computador"] || "",
+            sw_updates: m.softwareChecks?.["actualizaciones de windows"] || "",
+            sw_dominio: m.softwareChecks?.["dominio foscal.loc"] || "",
+            sw_ocs: m.softwareChecks?.["ocs inventory"] || "",
+            sw_sap: m.softwareChecks?.sap || "",
+
             garantia: m.garantia || "",
-            obs: m.observaciones || "",
+            vencimientoGarantia: m.vencimientoGarantia || "",
+
+            // Mapeo Hardware (Usando minúsculas como quedó el diálogo)
+            hw_cpu: m.hardwareChecks?.["limpieza cpu/aio"] || "",
+            hw_monitor: m.hardwareChecks?.["limpieza monitor"] || "",
+            hw_perifericos: m.hardwareChecks?.["limpieza periféricos"] || "",
+            hw_crema: m.hardwareChecks?.["cambio crema disipadora"] || "",
+            hw_board: m.hardwareChecks?.["limpieza board y componentes"] || "",
+            hw_portatil: m.hardwareChecks?.["limpieza portátil"] || "",
+
+            funcionarioTicMantenimiento: m.funcionarioTicMantenimiento || "",
+            fechaTicMantenimiento: m.fechaTicMantenimiento ? new Date(m.fechaTicMantenimiento).toLocaleString() : "",
+
+            minutosParada: m.minutosParada || "",
+            proporcionParada: m.proporcionParada || "",
+            totalDisponibilidad: m.totalDisponibilidad || "",
+            noOrdenSAP: m.noOrdenSAP || "",
+            observaciones: m.observaciones || ""
           });
         });
       });
 
-      // 4️⃣ RESPUESTA CORRECTA (EXCEL REAL)
+      // 4. ENVÍO DEL ARCHIVO
       res.setHeader(
-        "Content-Type",
+        "Content-Type", 
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       );
       res.setHeader(
-        "Content-Disposition",
-        "attachment; filename=Reporte_Mantenimientos.xlsx"
+        "Content-Disposition", 
+        'attachment; filename="Reporte_Mantenimientos.xlsx"'
       );
 
       const buffer = await workbook.xlsx.writeBuffer();
       return res.status(200).send(buffer);
     }
 
-    // ================= JSON NORMAL =================
-    return res.json(mantenimientos);
+    // 5. RESPUESTA JSON NORMAL
+    return res.status(200).json(mantenimientos);
 
   } catch (error) {
-    console.error("❌ ERROR CRÍTICO:", error);
+    console.error("❌ Error Grave en el Servidor:", error);
     if (!res.headersSent) {
-      return res.status(500).json({
-        error: "Error interno del servidor",
-        detalle: error.message
+      return res.status(500).json({ 
+        success: false, 
+        message: "No se pudo generar el reporte", 
+        error: error.message 
       });
     }
   }

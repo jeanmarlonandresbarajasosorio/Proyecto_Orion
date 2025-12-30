@@ -297,3 +297,70 @@ body.modal-open {
 .equipos-table tbody tr:hover {
   background: #fafbff;
 }
+/* Botón X de cerrar */
+.md-close-x {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.md-close-x:hover {
+  color: #d32f2f;
+}
+
+/* Estilo de los Labels */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  text-transform: uppercase;
+}
+
+/* Alineación del botón agregar equipo */
+.align-end {
+  justify-content: flex-end;
+}
+
+.md-modal {
+  position: relative; /* Importante para la X absoluta */
+  /* ... resto de tu diseño ... */
+}
+.md-modal { position: relative; } /* Para que la X se ubique bien */
+
+.md-btn-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.field label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: #333;
+}

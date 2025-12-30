@@ -1,23 +1,4 @@
-version: '3.8'
-
 services:
-  mongo:
-    image: mongo:7
-    container_name: orion-mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin123
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./orion.api
@@ -27,25 +8,19 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - MONGO_URI=mongodb://admin:admin123@mongo:27017/OrionDB?authSource=admin
-      - JWT_SECRET=super_secret_key_123
-      - PORT=5000
-    depends_on:
-      mongo:
-        condition: service_healthy
+      MONGODB_URI: "mongodb+srv://usuario1:usuario1@cluster0.smpvu.mongodb.net/Orion?retryWrites=true&w=majority"
+      JWT_SECRET: "super_secret_key_123"
+      PORT: 5000
 
   frontend:
     build:
       context: ./orion.gui
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:5000/api
+        VITE_API_URL: "http://localhost:5000/api"
     container_name: orion-frontend
     restart: always
     ports:
       - "3000:80"
     depends_on:
       - backend
-
-volumes:
-  mongo-data:

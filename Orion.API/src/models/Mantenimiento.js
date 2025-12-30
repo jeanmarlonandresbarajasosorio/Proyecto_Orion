@@ -14,13 +14,12 @@ const EquipoSchema = new mongoose.Schema(
   { _id: false }
 );
 
-/* ================= MANTENIMIENTO ================= */
+/* ================= SCHEMA PRINCIPAL MANTENIMIENTO ================= */
 const MantenimientoSchema = new mongoose.Schema(
   {
     sede: String,
     area: String,
     ubicacion: String,
-
     equipos: [EquipoSchema],
 
     fechaRetiro: Date,
@@ -28,6 +27,12 @@ const MantenimientoSchema = new mongoose.Schema(
     fechaEntrega: Date,
     recibe: String,
 
+    funcionarioRealiza: String,
+    fechaRealiza: Date,
+    funcionarioAprueba: String,
+    fechaAprueba: Date,
+
+    // AJUSTADO: Claves con Mayúsculas para coincidir con el Frontend
     softwareChecks: {
       Antivirus: String,
       "Nombre del computador": String,
@@ -37,9 +42,10 @@ const MantenimientoSchema = new mongoose.Schema(
       SAP: String,
     },
 
-    garantia: String,
+    garantia: String, 
     vencimientoGarantia: Date,
 
+    // AJUSTADO: Claves con Mayúsculas para coincidir con el Frontend
     hardwareChecks: {
       "Limpieza CPU/AIO": String,
       "Limpieza Monitor": String,
@@ -51,23 +57,22 @@ const MantenimientoSchema = new mongoose.Schema(
 
     observaciones: String,
 
-    minutosParada: Number,
-    proporcionParada: Number,
-    totalDisponibilidad: Number,
+    funcionarioTicMantenimiento: String,
+    fechaTicMantenimiento: Date,
 
-    funcionarioRealiza: String,
-    fechaRealiza: Date,
-    funcionarioAprueba: String,
-    fechaAprueba: Date,
-
+    minutosParada: String,
+    proporcionParada: String,
+    totalDisponibilidad: String,
     noOrdenSAP: String,
   },
-  { timestamps: true }
+  { 
+    timestamps: true, 
+    versionKey: false 
+  }
 );
 
-/* 🔥 CLAVE ABSOLUTA */
 export default mongoose.model(
   "Mantenimiento",
   MantenimientoSchema,
-  "mantenimientos" // 👈 nombre EXACTO en MongoDB
+  "mantenimientos"
 );
