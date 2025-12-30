@@ -445,8 +445,8 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
             </div>
 
             <div className="md-actions">
-              <button type="button" className="btn-cancel" onClick={onClose}>cancelar</button>
-              <button type="submit" className="btn-save">guardar</button>
+              <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn-save">Guardar</button>
             </div>
 
           </form>
