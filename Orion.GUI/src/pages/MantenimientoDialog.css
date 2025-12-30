@@ -14,67 +14,20 @@
 }
 
 /* ===============================
-   👁️ BOTÓN ORION (SIN ICONOS)
-   =============================== */
-.orion-eye-btn {
-  all: unset;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--blue-dark);
-  cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
-  box-shadow: var(--shadow-1);
-}
-
-.orion-eye-btn:hover {
-  background: var(--blue);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-2);
-}
-
-/* Ojo exterior */
-.orion-eye-btn::before {
-  content: "";
-  width: 14px;
-  height: 8px;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  position: absolute;
-}
-
-/* Pupila */
-.orion-eye-btn::after {
-  content: "";
-  width: 4px;
-  height: 4px;
-  background: #ffffff;
-  border-radius: 50%;
-  position: absolute;
-}
-
-/* ===============================
-   🔒 BLOQUEO SCROLL FONDO
+   🔒 BLOQUEO SCROLL
    =============================== */
 body.modal-open {
   overflow: hidden;
 }
 
 /* ===============================
-   MODAL OVERLAY
+   OVERLAY
    =============================== */
 .md-overlay {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.45);
   z-index: 9999;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,6 +37,7 @@ body.modal-open {
    MODAL
    =============================== */
 .md-modal {
+  position: relative;
   background: var(--card-bg);
   border-radius: 14px;
   width: 100%;
@@ -98,8 +52,45 @@ body.modal-open {
 }
 
 /* ===============================
+   ❌ BOTÓN CERRAR (X)
+   =============================== */
+.md-btn-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: none;
+  font-size: 22px;
+  font-weight: bold;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-1);
+  transition: all 0.2s ease;
+}
+
+.md-btn-close:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-2);
+}
+
+/* ===============================
    TITULOS
    =============================== */
+.md-modal h2,
+.md-section h3,
+.md-form label,
+.equipos-table th {
+  text-transform: capitalize;
+}
+
 .md-modal h2 {
   margin-bottom: 14px;
   color: var(--blue-dark);
@@ -118,10 +109,17 @@ body.modal-open {
 /* ===============================
    FORMULARIO
    =============================== */
-.md-form label {
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.field label {
   font-size: 13px;
-  color: #334155;
   font-weight: 600;
+  color: #334155;
 }
 
 .md-form input,
@@ -132,8 +130,8 @@ body.modal-open {
   border-radius: 10px;
   border: 1px solid #e6edf7;
   background: #fbfdff;
-  outline: none;
   font-size: 14px;
+  outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -158,28 +156,6 @@ body.modal-open {
   margin-top: 12px;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* ===============================
-   EQUIPO BOX
-   =============================== */
-.equipo-box {
-  border: 1px solid #eef3ff;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 14px;
-  background: #fbfdff;
-}
-
-.equipo-box h4 {
-  margin-bottom: 10px;
-  color: var(--blue-dark);
-}
-
 /* ===============================
    BOTONES
    =============================== */
@@ -196,9 +172,10 @@ body.modal-open {
   border: none;
   padding: 10px 18px;
   border-radius: 10px;
-  cursor: pointer;
   font-weight: 600;
+  cursor: pointer;
   box-shadow: var(--shadow-1);
+  transition: all 0.2s ease;
 }
 
 .btn-save:hover {
@@ -212,12 +189,45 @@ body.modal-open {
   border: 1px solid #e6edf7;
   padding: 10px 18px;
   border-radius: 10px;
-  cursor: pointer;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .btn-cancel:hover {
   background: var(--bg-light);
+}
+
+/* ===============================
+   TABLA EQUIPOS
+   =============================== */
+.equipos-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.equipos-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.equipos-table th {
+  background: #f4f6fb;
+  font-size: 13px;
+  padding: 10px 12px;
+  color: #333;
+  text-align: left;
+}
+
+.equipos-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #444;
+  border-top: 1px solid #eaeaea;
+}
+
+.equipos-table tbody tr:hover {
+  background: #fafbff;
 }
 
 /* ===============================
@@ -231,136 +241,4 @@ body.modal-open {
   .md-modal {
     max-width: 95%;
   }
-}
-/* ================= TABLA EQUIPOS ================= */
-
-.equipos-table-wrapper {
-  overflow-x: auto;
-  border-radius: 12px;
-}
-
-.equipos-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: #fff;
-}
-
-.equipos-table th {
-  background: #f4f6fb;
-  font-weight: 600;
-  font-size: 13px;
-  color: #333;
-  padding: 10px 12px;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.equipos-table td {
-  padding: 10px 12px;
-  font-size: 13px;
-  color: #444;
-  border-top: 1px solid #eaeaea;
-  vertical-align: middle;
-}
-
-/* ===== COLUMNAS ===== */
-
-.col-equipo { min-width: 180px; }
-.col-dispositivo { min-width: 140px; }
-.col-inventario { min-width: 120px; text-align: center; }
-.col-hw { min-width: 120px; }
-.col-so { min-width: 140px; }
-.col-accion { width: 90px; text-align: center; }
-
-/* ===== BADGE INVENTARIO ===== */
-
-.badge-inv {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #2748B3;
-  font-weight: 600;
-  font-size: 12px;
-}
-
-/* ===== BOTÓN ===== */
-
-.equipos-table .btn-small {
-  padding: 4px 10px;
-  font-size: 12px;
-}
-
-/* ===== HOVER ===== */
-
-.equipos-table tbody tr:hover {
-  background: #fafbff;
-}
-/* Botón X de cerrar */
-.md-close-x {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  background: transparent;
-  border: none;
-  font-size: 28px;
-  color: #666;
-  cursor: pointer;
-  line-height: 1;
-  transition: color 0.2s;
-}
-
-.md-close-x:hover {
-  color: #d32f2f;
-}
-
-/* Estilo de los Labels */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 10px;
-}
-
-.field label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #444;
-  text-transform: uppercase;
-}
-
-/* Alineación del botón agregar equipo */
-.align-end {
-  justify-content: flex-end;
-}
-
-.md-modal {
-  position: relative; /* Importante para la X absoluta */
-  /* ... resto de tu diseño ... */
-}
-.md-modal { position: relative; } /* Para que la X se ubique bien */
-
-.md-btn-close {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-}
-
-.field label {
-  font-weight: bold;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  color: #333;
 }

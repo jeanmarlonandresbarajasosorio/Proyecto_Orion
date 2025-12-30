@@ -46,7 +46,6 @@ const initialForm = {
   },
   observaciones: "",
   
-  // Nuevo campo para la sección solicitada
   funcionarioTicMantenimiento: "",
   fechaTicMantenimiento: "",
 
@@ -142,24 +141,24 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
             
             {/* ================= DATOS ÁREA ================= */}
             <div className="md-section">
-              <h3 className="section-title">datos del área</h3>
+              <h3 className="section-title">Datos Area</h3>
               <div className="row-3">
                 <div className="field">
-                  <label>sede</label>
+                  <label>Sede</label>
                   <select name="sede" value={form.sede} onChange={handleChange}>
-                    <option value="">sede</option>
+                    <option value="">Sede</option>
                     {sedes.map(s => <option key={s.id} value={s.nombre}>{s.nombre}</option>)}
                   </select>
                 </div>
                 <div className="field">
-                  <label>área</label>
+                  <label>Area</label>
                   <select name="area" value={form.area} onChange={handleChange}>
-                    <option value="">área</option>
+                    <option value="">Area</option>
                     {areas.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
                   </select>
                 </div>
                 <div className="field">
-                  <label>ubicación</label>
+                  <label>Ubicación</label>
                   <input name="ubicacion" placeholder="ubicación" value={form.ubicacion} onChange={handleChange} />
                 </div>
               </div>
@@ -167,44 +166,44 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             {/* ================= DATOS DEL EQUIPO ================= */}
             <div className="md-section">
-              <h3 className="section-title">datos del equipo</h3>
+              <h3 className="section-title">Datos Equipo</h3>
               <div className="row-3">
                 <div className="field">
-                  <label>nombre equipo</label>
+                  <label>Nombre Equipo</label>
                   <input placeholder="nombre equipo" value={equipoTemp.nombreEquipo} onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
                 </div>
                 <div className="field">
-                  <label>dispositivo</label>
+                  <label>Dispositivo</label>
                   <select value={equipoTemp.dispositivo} onChange={e => handleEquipoTempChange("dispositivo", e.target.value)}>
-                    <option value="">dispositivo</option>
+                    <option value="">Dispositivo</option>
                     {dispositivos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
                   </select>
                 </div>
                 <div className="field">
-                  <label>inventario</label>
+                  <label>Inventario</label>
                   <input placeholder="inventario" value={equipoTemp.inventario} onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
                 </div>
               </div>
 
               <div className="row-3 mt">
                 <div className="field">
-                  <label>procesador</label>
+                  <label>Procesador</label>
                   <select value={equipoTemp.procesador} onChange={e => handleEquipoTempChange("procesador", e.target.value)}>
-                    <option value="">procesador</option>
+                    <option value="">Procesador</option>
                     {procesadores.map(p => <option key={p.id} value={p.nombre}>{p.nombre}</option>)}
                   </select>
                 </div>
                 <div className="field">
-                  <label>disco</label>
+                  <label>Disco</label>
                   <select value={equipoTemp.disco} onChange={e => handleEquipoTempChange("disco", e.target.value)}>
-                    <option value="">disco</option>
+                    <option value="">Disco</option>
                     {discos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
                   </select>
                 </div>
                 <div className="field">
-                  <label>ram</label>
+                  <label>Ram</label>
                   <select value={equipoTemp.ram} onChange={e => handleEquipoTempChange("ram", e.target.value)}>
-                    <option value="">ram</option>
+                    <option value="">Ram</option>
                     {rams.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
                   </select>
                 </div>
@@ -212,29 +211,29 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
               <div className="row-3 mt">
                 <div className="field">
-                  <label>sistema operativo</label>
+                  <label>Sistema Operativo</label>
                   <select value={equipoTemp.so} onChange={e => handleEquipoTempChange("so", e.target.value)}>
-                    <option value="">sistema operativo</option>
+                    <option value="">Sistema operativo</option>
                     {sistemasOperativos.map(so => (<option key={so.id} value={so.nombre}>{so.nombre}</option>))}
                   </select>
                 </div>
               </div>
 
-              <button type="button" className="btn-save mt" onClick={agregarEquipo}>+ agregar equipo</button>
+              <button type="button" className="btn-save mt" onClick={agregarEquipo}>+ Agregar Equipo</button>
 
               {form.equipos.length > 0 && (
                 <div className="equipos-table-wrapper mt">
                   <table className="md-table equipos-table">
                     <thead>
                       <tr>
-                        <th className="col-equipo">equipo</th>
-                        <th className="col-dispositivo">dispositivo</th>
-                        <th className="col-inventario">inventario</th>
-                        <th className="col-hw">procesador</th>
-                        <th className="col-hw">disco</th>
-                        <th className="col-hw">ram</th>
-                        <th className="col-so">so</th>
-                        <th className="col-accion">acción</th>
+                        <th className="col-equipo">Equipo</th>
+                        <th className="col-dispositivo">Dispositivo</th>
+                        <th className="col-inventario">Inventario</th>
+                        <th className="col-hw">Procesador</th>
+                        <th className="col-hw">Disco</th>
+                        <th className="col-hw">Ram</th>
+                        <th className="col-so">So</th>
+                        <th className="col-accion">Acción</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -260,29 +259,29 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             {/* ================= AUTORIZACIÓN RETIRO ================= */}
             <div className="md-section">
-              <h3 className="section-title">autorización de retiro y recibo</h3>
+              <h3 className="section-title">Autorización Retiro Recibo</h3>
               <div className="row-2">
                 <div className="field">
-                  <label>fecha retiro</label>
+                  <label>Fecha retiro</label>
                   <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
                 </div>
                 <div className="field">
-                  <label>autoriza retiro</label>
+                  <label>Autoriza retiro</label>
                   <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
-                    <option value="">seleccionar</option>
+                    <option value="">Seleccionar</option>
                     {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
                   </select>
                 </div>
               </div>
               <div className="row-2 mt">
                 <div className="field">
-                  <label>fecha entrega</label>
+                  <label>Fecha Entrega</label>
                   <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
                 </div>
                 <div className="field">
-                  <label>recibe</label>
+                  <label>Recibe</label>
                   <select name="recibe" value={form.recibe} onChange={handleChange}>
-                    <option value="">seleccionar</option>
+                    <option value="">Seleccionar</option>
                     {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
                   </select>
                 </div>
@@ -294,27 +293,27 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
               <h3 className="section-title">Funcionarios</h3>
               <div className="row-2">
                 <div className="field">
-                  <label>funcionario realiza</label>
+                  <label>Funcionario realiza</label>
                   <select name="funcionarioRealiza" value={form.funcionarioRealiza} onChange={handleChange}>
-                    <option value="">seleccionar</option>
+                    <option value="">Seleccionar</option>
                     {funcionarios.map(f => (<option key={f.id} value={f.nombre}>{f.nombre}</option>))}
                   </select>
                 </div>
                 <div className="field">
-                  <label>fecha realiza</label>
+                  <label>Fecha Realiza</label>
                   <input type="datetime-local" name="fechaRealiza" value={form.fechaRealiza} onChange={handleChange} />
                 </div>
               </div>
               <div className="row-2 mt">
                 <div className="field">
-                  <label>funcionario aprueba</label>
+                  <label>Funcionario Aprueba</label>
                   <select name="funcionarioAprueba" value={form.funcionarioAprueba} onChange={handleChange}>
-                    <option value="">seleccionar</option>
+                    <option value="">Seleccionar</option>
                     {funcionarios.map(f => (<option key={f.id} value={f.nombre}>{f.nombre}</option>))}
                   </select>
                 </div>
                 <div className="field">
-                  <label>fecha aprueba</label>
+                  <label>Fecha aprueba</label>
                   <input type="datetime-local" name="fechaAprueba" value={form.fechaAprueba} onChange={handleChange} />
                 </div>
               </div>
@@ -322,15 +321,15 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             {/* ================= SOFTWARE ================= */}
             <div className="md-section">
-              <h3 className="section-title">lista de chequeo de software</h3>
+              <h3 className="section-title">Lista Chequeo Software</h3>
               <div className="grid-2">
                 {Object.keys(form.softwareChecks).map(k => (
                   <div className="field" key={k}>
                     <label>{k.toLowerCase()}</label>
                     <select value={form.softwareChecks[k]} onChange={e => handleNestedChange("softwareChecks", k, e.target.value)}>
-                      <option value="">estado</option>
-                      <option>verificado</option>
-                      <option>no aplica</option>
+                      <option value="">Seleccionar</option>
+                      <option>Verificado</option>
+                      <option>No Aplica</option>
                     </select>
                   </div>
                 ))}
@@ -339,12 +338,12 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             {/* ================= GARANTÍA ================= */}
             <div className="md-section">
-              <h3 className="section-title">garantía</h3>
+              <h3 className="section-title">Garantía</h3>
               <div className="row-2">
                 <div className="field">
-                  <label>¿equipo en garantía?</label>
+                  <label>Equipo en Garantía</label>
                   <select name="garantia" value={form.garantia} onChange={handleChange}>
-                    <option value="">seleccionar</option>
+                    <option value="">Seleccionar</option>
                     <option>SI</option>
                     <option>NO</option>
                   </select>
@@ -357,23 +356,23 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
             </div>
 
             {/* ================= HARDWARE ================= */}
-            {form.garantia === "NO" && (
+            {form.Garantia === "NO" && (
               <div className="md-section">
-                <h3 className="section-title">lista de chequeo de hardware</h3>
+                <h3 className="section-title">Lista Chequeo Hardware</h3>
                 <div className="grid-2">
                   {Object.keys(form.hardwareChecks).map(k => (
                     <div className="field" key={k}>
                       <label>{k.toLowerCase()}</label>
                       <select value={form.hardwareChecks[k]} onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}>
-                        <option value="">estado</option>
-                        <option>realizado</option>
-                        <option>no aplica</option>
+                        <option value="">Seleccionar</option>
+                        <option>Realizado</option>
+                        <option>No Aplica</option>
                       </select>
                     </div>
                   ))}
                 </div>
                 <div className="field mt">
-                  <label>observaciones</label>
+                  <label>Observaciones</label>
                   <textarea name="observaciones" value={form.observaciones} onChange={handleChange} />
                 </div>
               </div>
@@ -381,23 +380,23 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             {/* =================  FUNCIONARIO TIC REALIZA ================= */}
             <div className="md-section">
-              <h3 className="section-title">funcionario tic que realiza el mantenimiento</h3>
+              <h3 className="section-title">Funcionario Tic Realiza Mantenimiento</h3>
               <div className="row-2">
                 <div className="field">
-                  <label>funcionario tic</label>
+                  <label>Funcionario tic</label>
                   <select 
                     name="funcionarioTicMantenimiento" 
                     value={form.funcionarioTicMantenimiento} 
                     onChange={handleChange}
                   >
-                    <option value="">seleccionar funcionario</option>
+                    <option value="">Seleccionar Funcionario</option>
                     {funcionarios.map(f => (
                       <option key={f.id} value={f.nombre}>{f.nombre}</option>
                     ))}
                   </select>
                 </div>
                 <div className="field">
-                  <label>fecha</label>
+                  <label>Fecha</label>
                   <input 
                     type="datetime-local" 
                     name="fechaTicMantenimiento" 
@@ -410,23 +409,23 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 
             {/* ================= TIEMPO DE PARADA ================= */}
             <div className="md-section">
-              <h3 className="section-title">tiempo de parada</h3>
+              <h3 className="section-title">Tiempo Parada</h3>
               <div className="row-3">
                 <div className="field">
-                  <label>minutos parada</label>
+                  <label>Minutos parada</label>
                   <input name="minutosParada" value={form.minutosParada} onChange={handleChange} />
                 </div>
                 <div className="field">
-                  <label>proporción (%)</label>
+                  <label>Proporción (%)</label>
                   <input name="proporcionParada" value={form.proporcionParada} onChange={handleChange} />
                 </div>
                 <div className="field">
-                  <label>total disponibilidad</label>
+                  <label>total Disponibilidad</label>
                   <input name="totalDisponibilidad" value={form.totalDisponibilidad} onChange={handleChange} />
                 </div>
               </div>
               <div className="field mt">
-                <label>no. orden sap</label>
+                <label>No. Orden Sap</label>
                 <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
               </div>
             </div>
