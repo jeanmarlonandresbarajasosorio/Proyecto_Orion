@@ -213,7 +213,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                 <div className="field">
                   <label>Sistema Operativo</label>
                   <select value={equipoTemp.so} onChange={e => handleEquipoTempChange("so", e.target.value)}>
-                    <option value="">Sistema operativo</option>
+                    <option value="">Sistema Operativo</option>
                     {sistemasOperativos.map(so => (<option key={so.id} value={so.nombre}>{so.nombre}</option>))}
                   </select>
                 </div>
