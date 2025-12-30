@@ -350,47 +350,75 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
 </div>
 
 
-            {/* ================= GARANTÍA ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Garantía</h3>
-              <div className="row-2">
-                <div className="field">
-                  <label>Equipo en Garantía</label>
-                  <select name="garantia" value={form.garantia} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    <option>SI</option>
-                    <option>NO</option>
-                  </select>
-                </div>
-                <div className="field">
-                  <label>fecha vencimiento {form.garantia === "SI" && <span style={{color: 'red'}}>*</span>}</label>
-                  <input type="date" name="vencimientoGarantia" value={form.vencimientoGarantia} onChange={handleChange} />
-                </div>
-              </div>
-            </div>
+{/* ================= GARANTÍA ================= */}
+<div className="md-section">
+  <h3 className="section-title">Garantía</h3>
 
-            {/* ================= HARDWARE ================= */}
-            {form.Garantia === "NO" && (
-              <div className="md-section">
-                <h3 className="section-title">Lista Chequeo Hardware</h3>
-                <div className="grid-2">
-                  {Object.keys(form.hardwareChecks).map(k => (
-                    <div className="field" key={k}>
-                      <label>{k.toLowerCase()}</label>
-                      <select value={form.hardwareChecks[k]} onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}>
-                        <option value="">Seleccionar</option>
-                        <option>Realizado</option>
-                        <option>No Aplica</option>
-                      </select>
-                    </div>
-                  ))}
-                </div>
-                <div className="field mt">
-                  <label>Observaciones</label>
-                  <textarea name="observaciones" value={form.observaciones} onChange={handleChange} />
-                </div>
-              </div>
-            )}
+  <div className="row-2">
+    <div className="field">
+      <label>Equipo en Garantía</label>
+      <select
+        name="garantia"
+        value={form.garantia}
+        onChange={handleChange}
+      >
+        <option value="">Seleccionar</option>
+        <option>SI</option>
+        <option>NO</option>
+      </select>
+    </div>
+
+    <div className="field">
+      <label>
+        Fecha vencimiento{" "}
+        {form.garantia === "SI" && (
+          <span style={{ color: "red" }}>*</span>
+        )}
+      </label>
+      <input
+        type="date"
+        name="vencimientoGarantia"
+        value={form.vencimientoGarantia}
+        onChange={handleChange}
+      />
+    </div>
+  </div>
+</div>
+
+{/* ================= HARDWARE ================= */}
+{form.garantia === "NO" && (
+  <div className="md-section">
+    <h3 className="section-title">Lista Chequeo Hardware</h3>
+
+    <div className="grid-2">
+      {Object.keys(form.hardwareChecks).map(k => (
+        <div className="field" key={k}>
+          <label>{k.toLowerCase()}</label>
+          <select
+            value={form.hardwareChecks[k]}
+            onChange={e =>
+              handleNestedChange("hardwareChecks", k, e.target.value)
+            }
+          >
+            <option value="">Seleccionar</option>
+            <option>Realizado</option>
+            <option>No Aplica</option>
+          </select>
+        </div>
+      ))}
+    </div>
+
+    <div className="field mt">
+      <label>Observaciones</label>
+      <textarea
+        name="observaciones"
+        value={form.observaciones}
+        onChange={handleChange}
+      />
+    </div>
+  </div>
+)}
+
 
             {/* =================  FUNCIONARIO TIC REALIZA ================= */}
             <div className="md-section">
