@@ -302,7 +302,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                         <th className="col-hw">Procesador</th>
                         <th className="col-hw">Disco</th>
                         <th className="col-hw">RAM</th>
-                        <th className="col-so">So</th>
+                        <th className="col-so">SO</th>
                         <th className="col-accion">Acción</th>
                       </tr>
                     </thead>
@@ -317,7 +317,7 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
                           <td className="col-hw">{eq.ram}</td>
                           <td className="col-so">{eq.so}</td>
                           <td className="col-accion">
-                            <button type="button" className="btn-cancel btn-small" onClick={() => quitarEquipo(i)}>quitar</button>
+                            <button type="button" className="btn-cancel btn-small" onClick={() => quitarEquipo(i)}>Quitar</button>
                           </td>
                         </tr>
                       ))}
