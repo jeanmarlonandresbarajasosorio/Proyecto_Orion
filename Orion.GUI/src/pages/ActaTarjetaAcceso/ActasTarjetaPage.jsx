@@ -29,13 +29,16 @@ export default function ActasTarjetaPage() {
       const res = await fetch(API_URL);
       const data = await res.json();
 
+      // Ordenar por fecha de creación descendente
+      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
       setTimeout(() => {
         setRecords(data);
         setVisibleRecords(data.slice(0, PAGE_SIZE));
         setLoadingInitial(false);
-      }, 400);
+      }, 300);
     } catch (err) {
-      console.error(err);
+      console.error("Error cargando registros:", err);
       setLoadingInitial(false);
     }
   };
@@ -62,7 +65,7 @@ export default function ActasTarjetaPage() {
       setEditingRecord(null);
       loadRecords();
     } catch (err) {
-      console.error(err);
+      console.error("Error guardando registro:", err);
     }
   };
 
@@ -72,9 +75,7 @@ export default function ActasTarjetaPage() {
     const t = setTimeout(() => {
       const base = filtro
         ? records.filter(r =>
-            r.funcionarioEntrega
-              ?.toLowerCase()
-              .includes(filtro.toLowerCase())
+            r.nombre?.toLowerCase().includes(filtro.toLowerCase())
           )
         : records;
 
@@ -85,8 +86,15 @@ export default function ActasTarjetaPage() {
     return () => clearTimeout(t);
   }, [filtro, records]);
 
-  const f = v => (v ? v : "-");
-  const d = v => (v ? new Date(v).toLocaleString() : "-");
+  /* ================= FUNCIONES AUX ================= */
+  const f = (v) => (v ? v : "-");
+
+  const formatFecha = (r) => {
+    if (r.dia && r.mes && r.anio) {
+      return `${r.dia}/${r.mes}/${r.anio}`;
+    }
+    return "-";
+  };
 
   /* ================= UI ================= */
   return (
@@ -100,10 +108,9 @@ export default function ActasTarjetaPage() {
             className="mui-input"
             placeholder="Buscar por funcionario"
             value={filtro}
-            onChange={e => setFiltro(e.target.value)}
+            onChange={(e) => setFiltro(e.target.value)}
             style={{ flex: 1 }}
           />
-
           <button
             className="mui-btn mui-btn-primary"
             style={{ whiteSpace: "nowrap", height: 40 }}
@@ -137,14 +144,14 @@ export default function ActasTarjetaPage() {
                     <th>Acciones</th>
                     <th>Funcionario</th>
                     <th>Cargo</th>
-                    <th>Área</th>
+                    <th>Área / Sede</th>
                     <th>Tarjeta</th>
                     <th>Fecha Entrega</th>
                     <th>Fecha Devolución</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleRecords.map(r => (
+                  {visibleRecords.map((r) => (
                     <tr key={r._id}>
                       <td>
                         <button
@@ -157,12 +164,12 @@ export default function ActasTarjetaPage() {
                           Editar
                         </button>
                       </td>
-                      <td>{f(r.funcionarioEntrega)}</td>
+                      <td>{f(r.nombre)}</td>
                       <td>{f(r.cargo)}</td>
-                      <td>{f(r.area)}</td>
+                      <td>{f(r.sede)}</td>
                       <td>{f(r.numeroTarjeta)}</td>
-                      <td>{d(r.fechaEntrega)}</td>
-                      <td>{d(r.fechaDevolucion)}</td>
+                      <td>{formatFecha(r)}</td>
+                      <td>{f(r.fechaDevolucion)}</td>
                     </tr>
                   ))}
                 </tbody>

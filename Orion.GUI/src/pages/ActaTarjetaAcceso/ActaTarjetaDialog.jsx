@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import "./ActaTarjetaDialog.css";
 import FirmaCanvas from "../../components/FirmaCanvas";
 
+/* ================= API ================= */
+const API_TIPO_ENTREGA = `${import.meta.env.VITE_API_URL}/tipos-entrega`;
+const API_TIPO_CAMBIO = `${import.meta.env.VITE_API_URL}/tipos-cambio`;
+const API_ACTAS = `${import.meta.env.VITE_API_URL}/actas-tarjeta`;
+
+/* ================= FORM BASE ================= */
 const initialForm = {
   sede: "",
   tipoEntrega: "",
+  tipoCambio: "",
   otraCual: "",
   dia: "",
   mes: "",
@@ -15,14 +22,38 @@ const initialForm = {
   firma: ""
 };
 
-export default function ActaTarjetaDialog({ onClose, onSave }) {
+export default function ActaTarjetaDialog({ onClose }) {
   const [form, setForm] = useState(initialForm);
+  const [tiposEntrega, setTiposEntrega] = useState([]);
+  const [tiposCambio, setTiposCambio] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  /* ================= MODAL LOCK ================= */
   useEffect(() => {
     document.body.classList.add("modal-open");
     return () => document.body.classList.remove("modal-open");
   }, []);
 
+  /* ================= CARGAR MAESTROS ================= */
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [entregaRes, cambioRes] = await Promise.all([
+          fetch(API_TIPO_ENTREGA),
+          fetch(API_TIPO_CAMBIO)
+        ]);
+
+        setTiposEntrega(await entregaRes.json());
+        setTiposCambio(await cambioRes.json());
+      } catch (error) {
+        console.error("Error cargando maestros:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  /* ================= HANDLERS ================= */
   const handleChange = (e) => {
     setForm(prev => ({
       ...prev,
@@ -30,7 +61,7 @@ export default function ActaTarjetaDialog({ onClose, onSave }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.firma) {
@@ -38,8 +69,41 @@ export default function ActaTarjetaDialog({ onClose, onSave }) {
       return;
     }
 
-    onSave(form);
+    try {
+      setLoading(true);
+
+      const res = await fetch(API_ACTAS, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al guardar el acta");
+      }
+
+      alert(
+        "✅ Acta guardada correctamente.\n📧 El PDF fue enviado al correo registrado."
+      );
+
+      onClose();
+    } catch (error) {
+      console.error(error);
+      alert("❌ Ocurrió un error al enviar el acta");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  /* ================= TEXTO DINÁMICO ================= */
+  const nombreInstitucion =
+    form.sede === "foscal"
+      ? "FOSCAL"
+      : form.sede === "foscal-internacional"
+      ? "FUNDACIÓN FOSUNAB"
+      : "";
 
   return (
     <div className="md-overlay">
@@ -77,23 +141,29 @@ export default function ActaTarjetaDialog({ onClose, onSave }) {
                     onChange={handleChange}
                   >
                     <option value="">Seleccionar</option>
-                    <option value="PRIMERA_VEZ">Primera vez</option>
-                    <option value="CAMBIO_DANO">Cambio por daño</option>
-                    <option value="CAMBIO_PERDIDA">Cambio por pérdida</option>
-                    <option value="OTRA">Otra</option>
+                    {tiposEntrega.map(item => (
+                      <option key={item._id} value={item._id}>
+                        {item.nombre}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
-                {form.tipoEntrega === "OTRA" && (
-                  <div className="field">
-                    <label>¿Cuál?</label>
-                    <input
-                      name="otraCual"
-                      value={form.otraCual}
-                      onChange={handleChange}
-                    />
-                  </div>
-                )}
+                <div className="field">
+                  <label>Tipo Cambio</label>
+                  <select
+                    name="tipoCambio"
+                    value={form.tipoCambio}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar</option>
+                    {tiposCambio.map(item => (
+                      <option key={item._id} value={item._id}>
+                        {item.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="row-3 mt">
@@ -112,26 +182,26 @@ export default function ActaTarjetaDialog({ onClose, onSave }) {
               </div>
             </div>
 
-            {/* ================= TEXTO CONDICIONAL ================= */}
-            {form.sede === "foscal-internacional" && (
+            {/* ================= NORMAS DE USO ================= */}
+            {(form.sede === "foscal" || form.sede === "foscal-internacional") && (
               <div className="md-section">
                 <h3 className="section-title">Normas de Uso</h3>
 
                 <p>
-                  La tarjeta de control de acceso permite el ingreso a algunas
-                  áreas restringidas de <b>FUNDACIÓN FOSUNAB</b> de acuerdo a las
-                  funciones del cargo de la persona que recibe la misma, por lo
-                  tanto es de uso personal e intransferible.
+                  La tarjeta de control de acceso permite el ingreso a áreas
+                  restringidas de <b>{nombreInstitucion}</b>, de acuerdo a las
+                  funciones del cargo, por lo tanto es de uso personal e
+                  intransferible.
                 </p>
 
                 <p>
                   En caso de pérdida o hurto deberá notificar inmediatamente a la
-                  institución. Outsourcing - Vigilancia 6191 - 6192.
+                  institución.
                 </p>
 
                 <p>
-                  La tarjeta es propiedad de la institución y deberá ser
-                  devuelta al finalizar el contrato laboral.
+                  La tarjeta es propiedad de la institución y deberá ser devuelta
+                  al finalizar la relación contractual.
                 </p>
               </div>
             )}
@@ -194,12 +264,13 @@ export default function ActaTarjetaDialog({ onClose, onSave }) {
                 type="button"
                 className="btn-cancel"
                 onClick={onClose}
+                disabled={loading}
               >
                 Cancelar
               </button>
 
-              <button type="submit" className="btn-save">
-                Guardar y Enviar
+              <button type="submit" className="btn-save" disabled={loading}>
+                {loading ? "Enviando..." : "Guardar y Enviar"}
               </button>
             </div>
 

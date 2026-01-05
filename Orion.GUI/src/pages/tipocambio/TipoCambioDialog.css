@@ -1,0 +1,162 @@
+
+.md-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 9999;
+}
+
+.md-modal {
+  background: white;
+  width: 900px;
+  max-width: 95%;
+  max-height: 95%;
+  border-radius: 18px;         
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  overflow: hidden;           
+  display: flex;
+  flex-direction: column;
+}
+
+.md-modal-content {
+  padding: 24px;
+  overflow-y: auto;             
+}
+
+/* Título */
+.md-modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  border-bottom: 2px solid #e5e5e5;
+  padding-bottom: 10px;
+}
+
+
+.md-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.md-form input,
+.md-form select,
+.md-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border-radius: 8px;            
+  border: 1px solid #ccc;
+  font-size: 14px;
+  resize: none;
+}
+
+.md-form textarea {
+  min-height: 80px;
+}
+
+
+.row-1,
+.row-2,
+.row-3 {
+  display: grid;
+  gap: 16px;
+}
+
+.row-1 { grid-template-columns: 1fr; }
+.row-2 { grid-template-columns: 1fr 1fr; }
+.row-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.mt {
+  margin-top: 16px;
+}
+
+
+
+.md-section {
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;           
+  padding: 18px;
+  margin-top: 24px;
+  background: #fafafa;
+}
+
+.md-section h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  font-size: 18px;
+  color: #1E40AF;
+  font-weight: 700;
+}
+
+
+
+.md-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancel {
+  background: #bbb;
+}
+
+.btn-save {
+  background: #1E40AF;
+  color: white;
+}
+
+.btn-cancel:hover { background: #a2a2a2; }
+.btn-save:hover { background: #16338a; }
+
+
+
+@media (max-width: 768px) {
+  .md-modal {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .md-modal-content {
+    padding: 16px;
+  }
+
+  .row-2,
+  .row-3,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .md-section {
+    padding: 12px;
+  }
+}

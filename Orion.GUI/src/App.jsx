@@ -22,6 +22,8 @@ import MemoriaRamPage from "./pages/memoriaram/MemoriaRamPage.jsx";
 import ProcesadorPage from "./pages/procesador/ProcesadorPage.jsx";
 import ActaTarjetaPage from "./pages/ActaTarjetaAcceso/ActasTarjetaPage.jsx";
 import TipoEntregaPage from "./pages/tipoentrega/TipoEntregaPage.jsx";
+import TipoCambioPage from "./pages/tipocambio/TipoCambioPage.jsx";
+
 
 
 /* ADMIN */
@@ -31,7 +33,7 @@ import PermissionsPage from "./admin/PermissionsPage.jsx";
 /* ICONOS */
 import { FiBell, FiLogOut, FiUser, FiLock } from "react-icons/fi";
 
-const API_MANTENIMIENTOS = "http://localhost:5000/api/mantenimientos";
+const API_MANTENIMIENTOS = `${import.meta.env.VITE_API_URL}/mantenimientos`;
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -289,6 +291,8 @@ export default function App() {
                   <a onClick={() => setActivePage("sedes")}>Sede</a>
                   <a onClick={() => setActivePage("area")}>Área</a>
                   <a onClick={() => setActivePage("tipoentrega")}>Tipo Entrega</a>
+                  <a onClick={() => setActivePage("tipocambio")}>Tipo Cambio</a>
+                  
                 </div>
               )}
             </div>
@@ -331,6 +335,8 @@ export default function App() {
             {activePage === "sedes" && <SedePage />}
             {activePage === "area" && <AreaPage />}
             {activePage === "tipoentrega" && <TipoEntregaPage />}
+            {activePage === "tipocambio" && <TipoCambioPage />}
+          
           </>
         )}
 
