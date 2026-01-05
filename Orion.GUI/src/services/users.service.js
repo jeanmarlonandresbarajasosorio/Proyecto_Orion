@@ -1,10 +1,24 @@
 import api from "./api";
 
+/**
+ * Función auxiliar para obtener el token del localStorage
+ * y configurar el header de autorización.
+ */
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token"); 
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  };
+};
+
 /* ========================= */
 /* GET ALL USERS */
 /* ========================= */
 export const getUsers = async () => {
-  const res = await api.get("/users");
+  // Pasamos los headers como segundo argumento en GET
+  const res = await api.get("/users", getAuthHeaders());
   return res;
 };
 
@@ -12,7 +26,8 @@ export const getUsers = async () => {
 /* CREATE USER */
 /* ========================= */
 export const createUser = async (data) => {
-  const res = await api.post("/users", data);
+  // Pasamos los headers como tercer argumento en POST (después del body)
+  const res = await api.post("/users", data, getAuthHeaders());
   return res;
 };
 
@@ -20,7 +35,8 @@ export const createUser = async (data) => {
 /* UPDATE USER */
 /* ========================= */
 export const updateUser = async (id, data) => {
-  const res = await api.put(`/users/${id}`, data);
+  // Pasamos los headers como tercer argumento en PUT
+  const res = await api.put(`/users/${id}`, data, getAuthHeaders());
   return res;
 };
 
@@ -28,6 +44,7 @@ export const updateUser = async (id, data) => {
 /* TOGGLE USER STATUS */
 /* ========================= */
 export const toggleUserStatus = async (id) => {
-  const res = await api.patch(`/users/${id}/toggle`);
+  // Pasamos los headers como segundo argumento en PATCH
+  const res = await api.patch(`/users/${id}/toggle`, {}, getAuthHeaders());
   return res;
 };

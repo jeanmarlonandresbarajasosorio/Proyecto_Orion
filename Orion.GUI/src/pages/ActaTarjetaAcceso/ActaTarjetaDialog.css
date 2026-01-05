@@ -1,0 +1,253 @@
+/* ===============================
+   🎨 VARIABLES ORION
+   =============================== */
+:root {
+  --blue: #2748B3;
+  --blue-dark: #1E3A8A;
+  --blue-light: #3B82F6;
+  --bg-light: #f8faff;
+  --card-bg: #ffffff;
+  --muted: #6b7280;
+  --radius: 12px;
+  --shadow-1: 0 6px 20px rgba(16,24,40,0.06);
+  --shadow-2: 0 12px 30px rgba(16,24,40,0.08);
+}
+
+/* ===============================
+   🔒 BLOQUEO SCROLL
+   =============================== */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* ===============================
+   OVERLAY
+   =============================== */
+.md-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   MODAL
+   =============================== */
+.md-modal {
+  position: relative;
+  background: var(--card-bg);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-2);
+}
+
+.md-modal-content {
+  padding: 20px 24px 26px;
+}
+
+/* ===============================
+   ❌ BOTÓN CERRAR
+   =============================== */
+.md-btn-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: none;
+  font-size: 22px;
+  font-weight: bold;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-1);
+  transition: all 0.2s ease;
+}
+
+.md-btn-close:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-2);
+}
+
+/* ===============================
+   TÍTULOS
+   =============================== */
+.md-modal h2,
+.md-section h3,
+.equipos-table th {
+  text-transform: capitalize;
+}
+
+.md-modal h2 {
+  margin-bottom: 14px;
+  color: var(--blue-dark);
+}
+
+.md-section {
+  margin-bottom: 22px;
+}
+
+.md-section h3 {
+  margin-bottom: 10px;
+  color: var(--blue-dark);
+  font-size: 16px;
+}
+
+/* ===============================
+   FORMULARIO (🔥 AQUÍ ESTÁ LA CLAVE)
+   =============================== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  text-transform: capitalize; /* ✅ Antivirus, Nombre del computador, etc */
+}
+
+/* 🔥 ACRÓNIMOS FORZADOS */
+.field label.label-acronym {
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* ===============================
+   INPUTS
+   =============================== */
+.md-form input,
+.md-form select,
+.md-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e6edf7;
+  background: #fbfdff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.md-form input:focus,
+.md-form select:focus,
+.md-form textarea:focus {
+  border-color: var(--blue-dark);
+  box-shadow: 0 4px 14px rgba(30,58,138,0.15);
+  background: white;
+}
+
+/* ===============================
+   GRID
+   =============================== */
+.row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.mt {
+  margin-top: 12px;
+}
+
+/* ===============================
+   BOTONES
+   =============================== */
+.md-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-save {
+  background: var(--blue-dark);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+.btn-cancel {
+  background: white;
+  color: var(--blue-dark);
+  border: 1px solid #e6edf7;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: var(--bg-light);
+}
+
+/* ===============================
+   TABLA EQUIPOS
+   =============================== */
+.equipos-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.equipos-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.equipos-table th {
+  background: #f4f6fb;
+  font-size: 13px;
+  padding: 10px 12px;
+  color: #333;
+  text-align: left;
+}
+
+.equipos-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #444;
+  border-top: 1px solid #eaeaea;
+}
+
+.equipos-table tbody tr:hover {
+  background: #fafbff;
+}
+
+/* ===============================
+   RESPONSIVE
+   =============================== */
+@media (max-width: 900px) {
+  .row-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .md-modal {
+    max-width: 95%;
+  }
+}

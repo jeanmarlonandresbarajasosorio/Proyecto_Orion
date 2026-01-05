@@ -860,4 +860,127 @@ body {
   cursor: not-allowed;
   transform: none;
 }
+/* Contenedor Principal */
+.orion-loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #3F64D9 0%, #1A337E 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Caja de contenido con espaciado controlado */
+.orion-loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Contenedor del Logo (Relativo para los anillos) */
+.loader-logo-wrapper {
+  position: relative;
+  width: 220px; /* Espacio fijo para que los anillos no se desfasen */
+  height: 220px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Los anillos ahora usan absolute respecto al wrapper */
+.loader-ring, .loader-ring-outer {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orion-blue-ring {
+  width: 170px;
+  height: 170px;
+  border: 4px solid transparent;
+  border-top-color: #78D9FB;
+  border-bottom-color: #ffffff;
+  animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.orion-orange-ring {
+  width: 200px;
+  height: 200px;
+  border: 2px dashed rgba(255, 157, 0, 0.6);
+  animation: spin 8s linear infinite reverse;
+}
+
+/* Título ajustado */
+.orion-loader-title {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 300;
+  margin: 10px 0;
+  letter-spacing: 3px;
+  line-height: 1.2;
+}
+
+.orion-loader-title span {
+  display: block; /* Orion abajo para mejor impacto */
+  font-weight: 900;
+  color: #78D9FB;
+  font-size: 2.8rem;
+  text-shadow: 0 0 20px rgba(120, 217, 251, 0.4);
+}
+
+/* Barra de carga centrada */
+.loader-status {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.bar-container {
+  width: 220px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.orion-gradient-bar {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #1A337E, #78D9FB, #FF9D00);
+  background-size: 200% 100%;
+  animation: progressFlow 2s infinite linear;
+}
+
+/* Tag FOSCAL al final */
+.foscal-tag-animated {
+  margin-top: 40px;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 6px;
+  opacity: 0.3;
+  font-size: 1.1rem;
+}
+
+/* Keyframes optimizados */
+@keyframes spin { 
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes progressFlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
   BarChart, Bar, PieChart, Pie, Cell, Legend
@@ -20,29 +20,23 @@ import SistemaOperativoPage from "./pages/sistemaoperativo/SistemaOperativoPage.
 import DiscoDuroPage from "./pages/discoduro/DiscoDuroPage.jsx";
 import MemoriaRamPage from "./pages/memoriaram/MemoriaRamPage.jsx";
 import ProcesadorPage from "./pages/procesador/ProcesadorPage.jsx";
+import ActaTarjetaPage from "./pages/ActaTarjetaAcceso/ActasTarjetaPage.jsx";
+import TipoEntregaPage from "./pages/tipoentrega/TipoEntregaPage.jsx";
+
+
 /* ADMIN */
-import AdminPanel from "./admin/AdminPanel.jsx";
 import UsersPage from "./admin/UsersPage.jsx";
-import RolesPage from "./admin/RolesPage.jsx";
 import PermissionsPage from "./admin/PermissionsPage.jsx";
 
 /* ICONOS */
-import { FiBell, FiLogOut, FiUser, FiX } from "react-icons/fi";
+import { FiBell, FiLogOut, FiUser, FiLock } from "react-icons/fi";
 
 const API_MANTENIMIENTOS = "http://localhost:5000/api/mantenimientos";
 
 export default function App() {
-
-  /* ===================== */
-  /* AUTH + LOADER         */
-  /* ===================== */
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-
-  /* ===================== */
-  /* UI STATES             */
-  /* ===================== */
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -52,95 +46,81 @@ export default function App() {
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
   const [descargando, setDescargando] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-  /* ===================== */
-  /* DESCARGA EXCEL        */
-  /* ===================== */
-const descargarExcel = async () => {
+  const hasPermission = (p) => {
+    if (!user || !user.permissions || !Array.isArray(user.permissions)) return false;
+    return user.permissions.includes(p);
+  };
+
+  const descargarExcel = async () => {
     if (!fechaDesde || !fechaHasta) {
       alert("Por favor, selecciona un rango de fechas.");
       return;
     }
-
     try {
       setDescargando(true);
-      
-      // Asegúrate de que esta URL coincida con tu Backend
       const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const url = `${baseUrl}/mantenimientos?format=excel&desde=${fechaDesde}&hasta=${fechaHasta}`;
-
       const response = await fetch(url, { method: "GET" });
-
-      if (!response.ok) {
-        throw new Error("El servidor no pudo generar el archivo");
-      }
-
-      // IMPORTANTE: Manejar como BLOB
+      if (!response.ok) throw new Error("Error en el servidor");
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;
       link.setAttribute("download", `Reporte_ORION_${fechaDesde}.xlsx`);
-      
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(downloadUrl);
-
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error al descargar. Verifica que el Backend esté encendido y tenga instalada la librería exceljs.");
+      console.error(error);
+      alert("Error al descargar");
     } finally {
       setDescargando(false);
     }
   };
 
-  /* ===================== */
-  /* FILTRO BÚSQUEDA       */
-  /* ===================== */
-  const [searchText, setSearchText] = useState("");
-
-  /* ===================== */
-  /* RESTAURAR SESIÓN      */
-  /* ===================== */
   useEffect(() => {
     const savedUser = localStorage.getItem("orion_user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      setIsAuthenticated(true);
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+        if (parsedUser.role === "LECTOR" || !parsedUser.permissions?.includes("dashboard.view")) {
+          setActivePage("empty");
+        }
+      } catch (e) {
+        localStorage.removeItem("orion_user");
+      }
     }
   }, []);
 
-  /* ===================== */
-  /* NOTIFICACIONES        */
-  /* ===================== */
   useEffect(() => {
     const cargar = async () => {
+      if (!isAuthenticated || !hasPermission("mantenimientos.view")) return;
       try {
         const res = await fetch(API_MANTENIMIENTOS);
         const data = await res.json();
         setNotificaciones(Array.isArray(data) ? data.length : 0);
-      } catch {
-        setNotificaciones(0);
-      }
+      } catch { setNotificaciones(0); }
     };
-
     cargar();
     const interval = setInterval(cargar, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated, user]);
 
-  /* ===================== */
-  /* LOGIN / LOGOUT        */
-  /* ===================== */
   const handleLogin = (u) => {
     setLoading(true);
     localStorage.setItem("orion_user", JSON.stringify(u));
     setUser(u);
-
     setTimeout(() => {
       setIsAuthenticated(true);
       setLoading(false);
+      if (u.role === "LECTOR" || !u.permissions?.includes("dashboard.view")) {
+        setActivePage("empty");
+      }
     }, 1500);
   };
 
@@ -149,11 +129,9 @@ const descargarExcel = async () => {
     setIsAuthenticated(false);
     setUser(null);
     setActivePage("dashboard");
+    setUserMenuOpen(false);
   };
 
-  /* ===================== */
-  /* RESPONSIVE SIDEBAR    */
-  /* ===================== */
   useEffect(() => {
     const update = () => setSidebarOpen(window.innerWidth > 1100);
     update();
@@ -161,117 +139,44 @@ const descargarExcel = async () => {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  /* ===================== */
-  /* LOGIN / LOADER VIEW   */
-  /* ===================== */
   if (!isAuthenticated && !loading) return <Login onLogin={handleLogin} />;
   if (loading) return <WelcomeSpinner />;
 
-  /* ===================== */
-  /* DASHBOARD DATA        */
-  /* ===================== */
-  const dataGarantias = [
-    { name: "Ene", value: 10 },
-    { name: "Feb", value: 40 },
-    { name: "Mar", value: 25 },
-    { name: "Abr", value: 60 },
-  ];
+  const Dashboard = () => {
+    if (!hasPermission("dashboard.view")) return <AccessDenied />;
+    const dataGarantias = [{ name: "Ene", value: 10 }, { name: "Feb", value: 40 }, { name: "Mar", value: 25 }, { name: "Abr", value: 60 }];
+    const dataMantenimientos = [{ name: "Pendientes", value: 12 }, { name: "Completados", value: 30 }];
+    const dataHardware = [{ name: "CPU", value: 30 }, { name: "RAM", value: 20 }, { name: "Discos", value: 25 }, { name: "Periféricos", value: 15 }];
+    const COLORS = ["#2563EB", "#1E3A8A", "#3B82F6", "#60A5FA"];
 
-  const dataMantenimientos = [
-    { name: "Pendientes", value: 12 },
-    { name: "Completados", value: 30 },
-  ];
-
-  const dataHardware = [
-    { name: "CPU", value: 30 },
-    { name: "RAM", value: 20 },
-    { name: "Discos", value: 25 },
-    { name: "Periféricos", value: 15 },
-  ];
-
-  const COLORS = ["#2563EB", "#1E3A8A", "#3B82F6", "#60A5FA"];
-
-  /* ===================== */
-  /* DASHBOARD VIEW        */
-  /* ===================== */
-  const Dashboard = () => (
-    <>
-      {/* ====== GRÁFICAS ====== */}
-      <section className="grid">
-        <div className="card">
-          <h3>Garantías</h3>
-          <LineChart width={320} height={200} data={dataGarantias}>
-            <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} />
-            <CartesianGrid stroke="#e5e7eb" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-          </LineChart>
-        </div>
-
-        <div className="card">
-          <h3>Mantenimientos</h3>
-          <BarChart width={320} height={200} data={dataMantenimientos}>
-            <CartesianGrid stroke="#e5e7eb" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="value">
-              {dataMantenimientos.map((_, i) => (
-                <Cell key={i} fill={COLORS[i]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </div>
-
-        <div className="card">
-          <h3>Checklist Hardware</h3>
-          <PieChart width={320} height={240}>
-            <Pie data={dataHardware} dataKey="value" outerRadius={80} label>
-              {dataHardware.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Pie>
-            <Legend />
-            <Tooltip />
-          </PieChart>
-        </div>
-      </section>
-      
-       {/* ====== DESCARGA EXCEL ====== */}
-      <section className="card excel-card">
-        <h3>Descargar Mantenimientos</h3>
-
-        <div className="excel-filtros">
-          <div>
-            <label>Desde</label>
-            <input
-              type="date"
-              value={fechaDesde}
-              onChange={(e) => setFechaDesde(e.target.value)}
-            />
+    return (
+      <>
+        <section className="grid">
+          <div className="card"><h3>Garantías</h3><LineChart width={320} height={200} data={dataGarantias}><Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} /><CartesianGrid stroke="#e5e7eb" /><XAxis dataKey="name" /><YAxis /><Tooltip /></LineChart></div>
+          <div className="card"><h3>Mantenimientos</h3><BarChart width={320} height={200} data={dataMantenimientos}><CartesianGrid stroke="#e5e7eb" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Bar dataKey="value">{dataMantenimientos.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}</Bar></BarChart></div>
+          <div className="card"><h3>Checklist Hardware</h3><PieChart width={320} height={240}><Pie data={dataHardware} dataKey="value" outerRadius={80} label>{dataHardware.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Legend /><Tooltip /></PieChart></div>
+        </section>
+        <section className="card excel-card">
+          <h3>Descargar Mantenimientos</h3>
+          <div className="excel-filtros">
+            <div><label>Desde</label><input type="date" value={fechaDesde} onChange={(e) => setFechaDesde(e.target.value)} /></div>
+            <div><label>Hasta</label><input type="date" value={fechaHasta} onChange={(e) => setFechaHasta(e.target.value)} /></div>
+            <button className="excel-btn" onClick={descargarExcel} disabled={descargando}>{descargando ? "Generando..." : "Descargar Excel"}</button>
           </div>
+        </section>
+      </>
+    );
+  };
 
-          <div>
-            <label>Hasta</label>
-            <input
-              type="date"
-              value={fechaHasta}
-              onChange={(e) => setFechaHasta(e.target.value)}
-            />
-          </div>
-
-          <button
-            className="excel-btn"
-            onClick={descargarExcel}
-            disabled={descargando}
-          >
-            {descargando ? "Generando..." : "Descargar Excel"}
-          </button>
-        </div>
-      </section>
-
-    </>
+  const AccessDenied = () => (
+    <div className="empty-state-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+      <div className="card" style={{ textAlign: 'center', padding: '50px', maxWidth: '500px', borderTop: '4px solid #ef4444' }}>
+        <FiLock size={60} color="#ef4444" style={{ marginBottom: '20px' }} />
+        <h2>Acceso Restringido</h2>
+        <p>Hola <strong>{user?.name}</strong>. Tu perfil actual (<strong>{user?.role}</strong>) no tiene permisos asignados para ver este módulo.</p>
+        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '10px' }}>Contacta al administrador para solicitar acceso a las funciones del sistema.</p>
+      </div>
+    </div>
   );
 
   const navigate = (page) => {
@@ -281,149 +186,206 @@ const descargarExcel = async () => {
 
   return (
     <div className={`app-root ${sidebarOpen ? "" : "sidebar-closed"}`}>
-
-      {/* ================= TOPBAR ================= */}
       <header className="topbar">
         <div className="left">
           <button className="menu-btn" onClick={() => setSidebarOpen(s => !s)}>☰</button>
           <div className="brand">ORION</div>
         </div>
-
         <div className="right topbar-actions">
-
-          {/* NOTIFICACIONES */}
-          <button
-            className="notification-btn"
-            onClick={() => navigate("listamantenimientos")}
-          >
-            <FiBell size={22} />
-            {notificaciones > 0 && (
-              <span className="notification-badge">
-                {notificaciones > 99 ? "99+" : notificaciones}
-              </span>
-            )}
-          </button>
-
-          {/* USER */}
+          {hasPermission("mantenimientos.view") && (
+            <button className="notification-btn" onClick={() => navigate("listamantenimientos")}>
+              <FiBell size={22} />
+              {notificaciones > 0 && <span className="notification-badge">{notificaciones > 99 ? "99+" : notificaciones}</span>}
+            </button>
+          )}
           <div className="user-panel" onClick={() => setUserMenuOpen(o => !o)}>
-            <div className="user-avatar">
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
-
+            <div className="user-avatar">{(user?.name || "U").charAt(0).toUpperCase()}</div>
             <div className="user-info">
-              <span className="user-name">{user?.name}</span>
-              <span className="user-role">{user?.role}</span>
+              <span className="user-name">{user?.name || "Usuario"}</span>
+              <span className="user-role">{user?.role || "Lector"}</span>
             </div>
           </div>
-
           {userMenuOpen && (
             <div className="user-dropdown-modern">
-              <div className="dropdown-header">
-                <FiUser />
-                <div>
-                  <strong>{user?.name}</strong>
-                  <small>Rol: {user?.role}</small>
-                </div>
-              </div>
-
-              <button className="logout-btn" onClick={logout}>
-                <FiLogOut /> Cerrar sesión
-              </button>
+              <div className="dropdown-header"><FiUser /><div><strong>{user?.name}</strong><small>{user?.role}</small></div></div>
+              <button className="logout-btn" onClick={logout}><FiLogOut /> Cerrar sesión</button>
             </div>
           )}
         </div>
       </header>
 
-      {/* ================= SIDEBAR ================= */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
+        {/* BOTÓN DE CIERRE (FLECHA) */}
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>‹</button>
-        <h2 className="sidebar-title">Menú</h2>
+
+        <div className="sidebar-logo-container" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '15px 5px',
+          marginBottom: '10px',
+          position: 'relative'
+        }}>
+          <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g>
+              <path d="M10 45C10 22.9 27.9 5 50 5C72.1 5 90 22.9 90 45H10Z" fill="#78D9FB" />
+              <path d="M7 52C25 42 75 42 93 52L91 60C73 50 27 50 9 60L7 52Z" fill="#FF9D00" />
+              <path d="M12 65C25 85 75 85 88 65L86 72C73 90 27 90 14 72L12 65Z" fill="#97D700" />
+            </g>
+            <g stroke="white" strokeWidth="3.5" strokeLinejoin="round">
+              <circle cx="51" cy="22" r="9" fill="white" />
+              <path d="M51 34C40 34 15 22 10 14C18 45 45 65 42 96C55 70 92 42 94 10C75 27 58 34 51 34Z" fill="white" />
+            </g>
+            <g fill="#0056B3">
+              <circle cx="51" cy="22" r="8" />
+              <path d="M51 34
+                       C40 34 15 22 10 14
+                       C18 45 45 65 42 96
+                       C55 70 92 42 94 10
+                       C75 27 58 34 51 34Z"
+              />
+            </g>
+          </svg>
+
+          <span style={{
+            marginTop: '10px',
+            color: 'white',
+            fontSize: '1.2rem',
+            fontWeight: '900',
+            letterSpacing: '2px',
+            fontFamily: 'Arial, sans-serif',
+            textTransform: 'uppercase'
+          }}>FOSCAL</span>
+        </div>
 
         <nav className="menu">
-          <a className={activePage === "dashboard" ? "active" : ""} onClick={() => setActivePage("dashboard")}>
-            Inicio
-          </a>
+          {hasPermission("dashboard.view") && (
+            <a className={activePage === "dashboard" ? "active" : ""} onClick={() => setActivePage("dashboard")}>Inicio</a>
+          )}
 
-          <a className={activePage === "listamantenimientos" ? "active" : ""} onClick={() => setActivePage("listamantenimientos")}>
-            Mantenimientos
-          </a>
-
-          <div className="submenu">
-            <a onClick={() => setMaestrosOpen(!maestrosOpen)}>
-              Maestros {maestrosOpen ? "▲" : "▼"}
+          {hasPermission("tarjetas.view") && (
+            <a className={activePage === "tarjetas-acceso" ? "active" : ""} onClick={() => setActivePage("tarjetas-acceso")}>
+              Tarjetas de Acceso
             </a>
+          )}
 
-            {maestrosOpen && (
-              <div className="submenu-items">
-                <a onClick={() => setActivePage("tipodispositivo")}>Tipo Dispositivo</a>
-                <a onClick={() => setActivePage("sistemaoperativo")}>Sistema Operativo</a>
-                <a onClick={() => setActivePage("tipolista")}>Tipo Lista</a>
-                <a onClick={() => setActivePage("chequeo")}>Lista Chequeo</a>
-                <a onClick={() => setActivePage("discoduro")}>Disco Duro</a> 
-                <a onClick={() => setActivePage("memoriaram")}>Memoria RAM</a>
-                <a onClick={() => setActivePage("procesador")}>Procesador</a>
-                <a onClick={() => setActivePage("funcionarios")}>Funcionario</a>
-                <a onClick={() => setActivePage("sedes")}>Sede</a>
-                <a onClick={() => setActivePage("area")}>Área</a>
-              </div>
-            )}
-            
-            {/* ================= ADMIN ================= */}
-            {user?.role === "ADMIN" && (
-              <div className="submenu">
-                <a onClick={() => setAdminOpen(!adminOpen)}>
-                  Administración {adminOpen ? "▲" : "▼"}
-                </a>
+          {hasPermission("mantenimientos.view") && (
+            <a className={activePage === "listamantenimientos" ? "active" : ""} onClick={() => setActivePage("listamantenimientos")}>Mantenimientos</a>
+          )}
 
-                {adminOpen && (
-                  <div className="submenu-items">
-                    <a onClick={() => setActivePage("admin-users")}>Usuarios</a>
-                    <a onClick={() => setActivePage("admin-permissions")}>Permisos</a>
-                  </div>
-                )}
-              </div>
-            )}
+          {hasPermission("maestros.view") && (
+            <div className="submenu">
+              <a onClick={() => setMaestrosOpen(!maestrosOpen)}>Maestros {maestrosOpen ? "▲" : "▼"}</a>
+              {maestrosOpen && (
+                <div className="submenu-items">
+                  <a onClick={() => setActivePage("tipodispositivo")}>Tipo Dispositivo</a>
+                  <a onClick={() => setActivePage("sistemaoperativo")}>Sistema Operativo</a>
+                  <a onClick={() => setActivePage("tipolista")}>Tipo Lista</a>
+                  <a onClick={() => setActivePage("chequeo")}>Lista Chequeo</a>
+                  <a onClick={() => setActivePage("discoduro")}>Disco Duro</a>
+                  <a onClick={() => setActivePage("memoriaram")}>Memoria RAM</a>
+                  <a onClick={() => setActivePage("procesador")}>Procesador</a>
+                  <a onClick={() => setActivePage("funcionarios")}>Funcionario</a>
+                  <a onClick={() => setActivePage("sedes")}>Sede</a>
+                  <a onClick={() => setActivePage("area")}>Área</a>
+                  <a onClick={() => setActivePage("tipoentrega")}>Tipo Entrega</a>
+                </div>
+              )}
+            </div>
+          )}
 
-          </div>
+          {hasPermission("usuarios.view") && (
+            <div className="submenu">
+              <a onClick={() => setAdminOpen(!adminOpen)}>Administración {adminOpen ? "▲" : "▼"}</a>
+              {adminOpen && (
+                <div className="submenu-items">
+                  <a onClick={() => setActivePage("admin-users")}>Usuarios</a>
+                  <a onClick={() => setActivePage("admin-permissions")}>Permisos</a>
+                </div>
+              )}
+            </div>
+          )}
         </nav>
       </aside>
 
-      {/* ================= MAIN ================= */}
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
-        {activePage === "listamantenimientos" && (
-          <MantenimientoList search={searchText} />
+        {activePage === "empty" && <AccessDenied />}
+
+        {activePage === "listamantenimientos" && hasPermission("mantenimientos.view") && <MantenimientoList search={searchText} />}
+
+        {activePage === "tarjetas-acceso" && hasPermission("tarjetas.view") && (
+          <ActaTarjetaPage />
         )}
-        {activePage === "tipodispositivo" && <TipoDispositivoPage />}
-        {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
-        {activePage === "tipolista" && <TipoListaPage />}
-        {activePage === "discoduro" && <DiscoDuroPage />}
-        {activePage === "memoriaram" && <MemoriaRamPage />}
-        {activePage === "procesador" && <ProcesadorPage />}
-        {activePage === "chequeo" && <ChequeoPage />}
-        {activePage === "funcionarios" && <FuncionarioPage />}
-        {activePage === "sedes" && <SedePage />}
-        {activePage === "area" && <AreaPage />}
-        {/* ================= ADMIN ================= */}
-        {activePage === "admin-users" && <UsersPage />}
-        {activePage === "admin-permissions" && <PermissionsPage />}
+
+        {hasPermission("maestros.view") && (
+          <>
+            {activePage === "tipodispositivo" && <TipoDispositivoPage />}
+            {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
+            {activePage === "tipolista" && <TipoListaPage />}
+            {activePage === "discoduro" && <DiscoDuroPage />}
+            {activePage === "memoriaram" && <MemoriaRamPage />}
+            {activePage === "procesador" && <ProcesadorPage />}
+            {activePage === "chequeo" && <ChequeoPage />}
+            {activePage === "funcionarios" && <FuncionarioPage />}
+            {activePage === "sedes" && <SedePage />}
+            {activePage === "area" && <AreaPage />}
+            {activePage === "tipoentrega" && <TipoEntregaPage />}
+          </>
+        )}
+
+        {hasPermission("usuarios.view") && (
+          <>
+            {activePage === "admin-users" && <UsersPage />}
+            {activePage === "admin-permissions" && <PermissionsPage />}
+          </>
+        )}
       </main>
     </div>
   );
 }
 
-/* ===================== */
-/* LOADER ORION         */
-/* ===================== */
 function WelcomeSpinner() {
   return (
     <div className="orion-loader-overlay">
+      <div className="loader-particles"></div>
+      
       <div className="orion-loader-content">
+        {/* Logo y Anillos */}
+        <div className="loader-logo-wrapper">
+          <div className="loader-ring orion-blue-ring"></div>
+          <div className="loader-ring-outer orion-orange-ring"></div>
+          
+          <svg width="110" height="110" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="loader-svg-animated">
+            <g className="svg-body">
+              <path d="M10 45C10 22.9 27.9 5 50 5C72.1 5 90 22.9 90 45H10Z" fill="#78D9FB" />
+              <path d="M7 52C25 42 75 42 93 52L91 60C73 50 27 50 9 60L7 52Z" fill="#FF9D00" />
+              <path d="M12 65C25 85 75 85 88 65L86 72C73 90 27 90 14 72L12 65Z" fill="#97D700" />
+            </g>
+            <g stroke="white" strokeWidth="3.5" strokeLinejoin="round">
+              <circle cx="51" cy="22" r="9" fill="white" />
+              <path d="M51 34C40 34 15 22 10 14C18 45 45 65 42 96C55 70 92 42 94 10C75 27 58 34 51 34Z" fill="white" />
+            </g>
+            <g fill="#1A337E">
+              <circle cx="51" cy="22" r="8" />
+              <path d="M51 34 C40 34 15 22 10 14 C18 45 45 65 42 96 C55 70 92 42 94 10 C75 27 58 34 51 34Z" />
+            </g>
+          </svg>
+        </div>
+
+        {/* Textos */}
         <h1 className="orion-loader-title">
-          Bienvenido a <span>ORION</span>
+          BIENVENIDO A <span>ORION</span>
         </h1>
-        <p className="orion-loader-text">Cargando sistema…</p>
-        <div className="orion-spinner"></div>
+        
+        <div className="loader-status">
+          <div className="bar-container">
+            <div className="progress-bar-fill orion-gradient-bar"></div>
+          </div>
+          <p className="orion-loader-text-animated">Sincronizando Sistema...</p>
+        </div>
+        
+        <div className="foscal-tag-animated">FOSCAL</div>
       </div>
     </div>
   );

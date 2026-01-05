@@ -4,7 +4,13 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import connectDB from "./src/Config/db.js";
 
-import authRoutes from "./src/routes/auth.routes.js"; 
+/* ===============================
+   IMPORTACIÓN DE RUTAS
+================================ */
+import authRoutes from "./src/routes/auth.routes.js";
+import usersRoutes from "./src/routes/users.routes.js";
+import permissionsRoutes from "./src/routes/permissions.routes.js";
+
 import sedeRoutes from "./src/routes/sede.routes.js";
 import sistemaOperativoRoutes from "./src/routes/sistemaOperativo.routes.js";
 import tipoDispositivoRoutes from "./src/routes/tipoDispositivo.routes.js";
@@ -16,9 +22,9 @@ import mantenimientosRoutes from "./src/routes/mantenimientos.routes.js";
 import discoDuroRoutes from "./src/routes/discoDuro.routes.js";
 import memoriaRamRoutes from "./src/routes/memoriaRam.routes.js";
 import procesadorRoutes from "./src/routes/procesador.routes.js";
+import tipoEntregaRoutes from "./src/routes/tipoEntrega.routes.js";
+
 import testRoutes from "./src/routes/test.routes.js";
-import usersRoutes from "./src/routes/users.routes.js";
-import permissionsRoutes from "./src/routes/permissions.routes.js";
 
 dotenv.config();
 
@@ -33,11 +39,13 @@ app.set("mongoose", mongoose);
 /* ===============================
    MIDDLEWARES
 ================================ */
-app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:5000"],
-  methods: "GET,POST,PUT,DELETE",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:5000"],
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
@@ -46,6 +54,7 @@ app.use(express.json());
 ================================ */
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/permissions", permissionsRoutes);
 app.use("/api/test", testRoutes);
 
 app.use("/api/sedes", sedeRoutes);
@@ -59,10 +68,10 @@ app.use("/api/mantenimientos", mantenimientosRoutes);
 app.use("/api/discos-duros", discoDuroRoutes);
 app.use("/api/memorias-ram", memoriaRamRoutes);
 app.use("/api/procesadores", procesadorRoutes);
-app.use("/api/permissions", permissionsRoutes);
+app.use("/api/tipos-entrega", tipoEntregaRoutes);
 
 /* ===============================
-   ARRANQUE SERVIDOR (🔥 CLAVE 🔥)
+   ARRANQUE SERVIDOR
 ================================ */
 const PORT = process.env.PORT || 5000;
 

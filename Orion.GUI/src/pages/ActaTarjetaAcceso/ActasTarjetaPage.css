@@ -1,0 +1,160 @@
+:root {
+  --blue: #2748B3;
+  --blue-dark: #1E3A8A;
+  --card-bg: #ffffff;
+  --muted: #6b7280;
+  --radius: 12px;
+  --shadow-1: 0 6px 20px rgba(16,24,40,0.06);
+  --shadow-2: 0 12px 30px rgba(16,24,40,0.08);
+}
+
+/* SOLUCIÓN RADICAL: 
+   Forzamos al contenedor a ignorar anchos máximos y ocupar el 100% 
+*/
+.mui-container {
+  width: 100% !important;
+  max-width: 100% !important; 
+  margin: 0 !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+
+.mui-grid {
+  display: block !important; /* Cambiamos de grid a block para asegurar que no haya columnas invisibles */
+  width: 100% !important;
+}
+
+.mui-column { 
+  width: 100% !important;
+  display: flex; 
+  flex-direction: column; 
+  gap: 18px; 
+}
+
+/* CARD DE REGISTROS 
+*/
+.mui-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  border: 1px solid #eef3ff;
+  overflow: hidden;
+  width: 100% !important; /* Ocupa todo el ancho disponible */
+}
+
+.mui-card-header {
+  padding: 14px 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,255,0.9));
+  font-weight: 700;
+  color: var(--blue-dark);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.mui-card-body {
+  padding: 16px 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mui-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  margin-bottom: 20px;
+}
+
+/* INPUTS Y BÚSQUEDA 
+*/
+.mui-input, .mui-select, .mui-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e6edf7;
+  background: #fbfdff;
+  outline: none;
+  font-size: 14px;
+}
+
+/* TABLA: Ajustes para que no se vea vacía en pantallas gigantes 
+*/
+.table-responsive { 
+  overflow-x: auto; 
+  width: 100% !important;
+}
+
+.table { 
+  width: 100% !important; 
+  border-collapse: collapse; 
+  table-layout: auto; /* Permite que las columnas se expandan según el contenido */
+}
+
+.table th, .table td { 
+  padding: 14px 10px; 
+  border-bottom: 1px solid #f0f4fb; 
+  text-align: left; 
+  font-size: 14px;
+}
+
+.table th { 
+  background: #fbfdff; 
+  color: var(--blue-dark); 
+  font-weight: 600; 
+}
+
+/* BOTÓN OJO (Mantenemos tu diseño) 
+*/
+.orion-eye-btn {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #07328f; 
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.orion-eye-btn::before {
+  content: "";
+  width: 14px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.orion-eye-btn::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* SPINNER 
+*/
+.orion-spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid rgba(39, 72, 179, 0.2);
+  border-top: 4px solid #2748B3;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* UTILIDADES */
+.mui-btn-primary { 
+  background: var(--blue-dark); 
+  color: white; 
+  padding: 10px 16px; 
+  border-radius: 10px; 
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}

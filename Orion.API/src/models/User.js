@@ -4,25 +4,15 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-
-    role: {
-      type: String,
-      enum: ["ADMIN", "TECNICO", "LECTOR"],
-      default: "LECTOR"
-    },
-
+    role: { type: String }, 
     permissions: {
       type: [String],
-      default: ["mantenimientos.read"]
+      default: []
     },
-
-    provider: {
-      type: String,
-      enum: ["google", "local"],
-      default: "google"
-    },
-
-    active: { type: Boolean, default: true }
+    active: {
+      type: Boolean,
+      default: true
+    }
   },
   { timestamps: true }
 );
