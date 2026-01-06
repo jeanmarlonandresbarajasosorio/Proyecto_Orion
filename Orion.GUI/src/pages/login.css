@@ -1,222 +1,195 @@
 /* =====================================================
-   🔐 LOGIN ORION - ESTILO EMPRESARIAL
-   ===================================================== */
-:root {
-  --orion-blue-dark: #1e3a8a;
-  --orion-blue: #2748B3;
-  --orion-blue-light: #4f6fdc;
-
-  --orion-bg-gradient: linear-gradient(
-    180deg,
-    #1e3a8a 0%,
-    #2748B3 45%,
-    #4f6fdc 100%
-  );
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-}
-
-/* CONTENEDOR */
-.login-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--orion-bg-gradient);
-}
-
-/* TARJETA */
-.login-card {
-  background: #ffffff;
-  width: 380px;
-  padding: 2.8rem 2.5rem;
-  border-radius: 8px;
-  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.25);
-  animation: scaleIn 0.35s ease-in-out;
-}
-
-/* TITULOS */
-.login-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--orion-blue-dark);
-  letter-spacing: 1px;
-  text-align: center;
-  margin-bottom: 0.3rem;
-}
-
-.login-subtitle {
-  font-size: 0.85rem;
-  color: #6b7280;
-  text-align: center;
-  margin-bottom: 2.2rem;
-}
-
-/* FORM */
-.login-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.login-form label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.3rem;
-}
-
-.login-form input {
-  padding: 0.65rem 0.75rem;
-  margin-bottom: 1.4rem;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.login-form input:focus {
-  border-color: var(--orion-blue);
-  box-shadow: 0 0 0 2px rgba(39, 72, 179, 0.15);
-}
-
-/* BOTON */
-.login-button {
-  margin-top: 0.6rem;
-  padding: 0.75rem;
-  background-color: var(--orion-blue);
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
-}
-
-.login-button:hover {
-  background-color: var(--orion-blue-dark);
-  transform: translateY(-1px);
-}
-
-/* ANIMACIONES */
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-/* =====================================================
-   🔐 LOGIN ORION - ESTILO EMPRESARIAL PRO
+   🔐 LOGIN ORION - INNOVACIÓN EMPRESARIAL 
    ===================================================== */
 
 :root {
   --orion-blue-dark: #1e3a8a;
   --orion-blue: #2748B3;
   --orion-blue-light: #4f6fdc;
-
   --orion-bg-gradient: linear-gradient(
-    180deg,
+    135deg,
     #1e3a8a 0%,
     #2748B3 45%,
     #4f6fdc 100%
   );
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  overflow: hidden;
 }
 
-/* CONTENEDOR */
+/* CONTENEDOR PRINCIPAL CON EFECTO PROFUNDIDAD */
 .login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--orion-bg-gradient);
+  position: relative;
+  padding: 20px;
 }
 
-/* TARJETA */
+/* DECORACIÓN INNOVADORA (Aura de fondo) */
+.login-container::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: var(--orion-blue-light);
+  filter: blur(150px);
+  border-radius: 50%;
+  top: 10%;
+  left: 10%;
+  opacity: 0.4;
+}
+
+/* TARJETA DE LOGIN MEJORADA */
 .login-card {
-  background: #ffffff;
-  width: 380px;
-  padding: 3rem 2.6rem;
-  border-radius: 10px;
-  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.28);
-  animation: scaleIn 0.35s ease-in-out;
+  background: var(--glass-bg);
+  width: 100%;
+  max-width: 420px;
+  padding: 3rem 2.5rem;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: slideUp 0.6s ease-out;
   text-align: center;
+  z-index: 1;
 }
 
-/* HEADER */
+/* CONTENEDOR DEL LOGO CON ANIMACIÓN DE FLOTACIÓN */
+.login-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+  animation: float 4s ease-in-out infinite;
+}
+
+.login-logo {
+  width: 150px; 
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #ffffff;
+  padding: 5px;
+  border: 2px solid #f3f4f6;
+}
+
+/* CABECERA Y TÍTULOS */
 .login-header {
-  margin-bottom: 1.2rem;
+  margin-bottom: 2rem;
 }
 
 .login-title {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--orion-blue-dark);
-  letter-spacing: 2px;
-  margin-bottom: 0.25rem;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.login-title span {
+  background: linear-gradient(to right, var(--orion-blue-dark), var(--orion-blue-light));
+  -webkit-text-fill-color: transparent;
 }
 
 .login-subtitle {
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 1rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+  font-weight: 400;
 }
 
-/* DIVISOR */
+/* DIVISOR ESTILIZADO */
 .login-divider {
   height: 1px;
   background: linear-gradient(
     to right,
     transparent,
-    var(--orion-blue-light),
+    #e2e8f0,
     transparent
   );
-  margin: 1.8rem 0;
+  margin: 2rem 0;
+  border: none;
 }
 
-/* GOOGLE */
+/* INPUTS Y FORMULARIO (Sugerencia de estilo para que combine) */
+/* Agregado para que los campos de texto luzcan igual de innovadores */
+input {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  transition: var(--transition);
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--orion-blue);
+  box-shadow: 0 0 0 4px rgba(39, 72, 179, 0.1);
+}
+
+/* BOTÓN DE GOOGLE / ACCIÓN */
 .login-google {
   display: flex;
   justify-content: center;
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+}
+
+.login-google:hover {
+  transform: translateY(-2px);
 }
 
 /* FOOTER */
 .login-footer {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 1rem;
+  font-weight: 500;
 }
 
-/* ANIMACIÓN */
-@keyframes scaleIn {
+/* --- ANIMACIONES --- */
+
+@keyframes slideUp {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
 
-
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 2rem 1.5rem;
+    border-radius: 0;
+    height: 100vh;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}

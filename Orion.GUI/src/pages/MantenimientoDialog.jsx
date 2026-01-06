@@ -45,10 +45,8 @@ const initialForm = {
     "Limpieza Portátil": "",
   },
   observaciones: "",
-  
   funcionarioTicMantenimiento: "",
   fechaTicMantenimiento: "",
-
   minutosParada: "",
   proporcionParada: "",
   totalDisponibilidad: "",
@@ -130,430 +128,264 @@ export default function MantenimientoDialog({ onClose, onSave, editingRecord }) 
   };
 
   return (
-    <div className="md-overlay">
-      <div className="md-modal">
-        <button className="md-btn-close" onClick={onClose}>&times;</button>
-        
-        <div className="md-modal-content">
-          <h2 className="md-title">{editingRecord ? "editar mantenimiento" : "crear mantenimiento"}</h2>
+    <div className="modal-backdrop">
+      <div className="modal-card">
+        <header className="modal-header">
+          <h2>{editingRecord ? "Editar Mantenimiento" : "Crear Mantenimiento"}</h2>
+          <button type="button" className="close-btn" onClick={onClose}>✕</button>
+        </header>
 
-          <form onSubmit={handleSubmit} className="md-form">
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
             
-           {/* ================= DATOS ÁREA ================= */}
-<div className="md-section">
-  <h3 className="section-title">Datos Area</h3>
-
-  <div className="row-3">
-    <div className="field">
-      <label>Sede</label>
-      <select name="sede" value={form.sede} onChange={handleChange}>
-        <option value="">Seleccionar</option>
-        {sedes.map(s => (
-          <option key={s.id} value={s.nombre}>
-            {s.nombre}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="field">
-      <label>Area</label>
-      <select name="area" value={form.area} onChange={handleChange}>
-        <option value="">Seleccionar</option>
-        {areas.map(a => (
-          <option key={a.id} value={a.nombre}>
-            {a.nombre}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="field">
-      <label>Ubicación</label>
-      <input
-        name="ubicacion"
-        placeholder="Ubicación"
-        value={form.ubicacion}
-        onChange={handleChange}
-      />
-    </div>
-  </div>
-</div>
-
+            {/* ================= DATOS ÁREA ================= */}
+            <section className="permissions-section">
+              <div className="permission-title">Datos del Área</div>
+              <div className="permission-group">
+                <div className="form-grid">
+                  <label>Sede
+                    <select name="sede" value={form.sede} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      {sedes.map(s => <option key={s.id} value={s.nombre}>{s.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Área
+                    <select name="area" value={form.area} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      {areas.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Ubicación
+                    <input name="ubicacion" placeholder="Ubicación" value={form.ubicacion} onChange={handleChange} />
+                  </label>
+                </div>
+              </div>
+            </section>
 
             {/* ================= DATOS DEL EQUIPO ================= */}
-<div className="md-section">
-  <h3 className="section-title">Datos Equipo</h3>
-
-  <div className="row-3">
-    <div className="field">
-      <label>Nombre Equipo</label>
-      <input
-        placeholder="Nombre Equipo"
-        value={equipoTemp.nombreEquipo}
-        onChange={e =>
-          handleEquipoTempChange("nombreEquipo", e.target.value)
-        }
-      />
-    </div>
-
-    <div className="field">
-      <label>Dispositivo</label>
-      <select
-        value={equipoTemp.dispositivo}
-        onChange={e =>
-          handleEquipoTempChange("dispositivo", e.target.value)
-        }
-      >
-        <option value="">Seleccionar</option>
-        {dispositivos.map(d => (
-          <option key={d.id} value={d.nombre}>
-            {d.nombre}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="field">
-      <label>Inventario</label>
-      <input
-        placeholder="Inventario"
-        value={equipoTemp.inventario}
-        onChange={e =>
-          handleEquipoTempChange("inventario", e.target.value)
-        }
-      />
-    </div>
-  </div>
-
-  <div className="row-3 mt">
-    <div className="field">
-      <label>Procesador</label>
-      <select
-        value={equipoTemp.procesador}
-        onChange={e =>
-          handleEquipoTempChange("procesador", e.target.value)
-        }
-      >
-        <option value="">Seleccionar</option>
-        {procesadores.map(p => (
-          <option key={p.id} value={p.nombre}>
-            {p.nombre}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="field">
-      <label>Disco</label>
-      <select
-        value={equipoTemp.disco}
-        onChange={e =>
-          handleEquipoTempChange("disco", e.target.value)
-        }
-      >
-        <option value="">Seleccionar</option>
-        {discos.map(d => (
-          <option key={d.id} value={d.nombre}>
-            {d.nombre}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div className="field">
-      <label className="label-acronym">RAM</label>
-      <select
-        value={equipoTemp.ram}
-        onChange={e =>
-          handleEquipoTempChange("ram", e.target.value)
-        }
-      >
-        <option value="">Seleccionar</option>
-        {rams.map(r => (
-          <option key={r.id} value={r.nombre}>
-            {r.nombre}
-          </option>
-        ))}
-      </select>
-    </div>
-  </div>
-
-              <div className="row-3 mt">
-                <div className="field">
-                  <label>Sistema Operativo</label>
-                  <select value={equipoTemp.so} onChange={e => handleEquipoTempChange("so", e.target.value)}>
-                    <option value="">Seleccionar</option>
-                    {sistemasOperativos.map(so => (<option key={so.id} value={so.nombre}>{so.nombre}</option>))}
-                  </select>
+            <section className="permissions-section">
+              <div className="permission-title">Datos del Equipo</div>
+              <div className="permission-group">
+                <div className="form-grid">
+                  <label>Nombre Equipo
+                    <input placeholder="Nombre Equipo" value={equipoTemp.nombreEquipo} onChange={e => handleEquipoTempChange("nombreEquipo", e.target.value)} />
+                  </label>
+                  <label>Dispositivo
+                    <select value={equipoTemp.dispositivo} onChange={e => handleEquipoTempChange("dispositivo", e.target.value)}>
+                      <option value="">Seleccionar</option>
+                      {dispositivos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Inventario
+                    <input placeholder="Inventario" value={equipoTemp.inventario} onChange={e => handleEquipoTempChange("inventario", e.target.value)} />
+                  </label>
+                  <label>Procesador
+                    <select value={equipoTemp.procesador} onChange={e => handleEquipoTempChange("procesador", e.target.value)}>
+                      <option value="">Seleccionar</option>
+                      {procesadores.map(p => <option key={p.id} value={p.nombre}>{p.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Disco
+                    <select value={equipoTemp.disco} onChange={e => handleEquipoTempChange("disco", e.target.value)}>
+                      <option value="">Seleccionar</option>
+                      {discos.map(d => <option key={d.id} value={d.nombre}>{d.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>RAM
+                    <select value={equipoTemp.ram} onChange={e => handleEquipoTempChange("ram", e.target.value)}>
+                      <option value="">Seleccionar</option>
+                      {rams.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
+                    </select>
+                  </label>
                 </div>
-              </div>
+                
+                <div className="form-grid" style={{ marginTop: '10px' }}>
+                    <label>Sistema Operativo
+                        <select value={equipoTemp.so} onChange={e => handleEquipoTempChange("so", e.target.value)}>
+                        <option value="">Seleccionar</option>
+                        {sistemasOperativos.map(so => <option key={so.id} value={so.nombre}>{so.nombre}</option>)}
+                        </select>
+                    </label>
+                </div>
 
-              <button type="button" className="btn-save mt" onClick={agregarEquipo}>+ Agregar Equipo</button>
+                <button type="button" className="btn-primary" style={{ marginTop: '16px', width: '100%' }} onClick={agregarEquipo}>+ Agregar Equipo</button>
 
-              {form.equipos.length > 0 && (
-                <div className="equipos-table-wrapper mt">
-                  <table className="md-table equipos-table">
-                    <thead>
-                      <tr>
-                        <th className="col-equipo">Equipo</th>
-                        <th className="col-dispositivo">Dispositivo</th>
-                        <th className="col-inventario">Inventario</th>
-                        <th className="col-hw">Procesador</th>
-                        <th className="col-hw">Disco</th>
-                        <th className="col-hw">RAM</th>
-                        <th className="col-so">SO</th>
-                        <th className="col-accion">Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {form.equipos.map((eq, i) => (
-                        <tr key={i}>
-                          <td className="col-equipo"><strong>{eq.nombreEquipo}</strong></td>
-                          <td className="col-dispositivo">{eq.dispositivo}</td>
-                          <td className="col-inventario"><span className="badge-inv">{eq.inventario}</span></td>
-                          <td className="col-hw">{eq.procesador}</td>
-                          <td className="col-hw">{eq.disco}</td>
-                          <td className="col-hw">{eq.ram}</td>
-                          <td className="col-so">{eq.so}</td>
-                          <td className="col-accion">
-                            <button type="button" className="btn-cancel btn-small" onClick={() => quitarEquipo(i)}>Quitar</button>
-                          </td>
+                {form.equipos.length > 0 && (
+                  <div style={{ marginTop: '16px', overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                      <thead style={{ background: '#f1f5f9' }}>
+                        <tr>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Equipo</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Inventario</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>HW</th>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Acción</th>
                         </tr>
+                      </thead>
+                      <tbody>
+                        {form.equipos.map((eq, i) => (
+                          <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                            <td style={{ padding: '8px' }}>{eq.nombreEquipo}</td>
+                            <td style={{ padding: '8px' }}><span className="badge-inv">{eq.inventario}</span></td>
+                            <td style={{ padding: '8px' }}>{eq.procesador} / {eq.ram}</td>
+                            <td style={{ padding: '8px' }}>
+                              <button type="button" style={{ color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer', fontWeight: '600' }} onClick={() => quitarEquipo(i)}>Quitar</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* ================= RETIRO Y RECIBO ================= */}
+            <section className="permissions-section">
+              <div className="permission-title">Autorización Retiro y Recibo</div>
+              <div className="permission-group">
+                <div className="form-grid">
+                  <label>Fecha retiro
+                    <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
+                  </label>
+                  <label>Autoriza retiro
+                    <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Fecha Entrega
+                    <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
+                  </label>
+                  <label>Recibe
+                    <select name="recibe" value={form.recibe} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            {/* ================= SOFTWARE ================= */}
+            <section className="permissions-section">
+              <div className="permission-title">Lista Chequeo Software</div>
+              <div className="permission-group">
+                <div className="form-grid">
+                  {Object.keys(form.softwareChecks).map(k => (
+                    <label key={k}>{k}
+                      <select value={form.softwareChecks[k]} onChange={e => handleNestedChange("softwareChecks", k, e.target.value)}>
+                        <option value="">Seleccionar</option>
+                        <option>Verificado</option>
+                        <option>No Aplica</option>
+                      </select>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* ================= GARANTÍA Y HW ================= */}
+            <section className="permissions-section">
+              <div className="permission-title">Garantía y Hardware</div>
+              <div className="permission-group">
+                <div className="form-grid">
+                  <label>Equipo en Garantía
+                    <select name="garantia" value={form.garantia} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      <option>SI</option>
+                      <option>NO</option>
+                    </select>
+                  </label>
+                  <label>Fecha vencimiento {form.garantia === "SI" && <span style={{ color: "red" }}>*</span>}
+                    <input type="date" name="vencimientoGarantia" value={form.vencimientoGarantia} onChange={handleChange} />
+                  </label>
+                </div>
+
+                {form.garantia === "NO" && (
+                  <div style={{ marginTop: '20px' }}>
+                    <p className="help-text">Checklist Hardware (Mantenimiento Preventivo):</p>
+                    <div className="form-grid">
+                      {Object.keys(form.hardwareChecks).map(k => (
+                        <label key={k}>{k}
+                          <select value={form.hardwareChecks[k]} onChange={e => handleNestedChange("hardwareChecks", k, e.target.value)}>
+                            <option value="">Seleccionar</option>
+                            <option>Realizado</option>
+                            <option>No Aplica</option>
+                          </select>
+                        </label>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* ================= AUTORIZACIÓN RETIRO ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Autorización Retiro Recibo</h3>
-              <div className="row-2">
-                <div className="field">
-                  <label>Fecha retiro</label>
-                  <input type="datetime-local" name="fechaRetiro" value={form.fechaRetiro} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>Autoriza retiro</label>
-                  <select name="autorizaRetiro" value={form.autorizaRetiro} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
-                  </select>
+                    </div>
+                  </div>
+                )}
+                <div style={{ marginTop: '15px' }}>
+                   <label style={{ fontSize: '13px', fontWeight: '500', color: '#334155' }}>Observaciones</label>
+                   <textarea name="observaciones" style={{ width: '100%', marginTop: '6px', borderRadius: '10px', border: '1px solid #cbd5e1', padding: '10px' }} value={form.observaciones} onChange={handleChange} rows="3" />
                 </div>
               </div>
-              <div className="row-2 mt">
-                <div className="field">
-                  <label>Fecha Entrega</label>
-                  <input type="datetime-local" name="fechaEntrega" value={form.fechaEntrega} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>Recibe</label>
-                  <select name="recibe" value={form.recibe} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
+            </section>
 
-            {/* ================= Fucionarios ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Funcionarios</h3>
-              <div className="row-2">
-                <div className="field">
-                  <label>Funcionario realiza</label>
-                  <select name="funcionarioRealiza" value={form.funcionarioRealiza} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => (<option key={f.id} value={f.nombre}>{f.nombre}</option>))}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Fecha Realiza</label>
-                  <input type="datetime-local" name="fechaRealiza" value={form.fechaRealiza} onChange={handleChange} />
-                </div>
-              </div>
-              <div className="row-2 mt">
-                <div className="field">
-                  <label>Funcionario Aprueba</label>
-                  <select name="funcionarioAprueba" value={form.funcionarioAprueba} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    {funcionarios.map(f => (<option key={f.id} value={f.nombre}>{f.nombre}</option>))}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Fecha aprueba</label>
-                  <input type="datetime-local" name="fechaAprueba" value={form.fechaAprueba} onChange={handleChange} />
+
+            {/* ================= FUNCIONARIOS ================= */}
+            <section className="permissions-section">
+              <div className="permission-title">Responsables del Proceso</div>
+              <div className="permission-group">
+                <div className="form-grid">
+                  <label>Funcionario TIC
+                    <select name="funcionarioTicMantenimiento" value={form.funcionarioTicMantenimiento} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Fecha TIC
+                    <input type="datetime-local" name="fechaTicMantenimiento" value={form.fechaTicMantenimiento} onChange={handleChange} />
+                  </label>
+                  <label>Funcionario Realiza
+                    <select name="funcionarioRealiza" value={form.funcionarioRealiza} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Fecha Realiza
+                    <input type="datetime-local" name="fechaRealiza" value={form.fechaRealiza} onChange={handleChange} />
+                  </label>
+                  <label>Funcionario Aprueba
+                    <select name="funcionarioAprueba" value={form.funcionarioAprueba} onChange={handleChange}>
+                      <option value="">Seleccionar</option>
+                      {funcionarios.map(f => <option key={f.id} value={f.nombre}>{f.nombre}</option>)}
+                    </select>
+                  </label>
+                  <label>Fecha Aprueba
+                    <input type="datetime-local" name="fechaAprueba" value={form.fechaAprueba} onChange={handleChange} />
+                  </label>
                 </div>
               </div>
-            </div>
+            </section>
 
-         {/* ================= SOFTWARE ================= */}
-<div className="md-section">
-  <h3 className="section-title">Lista Chequeo Software</h3>
-
-  <div className="grid-2">
-    {Object.keys(form.softwareChecks).map(k => {
-      const isAcronym = k === "SAP" || k === "OCS Inventory";
-
-      return (
-        <div className="field" key={k}>
-          <label className={isAcronym ? "label-acronym" : ""}>
-            {isAcronym ? k : k.toLowerCase()}
-          </label>
-
-          <select
-            value={form.softwareChecks[k]}
-            onChange={e =>
-              handleNestedChange("softwareChecks", k, e.target.value)
-            }
-          >
-            <option value="">Seleccionar</option>
-            <option>Verificado</option>
-            <option>No Aplica</option>
-          </select>
-        </div>
-      );
-    })}
-  </div>
-</div>
-
-
-{/* ================= GARANTÍA ================= */}
-<div className="md-section">
-  <h3 className="section-title">Garantía</h3>
-
-  <div className="row-2">
-    <div className="field">
-      <label>Equipo en Garantía</label>
-      <select
-        name="garantia"
-        value={form.garantia}
-        onChange={handleChange}
-      >
-        <option value="">Seleccionar</option>
-        <option>SI</option>
-        <option>NO</option>
-      </select>
-    </div>
-
-    <div className="field">
-      <label>
-        Fecha vencimiento{" "}
-        {form.garantia === "SI" && (
-          <span style={{ color: "red" }}>*</span>
-        )}
-      </label>
-      <input
-        type="date"
-        name="vencimientoGarantia"
-        value={form.vencimientoGarantia}
-        onChange={handleChange}
-      />
-    </div>
-  </div>
-</div>
-
-{/* ================= HARDWARE ================= */}
-{form.garantia === "NO" && (
-  <div className="md-section">
-    <h3 className="section-title">Lista Chequeo Hardware</h3>
-
-    <div className="grid-2">
-      {Object.keys(form.hardwareChecks).map(k => {
-        const isAcronym = k.toUpperCase().includes("CPU/AIO");
-
-        return (
-          <div className="field" key={k}>
-            <label className={isAcronym ? "label-acronym" : ""}>
-              {k}
-            </label>
-
-            <select
-              value={form.hardwareChecks[k]}
-              onChange={e =>
-                handleNestedChange("hardwareChecks", k, e.target.value)
-              }
-            >
-              <option value="">Seleccionar</option>
-              <option>Realizado</option>
-              <option>No Aplica</option>
-            </select>
-          </div>
-        );
-      })}
-   </div>
-
-    <div className="field mt">
-      <label>Observaciones</label>
-      <textarea
-        name="observaciones"
-        value={form.observaciones}
-        onChange={handleChange}
-      />
-    </div>
-  </div>
-)}
-
-
-            {/* =================  FUNCIONARIO TIC REALIZA ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Funcionario TIC Realiza Mantenimiento</h3>
-              <div className="row-2">
-                <div className="field">
-                  <label>Funcionario TIC</label>
-                  <select 
-                    name="funcionarioTicMantenimiento" 
-                    value={form.funcionarioTicMantenimiento} 
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccionar Funcionario</option>
-                    {funcionarios.map(f => (
-                      <option key={f.id} value={f.nombre}>{f.nombre}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Fecha</label>
-                  <input 
-                    type="datetime-local" 
-                    name="fechaTicMantenimiento" 
-                    value={form.fechaTicMantenimiento} 
-                    onChange={handleChange} 
-                  />
+              {/* ================= DISPONIBILIDAD ================= */}
+            <section className="permissions-section">
+              <div className="permission-title">Disponibilidad y SAP</div>
+              <div className="permission-group">
+                <div className="form-grid">
+                  <label>Minutos parada
+                    <input name="minutosParada" value={form.minutosParada} onChange={handleChange} />
+                  </label>
+                  <label>Proporción (%)
+                    <input name="proporcionParada" value={form.proporcionParada} onChange={handleChange} />
+                  </label>
+                  <label>Total Disponibilidad
+                    <input name="totalDisponibilidad" value={form.totalDisponibilidad} onChange={handleChange} />
+                  </label>
+                  <label>No. Orden SAP
+                    <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
+                  </label>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* ================= TIEMPO DE PARADA ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Tiempo Parada</h3>
-              <div className="row-3">
-                <div className="field">
-                  <label>Minutos parada</label>
-                  <input name="minutosParada" value={form.minutosParada} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>Proporción (%)</label>
-                  <input name="proporcionParada" value={form.proporcionParada} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>total Disponibilidad</label>
-                  <input name="totalDisponibilidad" value={form.totalDisponibilidad} onChange={handleChange} />
-                </div>
-              </div>
-              <div className="field mt">
-                <label>No. Orden SAP</label>
-                <input name="noOrdenSAP" value={form.noOrdenSAP} onChange={handleChange} />
-              </div>
-            </div>
-
-            <div className="md-actions">
-              <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
-              <button type="submit" className="btn-save">Guardar</button>
-            </div>
-
+            <footer className="modal-actions">
+              <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn-primary">Guardar Registro</button>
+            </footer>
           </form>
         </div>
       </div>

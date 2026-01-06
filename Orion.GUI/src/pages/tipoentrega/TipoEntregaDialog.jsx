@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./TipoEntregaDialog.css";
 
-export default function TipoEntregaDialog({
-  onClose,
-  onSave,
-  editingRecord,
-}) {
+export default function TipoEntregaDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
     _id: null,
     nombre: "",
@@ -18,7 +14,6 @@ export default function TipoEntregaDialog({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "estado") {
       setForm({ ...form, estado: value === "true" });
     } else {
@@ -26,44 +21,52 @@ export default function TipoEntregaDialog({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (!form.nombre.trim()) return;
     onSave(form);
     onClose();
   };
 
   return (
-    <div className="md-overlay">
-      <div className="md-modal">
-        <div className="md-modal-content">
+    <div className="modal-backdrop">
+      <div className="modal-card" style={{ width: "500px" }}>
+        <header className="modal-header">
+          <h2>{form._id ? "Editar Tipo de Entrega" : "Nuevo Tipo de Entrega"}</h2>
+          <button type="button" className="close-btn" onClick={onClose}>✕</button>
+        </header>
 
-          <h2>
-            {form._id ? "Editar Tipo de Entrega" : "Nuevo Tipo de Entrega"}
-          </h2>
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            <section className="permissions-section">
+              <div className="permission-title">Configuración del Maestro</div>
+              <div className="permission-group">
+                <div className="form-grid" style={{ gridTemplateColumns: '1fr' }}>
+                  <label>
+                    Nombre del Tipo de Entrega
+                    <input
+                      type="text"
+                      name="nombre"
+                      placeholder=""
+                      value={form.nombre}
+                      onChange={handleChange}
+                      autoFocus
+                      required
+                    />
+                  </label>
+                </div>
+              </div>
+            </section>
 
-          <div className="md-form row-2">
-            <div>
-              <label>Nombre</label>
-              <input
-                className="mui-input"
-                type="text"
-                name="nombre"
-                value={form.nombre}
-                onChange={handleChange}
-                autoFocus
-              />
-            </div>
-          </div>
-
-          <div className="md-actions">
-            <button className="btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button className="btn-save" onClick={handleSubmit}>
-              Guardar
-            </button>
-          </div>
-
+            <footer className="modal-actions">
+              <button type="button" className="btn-secondary" onClick={onClose}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn-primary">
+                Guardar Registro
+              </button>
+            </footer>
+          </form>
         </div>
       </div>
     </div>

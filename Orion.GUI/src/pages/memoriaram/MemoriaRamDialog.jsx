@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./MemoriaRamDialog.css"; 
+import "./MemoriaRamDialog.css";
 
 export default function MemoriaRamDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
@@ -21,7 +21,9 @@ export default function MemoriaRamDialog({ onClose, onSave, editingRecord }) {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
     if (!form.nombre.trim()) {
       alert("El nombre es obligatorio");
       return;
@@ -45,33 +47,46 @@ export default function MemoriaRamDialog({ onClose, onSave, editingRecord }) {
   };
 
   return (
-    <div className="md-overlay">
-      <div className="md-modal">
-        <div className="md-modal-content">
+    <div className="modal-backdrop">
+      <div className="modal-card" style={{ width: "500px" }}>
+        <header className="modal-header">
           <h2>{form._id ? "Editar Memoria RAM" : "Nueva Memoria RAM"}</h2>
+          <button type="button" className="close-btn" onClick={onClose}>
+            ✕
+          </button>
+        </header>
 
-          <div className="md-form row-1">
-            <div>
-              <label>Nombre</label>
-              <input
-                className="mui-input"
-                type="text"
-                name="nombre"
-                value={form.nombre}
-                onChange={handleChange}
-                placeholder=""
-              />
-            </div>
-          </div>
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            <section className="permissions-section">
+              <div className="permission-title">Capacidad y Tipo</div>
+              <div className="permission-group">
+                <div className="form-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <label>
+                    Nombre / Especificación
+                    <input
+                      type="text"
+                      name="nombre"
+                      placeholder=""
+                      value={form.nombre}
+                      onChange={handleChange}
+                      autoFocus
+                      required
+                    />
+                  </label>
+                </div>
+              </div>
+            </section>
 
-          <div className="md-actions">
-            <button className="btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button className="btn-save" onClick={handleSubmit}>
-              Guardar
-            </button>
-          </div>
+            <footer className="modal-actions">
+              <button type="button" className="btn-secondary" onClick={onClose}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn-primary">
+                Guardar Memoria
+              </button>
+            </footer>
+          </form>
         </div>
       </div>
     </div>

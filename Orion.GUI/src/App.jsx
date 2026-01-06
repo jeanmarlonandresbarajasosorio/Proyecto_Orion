@@ -24,11 +24,8 @@ import ActaTarjetaPage from "./pages/ActaTarjetaAcceso/ActasTarjetaPage.jsx";
 import TipoEntregaPage from "./pages/tipoentrega/TipoEntregaPage.jsx";
 import TipoCambioPage from "./pages/tipocambio/TipoCambioPage.jsx";
 
-
-
 /* ADMIN */
 import UsersPage from "./admin/UsersPage.jsx";
-import PermissionsPage from "./admin/PermissionsPage.jsx";
 
 /* ICONOS */
 import { FiBell, FiLogOut, FiUser, FiLock } from "react-icons/fi";
@@ -217,38 +214,21 @@ export default function App() {
       </header>
 
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
-        {/* BOTÓN DE CIERRE (FLECHA) */}
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>‹</button>
 
         <div className="sidebar-logo-container" style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: '15px 5px',
-          marginBottom: '10px',
-          position: 'relative'
+          padding: '20px 5px',
+          marginBottom: '10px'
         }}>
-          <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g>
-              <path d="M10 45C10 22.9 27.9 5 50 5C72.1 5 90 22.9 90 45H10Z" fill="#78D9FB" />
-              <path d="M7 52C25 42 75 42 93 52L91 60C73 50 27 50 9 60L7 52Z" fill="#FF9D00" />
-              <path d="M12 65C25 85 75 85 88 65L86 72C73 90 27 90 14 72L12 65Z" fill="#97D700" />
-            </g>
-            <g stroke="white" strokeWidth="3.5" strokeLinejoin="round">
-              <circle cx="51" cy="22" r="9" fill="white" />
-              <path d="M51 34C40 34 15 22 10 14C18 45 45 65 42 96C55 70 92 42 94 10C75 27 58 34 51 34Z" fill="white" />
-            </g>
-            <g fill="#0056B3">
-              <circle cx="51" cy="22" r="8" />
-              <path d="M51 34
-                       C40 34 15 22 10 14
-                       C18 45 45 65 42 96
-                       C55 70 92 42 94 10
-                       C75 27 58 34 51 34Z"
-              />
-            </g>
-          </svg>
-
+          {/* CAMBIO: Logo consumido desde imagen física */}
+          <img 
+            src="/LogoOrion.png" 
+            alt="Logo FOSCAL" 
+            style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+          />
           <span style={{
             marginTop: '10px',
             color: 'white',
@@ -257,24 +237,19 @@ export default function App() {
             letterSpacing: '2px',
             fontFamily: 'Arial, sans-serif',
             textTransform: 'uppercase'
-          }}>FOSCAL</span>
+          }}></span>
         </div>
 
         <nav className="menu">
           {hasPermission("dashboard.view") && (
             <a className={activePage === "dashboard" ? "active" : ""} onClick={() => setActivePage("dashboard")}>Inicio</a>
           )}
-
           {hasPermission("tarjetas.view") && (
-            <a className={activePage === "tarjetas-acceso" ? "active" : ""} onClick={() => setActivePage("tarjetas-acceso")}>
-              Tarjetas de Acceso
-            </a>
+            <a className={activePage === "tarjetas-acceso" ? "active" : ""} onClick={() => setActivePage("tarjetas-acceso")}>Tarjetas de Acceso</a>
           )}
-
           {hasPermission("mantenimientos.view") && (
             <a className={activePage === "listamantenimientos" ? "active" : ""} onClick={() => setActivePage("listamantenimientos")}>Mantenimientos</a>
           )}
-
           {hasPermission("maestros.view") && (
             <div className="submenu">
               <a onClick={() => setMaestrosOpen(!maestrosOpen)}>Maestros {maestrosOpen ? "▲" : "▼"}</a>
@@ -292,19 +267,16 @@ export default function App() {
                   <a onClick={() => setActivePage("area")}>Área</a>
                   <a onClick={() => setActivePage("tipoentrega")}>Tipo Entrega</a>
                   <a onClick={() => setActivePage("tipocambio")}>Tipo Cambio</a>
-                  
                 </div>
               )}
             </div>
           )}
-
           {hasPermission("usuarios.view") && (
             <div className="submenu">
               <a onClick={() => setAdminOpen(!adminOpen)}>Administración {adminOpen ? "▲" : "▼"}</a>
               {adminOpen && (
                 <div className="submenu-items">
                   <a onClick={() => setActivePage("admin-users")}>Usuarios</a>
-                  <a onClick={() => setActivePage("admin-permissions")}>Permisos</a>
                 </div>
               )}
             </div>
@@ -315,13 +287,8 @@ export default function App() {
       <main className="main-area">
         {activePage === "dashboard" && <Dashboard />}
         {activePage === "empty" && <AccessDenied />}
-
         {activePage === "listamantenimientos" && hasPermission("mantenimientos.view") && <MantenimientoList search={searchText} />}
-
-        {activePage === "tarjetas-acceso" && hasPermission("tarjetas.view") && (
-          <ActaTarjetaPage />
-        )}
-
+        {activePage === "tarjetas-acceso" && hasPermission("tarjetas.view") && <ActaTarjetaPage />}
         {hasPermission("maestros.view") && (
           <>
             {activePage === "tipodispositivo" && <TipoDispositivoPage />}
@@ -336,15 +303,10 @@ export default function App() {
             {activePage === "area" && <AreaPage />}
             {activePage === "tipoentrega" && <TipoEntregaPage />}
             {activePage === "tipocambio" && <TipoCambioPage />}
-          
           </>
         )}
-
         {hasPermission("usuarios.view") && (
-          <>
-            {activePage === "admin-users" && <UsersPage />}
-            {activePage === "admin-permissions" && <PermissionsPage />}
-          </>
+          <>{activePage === "admin-users" && <UsersPage />}</>
         )}
       </main>
     </div>
@@ -355,33 +317,21 @@ function WelcomeSpinner() {
   return (
     <div className="orion-loader-overlay">
       <div className="loader-particles"></div>
-      
       <div className="orion-loader-content">
-        {/* Logo y Anillos */}
         <div className="loader-logo-wrapper">
           <div className="loader-ring orion-blue-ring"></div>
           <div className="loader-ring-outer orion-orange-ring"></div>
           
-          <svg width="110" height="110" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="loader-svg-animated">
-            <g className="svg-body">
-              <path d="M10 45C10 22.9 27.9 5 50 5C72.1 5 90 22.9 90 45H10Z" fill="#78D9FB" />
-              <path d="M7 52C25 42 75 42 93 52L91 60C73 50 27 50 9 60L7 52Z" fill="#FF9D00" />
-              <path d="M12 65C25 85 75 85 88 65L86 72C73 90 27 90 14 72L12 65Z" fill="#97D700" />
-            </g>
-            <g stroke="white" strokeWidth="3.5" strokeLinejoin="round">
-              <circle cx="51" cy="22" r="9" fill="white" />
-              <path d="M51 34C40 34 15 22 10 14C18 45 45 65 42 96C55 70 92 42 94 10C75 27 58 34 51 34Z" fill="white" />
-            </g>
-            <g fill="#1A337E">
-              <circle cx="51" cy="22" r="8" />
-              <path d="M51 34 C40 34 15 22 10 14 C18 45 45 65 42 96 C55 70 92 42 94 10 C75 27 58 34 51 34Z" />
-            </g>
-          </svg>
+          <img 
+            src="/LogoOrion.png" 
+            alt="Logo FOSCAL" 
+            className="loader-svg-animated"
+            style={{ width: '100px', height: '100px', objectFit: 'contain', position: 'relative', zIndex: 10 }}
+          />
         </div>
 
-        {/* Textos */}
         <h1 className="orion-loader-title">
-          BIENVENIDO A <span>ORION</span>
+          BIENVENIDOS.... <span></span>
         </h1>
         
         <div className="loader-status">
@@ -390,7 +340,6 @@ function WelcomeSpinner() {
           </div>
           <p className="orion-loader-text-animated">Sincronizando Sistema...</p>
         </div>
-        
         <div className="foscal-tag-animated">FOSCAL</div>
       </div>
     </div>

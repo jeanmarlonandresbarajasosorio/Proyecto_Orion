@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import "./ActaTarjetaDialog.css";
 import FirmaCanvas from "../../components/FirmaCanvas";
 
-/* ================= API ================= */
 const API_TIPO_ENTREGA = `${import.meta.env.VITE_API_URL}/tipos-entrega`;
 const API_TIPO_CAMBIO = `${import.meta.env.VITE_API_URL}/tipos-cambio`;
 const API_ACTAS = `${import.meta.env.VITE_API_URL}/actas-tarjeta`;
 
-/* ================= FORM BASE ================= */
 const initialForm = {
   sede: "",
   tipoEntrega: "",
@@ -28,13 +26,6 @@ export default function ActaTarjetaDialog({ onClose }) {
   const [tiposCambio, setTiposCambio] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  /* ================= MODAL LOCK ================= */
-  useEffect(() => {
-    document.body.classList.add("modal-open");
-    return () => document.body.classList.remove("modal-open");
-  }, []);
-
-  /* ================= CARGAR MAESTROS ================= */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -42,241 +33,144 @@ export default function ActaTarjetaDialog({ onClose }) {
           fetch(API_TIPO_ENTREGA),
           fetch(API_TIPO_CAMBIO)
         ]);
-
         setTiposEntrega(await entregaRes.json());
         setTiposCambio(await cambioRes.json());
       } catch (error) {
         console.error("Error cargando maestros:", error);
       }
     };
-
     fetchData();
   }, []);
 
-  /* ================= HANDLERS ================= */
   const handleChange = (e) => {
-    setForm(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!form.firma) {
       alert("Debe registrar la firma digital");
       return;
     }
-
     try {
       setLoading(true);
-
       const res = await fetch(API_ACTAS, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form)
       });
-
-      if (!res.ok) {
-        throw new Error("Error al guardar el acta");
-      }
-
-      alert(
-        "✅ Acta guardada correctamente.\n📧 El PDF fue enviado al correo registrado."
-      );
-
+      if (!res.ok) throw new Error("Error al guardar el acta");
+      alert("✅ Acta guardada correctamente.\n📧 El PDF fue enviado al correo registrado.");
       onClose();
     } catch (error) {
-      console.error(error);
       alert("❌ Ocurrió un error al enviar el acta");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= TEXTO DINÁMICO ================= */
-  const nombreInstitucion =
-    form.sede === "foscal"
-      ? "FOSCAL"
-      : form.sede === "foscal-internacional"
-      ? "FUNDACIÓN FOSUNAB"
-      : "";
+  const nombreInstitucion = form.sede === "foscal" 
+    ? "FOSCAL" 
+    : form.sede === "foscal-internacional" 
+      ? "FUNDACIÓN FOSUNAB" 
+      : "LA INSTITUCIÓN";
 
   return (
-    <div className="md-overlay">
-      <div className="md-modal">
-        <button className="md-btn-close" onClick={onClose}>
-          &times;
-        </button>
+    <div className="modal-backdrop">
+      <form className="modal-card" onSubmit={handleSubmit}>
+        <header className="modal-header">
+          <h2>Acta de Entrega – Tarjeta Control de Acceso</h2>
+          <button type="button" className="close-btn" onClick={onClose}>✕</button>
+        </header>
 
-        <div className="md-modal-content">
-          <h2 className="md-title">
-            Acta de Entrega – Tarjeta Control de Acceso
-          </h2>
+        <section className="modal-body">
+          <div className="permissions-section">
+            <div className="permission-title">Datos Generales</div>
+            <div className="form-grid">
+              <label>
+                Sede
+                <select name="sede" value={form.sede} onChange={handleChange} required>
+                  <option value="">Seleccionar</option>
+                  <option value="foscal">Foscal</option>
+                  <option value="foscal-internacional">Foscal Internacional</option>
+                </select>
+              </label>
 
-          <form onSubmit={handleSubmit} className="md-form">
+              <label>
+                Tipo Entrega
+                <select name="tipoEntrega" value={form.tipoEntrega} onChange={handleChange} required>
+                  <option value="">Seleccionar</option>
+                  {tiposEntrega.map(item => (
+                    <option key={item._id} value={item._id}>{item.nombre}</option>
+                  ))}
+                </select>
+              </label>
 
-            {/* ================= DATOS GENERALES ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Datos Generales</h3>
-
-              <div className="row-3">
-                <div className="field">
-                  <label>Sede</label>
-                  <select name="sede" value={form.sede} onChange={handleChange}>
-                    <option value="">Seleccionar</option>
-                    <option value="foscal">Foscal</option>
-                    <option value="foscal-internacional">Foscal Internacional</option>
-                  </select>
-                </div>
-
-                <div className="field">
-                  <label>Tipo Entrega</label>
-                  <select
-                    name="tipoEntrega"
-                    value={form.tipoEntrega}
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccionar</option>
-                    {tiposEntrega.map(item => (
-                      <option key={item._id} value={item._id}>
-                        {item.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="field">
-                  <label>Tipo Cambio</label>
-                  <select
-                    name="tipoCambio"
-                    value={form.tipoCambio}
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccionar</option>
-                    {tiposCambio.map(item => (
-                      <option key={item._id} value={item._id}>
-                        {item.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="row-3 mt">
-                <div className="field">
-                  <label>Día</label>
-                  <input name="dia" value={form.dia} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>Mes</label>
-                  <input name="mes" value={form.mes} onChange={handleChange} />
-                </div>
-                <div className="field">
-                  <label>Año</label>
-                  <input name="anio" value={form.anio} onChange={handleChange} />
-                </div>
-              </div>
+              <label>
+                Tipo Cambio
+                <select name="tipoCambio" value={form.tipoCambio} onChange={handleChange} required>
+                  <option value="">Seleccionar</option>
+                  {tiposCambio.map(item => (
+                    <option key={item._id} value={item._id}>{item.nombre}</option>
+                  ))}
+                </select>
+              </label>
             </div>
 
-            {/* ================= NORMAS DE USO ================= */}
-            {(form.sede === "foscal" || form.sede === "foscal-internacional") && (
-              <div className="md-section">
-                <h3 className="section-title">Normas de Uso</h3>
-
-                <p>
-                  La tarjeta de control de acceso permite el ingreso a áreas
-                  restringidas de <b>{nombreInstitucion}</b>, de acuerdo a las
-                  funciones del cargo, por lo tanto es de uso personal e
-                  intransferible.
-                </p>
-
-                <p>
-                  En caso de pérdida o hurto deberá notificar inmediatamente a la
-                  institución.
-                </p>
-
-                <p>
-                  La tarjeta es propiedad de la institución y deberá ser devuelta
-                  al finalizar la relación contractual.
-                </p>
-              </div>
-            )}
-
-            {/* ================= RESPONSABLE ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Datos del Responsable</h3>
-
-              <div className="row-2">
-                <div className="field">
-                  <label>Nombre Completo</label>
-                  <input
-                    name="nombre"
-                    value={form.nombre}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="field">
-                  <label>Número de Cédula</label>
-                  <input
-                    name="cedula"
-                    value={form.cedula}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="field mt">
-                <label>Correo Electrónico</label>
-                <input
-                  type="email"
-                  name="correo"
-                  value={form.correo}
-                  onChange={handleChange}
-                />
-              </div>
+            <div className="form-grid" style={{ marginTop: '16px' }}>
+              <label>Día <input name="dia" value={form.dia} onChange={handleChange} required /></label>
+              <label>Mes <input name="mes" value={form.mes} onChange={handleChange} required /></label>
+              <label>Año <input name="anio" value={form.anio} onChange={handleChange} required /></label>
             </div>
+          </div>
 
-            {/* ================= FIRMA ================= */}
-            <div className="md-section">
-              <h3 className="section-title">Firma Digital</h3>
+          <div className="permissions-section">
+            <div className="permission-title">Normas de Uso y Aceptación</div>
+            <div className="permission-group">
+              <p style={{ color: '#1e293b', fontWeight: '600', marginBottom: '10px', fontSize: '13px' }}>
+                Al firmar este documento se da constancia de la recepción y aceptación de:
+              </p>
+              <ul className="normas-list">
+                <li>Obligación de custodiar la tarjeta; el titular es responsable del uso indebido.</li>
+                <li>La tarjeta permite ingreso a áreas de <b>{nombreInstitucion}</b>; es personal e intransferible.</li>
+                <li>Pérdida o hurto debe notificarse inmediatamente (Ext. 6191 - 6192).</li>
+                <li>En caso de daño o pérdida, se debe cancelar el valor establecido.</li>
+                <li>Debe ser entregada en la <b>Subgerencia de Tecnología</b> al finalizar el contrato.</li>
+              </ul>
+            </div>
+          </div>
 
-              <FirmaCanvas
-                onSave={(firma) =>
-                  setForm(prev => ({ ...prev, firma }))
-                }
-              />
+          <div className="permissions-section">
+            <div className="permission-title">Datos del Responsable</div>
+            <div className="form-grid">
+              <label>Nombre Completo <input name="nombre" value={form.nombre} onChange={handleChange} required /></label>
+              <label>Número de Cédula <input name="cedula" value={form.cedula} onChange={handleChange} required /></label>
+              <label>Correo Electrónico <input type="email" name="correo" value={form.correo} onChange={handleChange} required /></label>
+            </div>
+          </div>
 
+          <div className="permissions-section">
+            <div className="permission-title">Firma Digital</div>
+            <div className="permission-group" style={{ background: '#fff' }}>
+              <FirmaCanvas onSave={(firma) => setForm(prev => ({ ...prev, firma }))} />
               {form.firma && (
-                <small style={{ color: "green" }}>
+                <div className="permissions-warning" style={{ background: '#ecfdf5', borderColor: '#10b981', color: '#065f46', marginTop: '10px' }}>
                   ✔ Firma registrada correctamente
-                </small>
+                </div>
               )}
             </div>
+          </div>
+        </section>
 
-            {/* ================= ACCIONES ================= */}
-            <div className="md-actions">
-              <button
-                type="button"
-                className="btn-cancel"
-                onClick={onClose}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-
-              <button type="submit" className="btn-save" disabled={loading}>
-                {loading ? "Enviando..." : "Guardar y Enviar"}
-              </button>
-            </div>
-
-          </form>
-        </div>
-      </div>
+        <footer className="modal-actions">
+          <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
+            Cancelar
+          </button>
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Enviando..." : "Guardar y Enviar Acta"}
+          </button>
+        </footer>
+      </form>
     </div>
   );
 }

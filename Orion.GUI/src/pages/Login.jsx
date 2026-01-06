@@ -48,7 +48,12 @@ export default function Login({ onLogin }) {
 
       window.google.accounts.id.renderButton(
         document.getElementById("google-login"),
-        { theme: "outline", size: "large", width: 260 }
+        { 
+          theme: "filled_blue", // Cambiado a 'filled_blue' para quitar el borde gris del botón
+          size: "large", 
+          width: 260,
+          shape: "pill" // Forma redondeada para que combine con el logo circular
+        }
       );
     };
 
@@ -66,11 +71,21 @@ export default function Login({ onLogin }) {
     <div className="login-container">
       <div className="login-card">
 
+        <div className="login-logo-wrapper">
+          <img
+            src="/LogoOrion.png"
+            alt="Logo FOSCAL"
+            className="login-logo"
+          />
+        </div>
+
         <div className="login-header">
-          <h1 className="login-title">ORION</h1>
+          <h1 className="login-title">
+          </h1>
           <p className="login-subtitle">
-            Gestión de Mantenimiento
+            Gestión de Mantenimiento FOSCAL
           </p>
+          
         </div>
 
         <div className="login-divider" />
@@ -80,7 +95,7 @@ export default function Login({ onLogin }) {
         </div>
 
         <p className="login-footer">
-          Acceso exclusivo para personal autorizado
+          Acceso Exclusivo Para Personal Autorizado
         </p>
 
       </div>

@@ -21,7 +21,7 @@
 }
 
 .mui-grid {
-  display: block !important; /* Cambiamos de grid a block para asegurar que no haya columnas invisibles */
+  display: block !important; 
   width: 100% !important;
 }
 

@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./TipoDispositivoDialog.css";
 
-export default function TipoDispositivoDialog({
-  onClose,
-  onSave,
-  editingRecord,
-}) {
+export default function TipoDispositivoDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState({
     _id: null,
     nombre: "",
@@ -17,20 +13,25 @@ export default function TipoDispositivoDialog({
       setForm({
         _id: editingRecord._id,
         nombre: editingRecord.nombre || "",
-        estado:
-          typeof editingRecord.estado === "boolean"
-            ? editingRecord.estado
-            : true,
+        estado: typeof editingRecord.estado === "boolean" ? editingRecord.estado : true,
       });
     }
   }, [editingRecord]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    // Manejo especial para el select de estado (string a boolean)
+    if (name === "estado") {
+      setForm((prev) => ({ ...prev, estado: value === "true" }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!form.nombre.trim()) return;
+
     const updated = {
       ...form,
       estado: typeof form.estado === "boolean" ? form.estado : true,
@@ -46,36 +47,44 @@ export default function TipoDispositivoDialog({
   };
 
   return (
-    <div className="md-overlay">
-      <div className="md-modal">
-        <div className="md-modal-content">
-          <h2>
-            {form._id
-              ? "Editar Tipo de Dispositivo"
-              : "Nuevo Tipo de Dispositivo"}
-          </h2>
+    <div className="modal-backdrop">
+      <div className="modal-card" style={{ width: "500px" }}>
+        <header className="modal-header">
+          <h2>{form._id ? "Editar Tipo de Dispositivo" : "Nuevo Tipo de Dispositivo"}</h2>
+          <button type="button" className="close-btn" onClick={onClose}>✕</button>
+        </header>
 
-          <div className="md-form row-2">
-            <div>
-              <label>Nombre</label>
-              <input
-                className="mui-input"
-                type="text"
-                name="nombre"
-                value={form.nombre}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            <section className="permissions-section">
+              <div className="permission-title">Configuración de Dispositivo</div>
+              <div className="permission-group">
+                <div className="form-grid" style={{ gridTemplateColumns: '1fr' }}>
+                  <label>
+                    Nombre del Dispositivo
+                    <input
+                      type="text"
+                      name="nombre"
+                      placeholder=""
+                      value={form.nombre}
+                      onChange={handleChange}
+                      autoFocus
+                      required
+                    />
+                  </label>
+                </div>
+              </div>
+            </section>
 
-          <div className="md-actions">
-            <button className="btn-cancel" onClick={onClose}>
-              Cancelar
-            </button>
-            <button className="btn-save" onClick={handleSubmit}>
-              Guardar
-            </button>
-          </div>
+            <footer className="modal-actions">
+              <button type="button" className="btn-secondary" onClick={onClose}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn-primary">
+                Guardar Dispositivo
+              </button>
+            </footer>
+          </form>
         </div>
       </div>
     </div>

@@ -1,16 +1,21 @@
+/* ========================================= */
+/* VARIABLES INSTITUCIONALES                 */
+/* ========================================= */
 :root {
   --blue: #2748B3;
-  --blue-dark: #1E3A8A;
+  --blue-dark: #1E3A8A; 
   --card-bg: #ffffff;
   --muted: #6b7280;
   --radius: 12px;
+  --radius-pill: 50px;
   --shadow-1: 0 6px 20px rgba(16,24,40,0.06);
   --shadow-2: 0 12px 30px rgba(16,24,40,0.08);
+  --green-foscal: #8cc63f;
 }
 
-/* SOLUCIÓN RADICAL: 
-   Forzamos al contenedor a ignorar anchos máximos y ocupar el 100% 
-*/
+/* ========================================= */
+/* CONTENEDOR RAÍZ                           */
+/* ========================================= */
 .mui-container {
   width: 100% !important;
   max-width: 100% !important; 
@@ -21,79 +26,102 @@
 }
 
 .mui-grid {
-  display: block !important; /* Cambiamos de grid a block para asegurar que no haya columnas invisibles */
+  display: block !important;
   width: 100% !important;
 }
 
-.mui-column { 
-  width: 100% !important;
-  display: flex; 
-  flex-direction: column; 
-  gap: 18px; 
+/* ========================================= */
+/* TOOLBAR BUSCADOR + BOTÓN                 */
+/* ========================================= */
+.acta-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
 }
 
-/* CARD DE REGISTROS 
-*/
+.acta-search-input {
+  flex: 1;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+  outline: none;
+}
+
+/* ========================================= */
+/* BOTÓN CREAR ACTA                         */
+/* ========================================= */
+.btn-crear-acta, 
+.mui-btn-primary { 
+  background-color: var(--green-foscal) !important;
+  color: white !important; 
+  padding: 0 24px !important;
+  height: 48px;
+  border-radius: 14px !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(140, 198, 63, 0.4);
+}
+
+.btn-crear-acta:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* ========================================= */
+/* MODAL                                    */
+/* ========================================= */
+.modal-card {
+  background: var(--white);
+  width: 1000px;
+  max-width: 95%;
+  height: 90vh;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-2);
+}
+
+.modal-header {
+  background-color: var(--blue-dark) !important;
+  padding: 18px 22px;
+  color: white;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 25px;
+  background-color: white;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 25px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ========================================= */
+/* TABLAS                                   */
+/* ========================================= */
 .mui-card {
   background: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow-1);
   border: 1px solid #eef3ff;
-  overflow: hidden;
-  width: 100% !important; /* Ocupa todo el ancho disponible */
-}
-
-.mui-card-header {
-  padding: 14px 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,255,0.9));
-  font-weight: 700;
-  color: var(--blue-dark);
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.mui-card-body {
-  padding: 16px 18px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.mui-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--blue-dark);
-  margin-bottom: 20px;
-}
-
-/* INPUTS Y BÚSQUEDA 
-*/
-.mui-input, .mui-select, .mui-textarea {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid #e6edf7;
-  background: #fbfdff;
-  outline: none;
-  font-size: 14px;
-}
-
-/* TABLA: Ajustes para que no se vea vacía en pantallas gigantes 
-*/
-.table-responsive { 
-  overflow-x: auto; 
   width: 100% !important;
-}
-
-.table { 
-  width: 100% !important; 
-  border-collapse: collapse; 
-  table-layout: auto; /* Permite que las columnas se expandan según el contenido */
-}
-
-.table th, .table td { 
-  padding: 14px 10px; 
-  border-bottom: 1px solid #f0f4fb; 
-  text-align: left; 
-  font-size: 14px;
 }
 
 .table th { 
@@ -102,59 +130,29 @@
   font-weight: 600; 
 }
 
-/* BOTÓN OJO (Mantenemos tu diseño) 
-*/
-.orion-eye-btn {
-  all: unset;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: #07328f; 
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+/* ========================================= */
+/* 🔧 FIX DE ALINEACIÓN (NO DAÑA DISEÑO)     */
+/* ========================================= */
+
+/* Contenedor real donde están inputs + botón */
+.mui-card > div {
+  align-items: center !important;
 }
 
-.orion-eye-btn::before {
-  content: "";
-  width: 14px;
-  height: 8px;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  position: absolute;
+/* Elimina márgenes verticales heredados */
+.mui-input,
+.mui-btn,
+.mui-btn-primary {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
-.orion-eye-btn::after {
-  content: "";
-  width: 4px;
-  height: 4px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  position: absolute;
+/* Asegura alineación vertical exacta */
+.mui-btn-primary {
+  align-self: center !important;
 }
 
-/* SPINNER 
-*/
-.orion-spinner {
-  width: 36px;
-  height: 36px;
-  border: 4px solid rgba(39, 72, 179, 0.2);
-  border-top: 4px solid #2748B3;
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* UTILIDADES */
-.mui-btn-primary { 
-  background: var(--blue-dark); 
-  color: white; 
-  padding: 10px 16px; 
-  border-radius: 10px; 
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
+/* Corrige el input date (culpable frecuente) */
+.mui-input[type="date"] {
+  line-height: normal !important;
 }
