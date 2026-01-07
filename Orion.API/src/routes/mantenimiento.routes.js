@@ -1,41 +1,37 @@
 import express from "express";
-import Mantenimiento from "../models/Mantenimiento.js";
+// Importamos las funciones del controlador avanzado
+import { 
+  getAllOrExcel, 
+  createMantenimiento, 
+  updateMantenimiento, 
+  deleteMantenimiento 
+} from "../controllers/mantenimientoController.js"; 
 
 const router = express.Router();
 
-// 🔹 GET todos
-router.get("/", async (req, res) => {
-  const data = await Mantenimiento.find().sort({ createdAt: -1 });
-  res.json(data);
-});
+// 🔹 Obtener todos O Exportar a Excel (Depende de si viene ?export=excel)
+// Esta ruta reemplaza tu GET básico porque getAllOrExcel ya hace el .find()
+router.get("/", getAllOrExcel);
 
-// 🔹 GET por ID
+// 🔹 Obtener por ID (Opcional, pero útil)
 router.get("/:id", async (req, res) => {
-  const item = await Mantenimiento.findById(req.params.id);
-  res.json(item);
+  try {
+    const item = await Mantenimiento.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "No encontrado" });
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-// 🔹 POST crear
-router.post("/", async (req, res) => {
-  const nuevo = new Mantenimiento(req.body);
-  await nuevo.save();
-  res.json(nuevo);
-});
+// 🔹 POST crear (Usando la función del controlador)
+router.post("/", createMantenimiento);
 
-// 🔹 PUT actualizar
-router.put("/:id", async (req, res) => {
-  const actualizado = await Mantenimiento.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true }
-  );
-  res.json(actualizado);
-});
+// 🔹 PUT actualizar (Usando la función del controlador corregida)
+// Esta es la que arregla el error de edición
+router.put("/:id", updateMantenimiento);
 
-// 🔹 DELETE
-router.delete("/:id", async (req, res) => {
-  await Mantenimiento.findByIdAndDelete(req.params.id);
-  res.json({ ok: true });
-});
+// 🔹 DELETE (Usando la función del controlador)
+router.delete("/:id", deleteMantenimiento);
 
 export default router;

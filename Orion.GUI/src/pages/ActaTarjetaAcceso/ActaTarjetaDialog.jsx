@@ -4,23 +4,22 @@ import FirmaCanvas from "../../components/FirmaCanvas";
 
 const API_TIPO_ENTREGA = `${import.meta.env.VITE_API_URL}/tipos-entrega`;
 const API_TIPO_CAMBIO = `${import.meta.env.VITE_API_URL}/tipos-cambio`;
-const API_ACTAS = `${import.meta.env.VITE_API_URL}/actas-tarjeta`;
 
 const initialForm = {
   sede: "",
   tipoEntrega: "",
   tipoCambio: "",
   otraCual: "",
-  dia: "",
-  mes: "",
-  anio: "",
+  dia: new Date().getDate().toString(),
+  mes: (new Date().getMonth() + 1).toString(),
+  anio: new Date().getFullYear().toString(),
   nombre: "",
   cedula: "",
   correo: "",
   firma: ""
 };
 
-export default function ActaTarjetaDialog({ onClose }) {
+export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState(initialForm);
   const [tiposEntrega, setTiposEntrega] = useState([]);
   const [tiposCambio, setTiposCambio] = useState([]);
@@ -33,14 +32,30 @@ export default function ActaTarjetaDialog({ onClose }) {
           fetch(API_TIPO_ENTREGA),
           fetch(API_TIPO_CAMBIO)
         ]);
-        setTiposEntrega(await entregaRes.json());
-        setTiposCambio(await cambioRes.json());
+        const dataEntrega = await entregaRes.json();
+        const dataCambio = await cambioRes.json();
+        
+        setTiposEntrega(dataEntrega);
+        setTiposCambio(dataCambio);
+
+        if (editingRecord) {
+          setForm({
+            ...editingRecord,
+            // Aseguramos que los select carguen los IDs
+            tipoEntrega: editingRecord.tipoEntrega?._id || editingRecord.tipoEntrega,
+            tipoCambio: editingRecord.tipoCambio?._id || editingRecord.tipoCambio,
+            // Aseguramos que las fechas se mantengan como strings al editar
+            dia: editingRecord.dia?.toString() || "",
+            mes: editingRecord.mes?.toString() || "",
+            anio: editingRecord.anio?.toString() || ""
+          });
+        }
       } catch (error) {
         console.error("Error cargando maestros:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [editingRecord]);
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -52,18 +67,29 @@ export default function ActaTarjetaDialog({ onClose }) {
       alert("Debe registrar la firma digital");
       return;
     }
+
     try {
       setLoading(true);
-      const res = await fetch(API_ACTAS, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      });
-      if (!res.ok) throw new Error("Error al guardar el acta");
-      alert("✅ Acta guardada correctamente.\n📧 El PDF fue enviado al correo registrado.");
+      
+      // Buscar los nombres correspondientes para el PDF y la Tabla
+      const nombreEntrega = tiposEntrega.find(t => t._id === form.tipoEntrega)?.nombre;
+      const nombreCambio = tiposCambio.find(t => t._id === form.tipoCambio)?.nombre;
+
+      // Construcción robusta del objeto para evitar errores de validación "Required"
+      const dataToSend = {
+        ...form,
+        dia: form.dia.toString(),
+        mes: form.mes.toString(),
+        anio: form.anio.toString(),
+        tipoEntregaNombre: nombreEntrega || form.tipoEntregaNombre,
+        tipoCambioNombre: nombreCambio || form.tipoCambioNombre
+      };
+
+      await onSave(dataToSend);
       onClose();
     } catch (error) {
-      alert("❌ Ocurrió un error al enviar el acta");
+      console.error("Error al procesar acta:", error);
+      alert("❌ Ocurrió un error al procesar el acta");
     } finally {
       setLoading(false);
     }
@@ -79,7 +105,7 @@ export default function ActaTarjetaDialog({ onClose }) {
     <div className="modal-backdrop">
       <form className="modal-card" onSubmit={handleSubmit}>
         <header className="modal-header">
-          <h2>Acta de Entrega – Tarjeta Control de Acceso</h2>
+          <h2>{editingRecord ? "Editar Acta de Entrega" : "Acta de Entrega – Tarjeta Control de Acceso"}</h2>
           <button type="button" className="close-btn" onClick={onClose}>✕</button>
         </header>
 
@@ -167,7 +193,7 @@ export default function ActaTarjetaDialog({ onClose }) {
             Cancelar
           </button>
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? "Enviando..." : "Guardar y Enviar Acta"}
+            {loading ? "Procesando..." : editingRecord ? "Actualizar Acta" : "Guardar y Enviar Acta"}
           </button>
         </footer>
       </form>

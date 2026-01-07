@@ -29,8 +29,29 @@ import UsersPage from "./admin/UsersPage.jsx";
 
 /* ICONOS */
 import { FiBell, FiLogOut, FiUser, FiLock } from "react-icons/fi";
+import { ResponsiveContainer } from "recharts";
 
 const API_MANTENIMIENTOS = `${import.meta.env.VITE_API_URL}/mantenimientos`;
+
+// COMPONENTE FOOTER INTEGRADO PARA EL COPY
+const Footer = () => (
+  <footer style={{
+    padding: '20px',
+    textAlign: 'center',
+    borderTop: '1px solid #e2e8f0',
+    backgroundColor: '#ffffff',
+    color: '#64748b',
+    fontSize: '13px',
+    marginTop: 'auto'
+  }}>
+    <p style={{ margin: '5px 0' }}>
+      Copyright © 2026 <strong>FOSCAL</strong>. Todos los derechos reservados.
+    </p>
+    <p style={{ margin: '0', fontSize: '11px', opacity: 0.8 }}>
+      Fundación Oftalmológica de Santander - Clínica FOSCAL. - Floridablanca. Colombia.
+    </p>
+  </footer>
+);
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,6 +67,8 @@ export default function App() {
   const [fechaHasta, setFechaHasta] = useState("");
   const [descargando, setDescargando] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const API_URL = `${import.meta.env.VITE_API_URL}/mantenimientos`; 
+
 
   const hasPermission = (p) => {
     if (!user || !user.permissions || !Array.isArray(user.permissions)) return false;
@@ -141,31 +164,129 @@ export default function App() {
   if (!isAuthenticated && !loading) return <Login onLogin={handleLogin} />;
   if (loading) return <WelcomeSpinner />;
 
-  const Dashboard = () => {
-    if (!hasPermission("dashboard.view")) return <AccessDenied />;
-    const dataGarantias = [{ name: "Ene", value: 10 }, { name: "Feb", value: 40 }, { name: "Mar", value: 25 }, { name: "Abr", value: 60 }];
-    const dataMantenimientos = [{ name: "Pendientes", value: 12 }, { name: "Completados", value: 30 }];
-    const dataHardware = [{ name: "CPU", value: 30 }, { name: "RAM", value: 20 }, { name: "Discos", value: 25 }, { name: "Periféricos", value: 15 }];
-    const COLORS = ["#2563EB", "#1E3A8A", "#3B82F6", "#60A5FA"];
+const Dashboard = () => {
+  if (!hasPermission("dashboard.view")) return <AccessDenied />;
 
-    return (
-      <>
-        <section className="grid">
-          <div className="card"><h3>Garantías</h3><LineChart width={320} height={200} data={dataGarantias}><Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={3} /><CartesianGrid stroke="#e5e7eb" /><XAxis dataKey="name" /><YAxis /><Tooltip /></LineChart></div>
-          <div className="card"><h3>Mantenimientos</h3><BarChart width={320} height={200} data={dataMantenimientos}><CartesianGrid stroke="#e5e7eb" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Bar dataKey="value">{dataMantenimientos.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}</Bar></BarChart></div>
-          <div className="card"><h3>Checklist Hardware</h3><PieChart width={320} height={240}><Pie data={dataHardware} dataKey="value" outerRadius={80} label>{dataHardware.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Legend /><Tooltip /></PieChart></div>
-        </section>
-        <section className="card excel-card">
-          <h3>Descargar Mantenimientos</h3>
-          <div className="excel-filtros">
-            <div><label>Desde</label><input type="date" value={fechaDesde} onChange={(e) => setFechaDesde(e.target.value)} /></div>
-            <div><label>Hasta</label><input type="date" value={fechaHasta} onChange={(e) => setFechaHasta(e.target.value)} /></div>
-            <button className="excel-btn" onClick={descargarExcel} disabled={descargando}>{descargando ? "Generando..." : "Descargar Excel"}</button>
+  const [dataLine, setDataLine] = useState([]);
+  const [dataBar, setDataBar] = useState([]);
+  const [dataPie, setDataPie] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  const COLORS = ["#0B5ED7", "#4CAF50", "#F59E0B", "#5DA9E9"];
+
+  const MONTHS = [
+    "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+    "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
+  ];
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const res = await fetch(API_URL);
+        const mantenimientos = await res.json();
+
+        const monthlyCount = Array(12).fill(0);
+        mantenimientos.forEach(m => {
+          const date = new Date(m.fecha || m.createdAt);
+          const month = date.getMonth(); 
+          monthlyCount[month]++;
+        });
+
+        const lineData = MONTHS.map((name, i) => ({
+          name,
+          value: monthlyCount[i],
+        }));
+
+        const estados = { PENDIENTE: 0, COMPLETADO: 0, "EN PROCESO": 0 };
+        mantenimientos.forEach(m => {
+          if (estados[m.estado] !== undefined) { estados[m.estado]++; }
+        });
+
+        const barData = [
+          { name: "Pendientes", value: estados["PENDIENTE"] },
+          { name: "Completados", value: estados["COMPLETADO"] },
+          { name: "En Proceso", value: estados["EN PROCESO"] },
+        ];
+
+        const hardwareCount = {};
+        mantenimientos.forEach(m => {
+          if (!m.hardware) return;
+          hardwareCount[m.hardware] = (hardwareCount[m.hardware] || 0) + 1;
+        });
+
+        const pieData = Object.keys(hardwareCount).map(key => ({
+          name: key,
+          value: hardwareCount[key],
+        }));
+
+        setDataLine(lineData);
+        setDataBar(barData);
+        setDataPie(pieData);
+      } catch (error) {
+        console.error("Error dashboard:", error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    loadDashboardData();
+  }, []);
+
+  if (loadingData) return <p style={{ padding: 20 }}>Cargando estadísticas...</p>;
+
+  return (
+    <>
+      <section className="dashboard-row">
+        <div className="dashboard-card large">
+          <h2 className="impact-title blue">Evolución Anual de Mantenimientos</h2>
+          <div className="chart-wrapper large-chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={dataLine}>
+                <CartesianGrid stroke="#E5E7EB" strokeDasharray="4 4" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#0B5ED7" strokeWidth={5} dot={{ r: 5, fill: "#F59E0B" }} activeDot={{ r: 9 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-        </section>
-      </>
-    );
-  };
+        </div>
+      </section>
+
+      <section className="dashboard-row two-cols">
+        <div className="dashboard-card large">
+          <h2 className="impact-title green">Estado de Mantenimientos</h2>
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={dataBar}>
+                <CartesianGrid stroke="#E5E7EB" strokeDasharray="4 4" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+                  {dataBar.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className="dashboard-card large">
+          <h2 className="impact-title orange">Checklist de Hardware</h2>
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={dataPie} dataKey="value" innerRadius="55%" outerRadius="80%" paddingAngle={4}>
+                  {dataPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
 
   const AccessDenied = () => (
     <div className="empty-state-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
@@ -215,41 +336,14 @@ export default function App() {
 
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
         <button className="close-arrow" onClick={() => setSidebarOpen(false)}>‹</button>
-
-        <div className="sidebar-logo-container" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '20px 5px',
-          marginBottom: '10px'
-        }}>
-          {/* CAMBIO: Logo consumido desde imagen física */}
-          <img 
-            src="/LogoOrion.png" 
-            alt="Logo FOSCAL" 
-            style={{ width: '80px', height: '80px', objectFit: 'contain' }}
-          />
-          <span style={{
-            marginTop: '10px',
-            color: 'white',
-            fontSize: '1.2rem',
-            fontWeight: '900',
-            letterSpacing: '2px',
-            fontFamily: 'Arial, sans-serif',
-            textTransform: 'uppercase'
-          }}></span>
+        <div className="sidebar-logo-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 5px', marginBottom: '10px' }}>
+          <img src="/LogoOrion.png" alt="Logo FOSCAL" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
         </div>
 
         <nav className="menu">
-          {hasPermission("dashboard.view") && (
-            <a className={activePage === "dashboard" ? "active" : ""} onClick={() => setActivePage("dashboard")}>Inicio</a>
-          )}
-          {hasPermission("tarjetas.view") && (
-            <a className={activePage === "tarjetas-acceso" ? "active" : ""} onClick={() => setActivePage("tarjetas-acceso")}>Tarjetas de Acceso</a>
-          )}
-          {hasPermission("mantenimientos.view") && (
-            <a className={activePage === "listamantenimientos" ? "active" : ""} onClick={() => setActivePage("listamantenimientos")}>Mantenimientos</a>
-          )}
+          {hasPermission("dashboard.view") && <a className={activePage === "dashboard" ? "active" : ""} onClick={() => setActivePage("dashboard")}>Inicio</a>}
+          {hasPermission("tarjetas.view") && <a className={activePage === "tarjetas-acceso" ? "active" : ""} onClick={() => setActivePage("tarjetas-acceso")}>Tarjetas de Acceso</a>}
+          {hasPermission("mantenimientos.view") && <a className={activePage === "listamantenimientos" ? "active" : ""} onClick={() => setActivePage("listamantenimientos")}>Mantenimientos</a>}
           {hasPermission("maestros.view") && (
             <div className="submenu">
               <a onClick={() => setMaestrosOpen(!maestrosOpen)}>Maestros {maestrosOpen ? "▲" : "▼"}</a>
@@ -274,40 +368,42 @@ export default function App() {
           {hasPermission("usuarios.view") && (
             <div className="submenu">
               <a onClick={() => setAdminOpen(!adminOpen)}>Administración {adminOpen ? "▲" : "▼"}</a>
-              {adminOpen && (
-                <div className="submenu-items">
-                  <a onClick={() => setActivePage("admin-users")}>Usuarios</a>
-                </div>
-              )}
+              {adminOpen && <div className="submenu-items"><a onClick={() => setActivePage("admin-users")}>Usuarios</a></div>}
             </div>
           )}
         </nav>
       </aside>
 
-      <main className="main-area">
-        {activePage === "dashboard" && <Dashboard />}
-        {activePage === "empty" && <AccessDenied />}
-        {activePage === "listamantenimientos" && hasPermission("mantenimientos.view") && <MantenimientoList search={searchText} />}
-        {activePage === "tarjetas-acceso" && hasPermission("tarjetas.view") && <ActaTarjetaPage />}
-        {hasPermission("maestros.view") && (
-          <>
-            {activePage === "tipodispositivo" && <TipoDispositivoPage />}
-            {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
-            {activePage === "tipolista" && <TipoListaPage />}
-            {activePage === "discoduro" && <DiscoDuroPage />}
-            {activePage === "memoriaram" && <MemoriaRamPage />}
-            {activePage === "procesador" && <ProcesadorPage />}
-            {activePage === "chequeo" && <ChequeoPage />}
-            {activePage === "funcionarios" && <FuncionarioPage />}
-            {activePage === "sedes" && <SedePage />}
-            {activePage === "area" && <AreaPage />}
-            {activePage === "tipoentrega" && <TipoEntregaPage />}
-            {activePage === "tipocambio" && <TipoCambioPage />}
-          </>
-        )}
-        {hasPermission("usuarios.view") && (
-          <>{activePage === "admin-users" && <UsersPage />}</>
-        )}
+      {/* AJUSTE EN MAIN-AREA PARA SOPORTAR EL FOOTER AL FINAL */}
+      <main className="main-area" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 65px)' }}>
+        <div style={{ flex: 1, padding: '20px' }}>
+          {activePage === "dashboard" && <Dashboard />}
+          {activePage === "empty" && <AccessDenied />}
+          {activePage === "listamantenimientos" && hasPermission("mantenimientos.view") && <MantenimientoList search={searchText} />}
+          {activePage === "tarjetas-acceso" && hasPermission("tarjetas.view") && <ActaTarjetaPage />}
+          {hasPermission("maestros.view") && (
+            <>
+              {activePage === "tipodispositivo" && <TipoDispositivoPage />}
+              {activePage === "sistemaoperativo" && <SistemaOperativoPage />}
+              {activePage === "tipolista" && <TipoListaPage />}
+              {activePage === "discoduro" && <DiscoDuroPage />}
+              {activePage === "memoriaram" && <MemoriaRamPage />}
+              {activePage === "procesador" && <ProcesadorPage />}
+              {activePage === "chequeo" && <ChequeoPage />}
+              {activePage === "funcionarios" && <FuncionarioPage />}
+              {activePage === "sedes" && <SedePage />}
+              {activePage === "area" && <AreaPage />}
+              {activePage === "tipoentrega" && <TipoEntregaPage />}
+              {activePage === "tipocambio" && <TipoCambioPage />}
+            </>
+          )}
+          {hasPermission("usuarios.view") && (
+            <>{activePage === "admin-users" && <UsersPage />}</>
+          )}
+        </div>
+        
+        {/* FOOTER IMPORTADO AL FINAL DE MAIN-AREA */}
+        <Footer />
       </main>
     </div>
   );
@@ -321,23 +417,11 @@ function WelcomeSpinner() {
         <div className="loader-logo-wrapper">
           <div className="loader-ring orion-blue-ring"></div>
           <div className="loader-ring-outer orion-orange-ring"></div>
-          
-          <img 
-            src="/LogoOrion.png" 
-            alt="Logo FOSCAL" 
-            className="loader-svg-animated"
-            style={{ width: '100px', height: '100px', objectFit: 'contain', position: 'relative', zIndex: 10 }}
-          />
+          <img src="/LogoOrion.png" alt="Logo FOSCAL" className="loader-svg-animated" style={{ width: '100px', height: '100px', objectFit: 'contain', position: 'relative', zIndex: 10 }} />
         </div>
-
-        <h1 className="orion-loader-title">
-          BIENVENIDOS.... <span></span>
-        </h1>
-        
+        <h1 className="orion-loader-title">BIENVENIDOS.... <span></span></h1>
         <div className="loader-status">
-          <div className="bar-container">
-            <div className="progress-bar-fill orion-gradient-bar"></div>
-          </div>
+          <div className="bar-container"><div className="progress-bar-fill orion-gradient-bar"></div></div>
           <p className="orion-loader-text-animated">Sincronizando Sistema...</p>
         </div>
         <div className="foscal-tag-animated">FOSCAL</div>

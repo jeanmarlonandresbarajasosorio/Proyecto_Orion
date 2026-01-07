@@ -1,9 +1,16 @@
 import { Router } from "express";
-import { crearActaTarjeta, getActasTarjeta } from "../controllers/actaTarjeta.controller.js";
+import { 
+  crearOActualizarActa, 
+  getActasTarjeta 
+} from "../controllers/actaTarjeta.controller.js";
 
 const router = Router();
 
-// Rutas
-router.post("/", crearActaTarjeta);
-router.get("/", getActasTarjeta); 
+router.post("/", crearOActualizarActa);
+
+router.get("/", getActasTarjeta);
+
+
+router.put("/:id", crearOActualizarActa);
+
 export default router;

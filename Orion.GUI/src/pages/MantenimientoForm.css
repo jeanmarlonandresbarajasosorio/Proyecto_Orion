@@ -25,134 +25,197 @@
   display: block !important;
 }
 
-.mui-grid {
-  display: block !important;
-  width: 100% !important;
-}
-
 /* ========================================= */
-/* TOOLBAR BUSCADOR + BOTÓN                 */
+/* TOOLBAR (ALINEACIÓN PERFECTA)             */
 /* ========================================= */
 .acta-toolbar {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: row;
+  align-items: center; /* Alineación central vertical */
+  justify-content: flex-start;
+  gap: 12px;
   width: 100%;
+  background: white;
+  padding: 16px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-1);
+  box-sizing: border-box;
 }
 
-.acta-search-input {
-  flex: 1;
-  height: 48px;
-  padding: 0 18px;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  font-size: 15px;
+/* Forzar altura idéntica en todos los elementos de la barra */
+.acta-search-input,
+.acta-date-input,
+.btn-crear-acta {
+  height: 45px !important; 
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  font-size: 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.acta-search-input,
+.acta-date-input {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 0 15px;
   outline: none;
+  transition: border-color 0.2s;
+}
+
+.acta-search-input { flex: 2; min-width: 200px; }
+.acta-date-input { flex: 1; min-width: 150px; cursor: pointer; }
+
+.acta-search-input:focus, .acta-date-input:focus {
+  border-color: var(--green-foscal);
 }
 
 /* ========================================= */
-/* BOTÓN CREAR ACTA                         */
+/* BOTONES (VERDE INSTITUCIONAL)             */
 /* ========================================= */
-.btn-crear-acta, 
-.mui-btn-primary { 
+.btn-crear-acta {
   background-color: var(--green-foscal) !important;
-  color: white !important; 
+  color: white !important;
   padding: 0 24px !important;
-  height: 48px;
-  border-radius: 14px !important;
   border: none !important;
   cursor: pointer !important;
   font-weight: 700 !important;
-  font-size: 15px !important;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(140, 198, 63, 0.4);
+  justify-content: center;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(140, 198, 63, 0.2);
 }
 
-.btn-crear-acta:hover {
-  filter: brightness(1.1);
+/* Botón del Ojo en la tabla */
+.orion-eye-btn {
+  background-color: var(--green-foscal) !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  color: white !important;
+  transition: transform 0.2s;
+}
+
+.orion-eye-btn::after {
+  content: "👁";
+  font-size: 18px;
+}
+
+.btn-crear-acta:hover, .orion-eye-btn:hover {
+  filter: brightness(1.05);
   transform: translateY(-1px);
 }
 
 /* ========================================= */
-/* MODAL                                    */
+/* MODAL / DIÁLOGOS                          */
 /* ========================================= */
-.modal-card {
-  background: var(--white);
-  width: 1000px;
-  max-width: 95%;
-  height: 90vh;
-  border-radius: 18px;
+.md-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.md-modal {
+  background: white;
+  width: 90%;
+  max-width: 850px;
+  max-height: 85vh;
+  border-radius: 16px;
+  box-shadow: var(--shadow-2);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  box-shadow: var(--shadow-2);
+  position: relative;
 }
 
-.modal-header {
-  background-color: var(--blue-dark) !important;
-  padding: 18px 22px;
-  color: white;
-}
-
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
+.md-modal-content {
   padding: 25px;
-  background-color: white;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 25px;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  overflow-y: auto;
 }
 
 /* ========================================= */
-/* TABLAS                                   */
+/* PAGINACIÓN (RESTAURADA Y MEJORADA)        */
+/* ========================================= */
+.orion-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 25px 0;
+  padding: 10px;
+}
+
+.orion-page-btn {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.orion-page-btn:hover:not(:disabled) {
+  border-color: var(--green-foscal);
+  color: var(--green-foscal);
+  background: #f9fdf4;
+}
+
+.orion-page-btn.active {
+  background-color: var(--green-foscal) !important;
+  border-color: var(--green-foscal) !important;
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(140, 198, 63, 0.3);
+}
+
+.orion-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
+
+/* ========================================= */
+/* TABLAS                                    */
 /* ========================================= */
 .mui-card {
   background: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow-1);
-  border: 1px solid #eef3ff;
-  width: 100% !important;
+  border: 1px solid #edf2f7;
+  overflow: hidden;
 }
 
 .table th { 
-  background: #fbfdff; 
+  background: #f8fafc; 
   color: var(--blue-dark); 
-  font-weight: 600; 
+  font-weight: 700; 
+  padding: 14px;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
 }
 
-/* ========================================= */
-/* 🔧 FIX DE ALINEACIÓN (NO DAÑA DISEÑO)     */
-/* ========================================= */
-
-/* Contenedor real donde están inputs + botón */
-.mui-card > div {
-  align-items: center !important;
-}
-
-/* Elimina márgenes verticales heredados */
-.mui-input,
-.mui-btn,
-.mui-btn-primary {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-/* Asegura alineación vertical exacta */
-.mui-btn-primary {
-  align-self: center !important;
-}
-
-/* Corrige el input date (culpable frecuente) */
-.mui-input[type="date"] {
-  line-height: normal !important;
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
 }
