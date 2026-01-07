@@ -30,7 +30,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Para pantallas pequeñas */
 @media (max-width: 640px) {
   .footer-content {
     padding: 0 20px;
