@@ -32,6 +32,8 @@ import { FiBell, FiLogOut, FiUser, FiLock } from "react-icons/fi";
 import { ResponsiveContainer } from "recharts";
 
 const API_MANTENIMIENTOS = `${import.meta.env.VITE_API_URL}/mantenimientos`;
+const API_TARJETAS = `${import.meta.env.VITE_API_URL}/actas-tarjeta`;
+
 
 // COMPONENTE FOOTER INTEGRADO PARA EL COPY
 const Footer = () => (
@@ -68,6 +70,7 @@ export default function App() {
   const [descargando, setDescargando] = useState(false);
   const [searchText, setSearchText] = useState("");
   const API_URL = `${import.meta.env.VITE_API_URL}/mantenimientos`; 
+  const API_TARJETAS = `${import.meta.env.VITE_API_URL}/actas-tarjeta`;
 
 
   const hasPermission = (p) => {
@@ -182,13 +185,14 @@ const Dashboard = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        const res = await fetch(API_URL);
-        const mantenimientos = await res.json();
+        /* ================= MANTENIMIENTOS ================= */
+        const resM = await fetch(API_MANTENIMIENTOS);
+        const mantenimientos = await resM.json();
 
         const monthlyCount = Array(12).fill(0);
         mantenimientos.forEach(m => {
           const date = new Date(m.fecha || m.createdAt);
-          const month = date.getMonth(); 
+          const month = date.getMonth();
           monthlyCount[month]++;
         });
 
@@ -199,7 +203,9 @@ const Dashboard = () => {
 
         const estados = { PENDIENTE: 0, COMPLETADO: 0, "EN PROCESO": 0 };
         mantenimientos.forEach(m => {
-          if (estados[m.estado] !== undefined) { estados[m.estado]++; }
+          if (estados[m.estado] !== undefined) {
+            estados[m.estado]++;
+          }
         });
 
         const barData = [
@@ -208,36 +214,49 @@ const Dashboard = () => {
           { name: "En Proceso", value: estados["EN PROCESO"] },
         ];
 
-        const hardwareCount = {};
-        mantenimientos.forEach(m => {
-          if (!m.hardware) return;
-          hardwareCount[m.hardware] = (hardwareCount[m.hardware] || 0) + 1;
+        /* ================= ACTAS TARJETA ================= */
+        const resT = await fetch(API_TARJETAS);
+        const actas = await resT.json();
+
+        const tarjetasPorEstado = {};
+        actas.forEach(a => {
+          const estado = a.estado || "SIN ESTADO";
+          tarjetasPorEstado[estado] =
+            (tarjetasPorEstado[estado] || 0) + 1;
         });
 
-        const pieData = Object.keys(hardwareCount).map(key => ({
+        const pieData = Object.keys(tarjetasPorEstado).map(key => ({
           name: key,
-          value: hardwareCount[key],
+          value: tarjetasPorEstado[key],
         }));
 
+        /* ================= SET STATES ================= */
         setDataLine(lineData);
         setDataBar(barData);
         setDataPie(pieData);
+
       } catch (error) {
         console.error("Error dashboard:", error);
       } finally {
         setLoadingData(false);
       }
     };
+
     loadDashboardData();
   }, []);
 
-  if (loadingData) return <p style={{ padding: 20 }}>Cargando estadísticas...</p>;
+  if (loadingData) {
+    return <p style={{ padding: 20 }}>Cargando estadísticas...</p>;
+  }
 
   return (
     <>
+      {/* ================= LINE ================= */}
       <section className="dashboard-row">
         <div className="dashboard-card large">
-          <h2 className="impact-title blue">Evolución Anual de Mantenimientos</h2>
+          <h2 className="impact-title blue">
+            Evolución Anual de Mantenimientos
+          </h2>
           <div className="chart-wrapper large-chart">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={dataLine}>
@@ -245,13 +264,21 @@ const Dashboard = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#0B5ED7" strokeWidth={5} dot={{ r: 5, fill: "#F59E0B" }} activeDot={{ r: 9 }} />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#0B5ED7"
+                  strokeWidth={5}
+                  dot={{ r: 5 }}
+                  activeDot={{ r: 9 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
       </section>
 
+      {/* ================= BAR + PIE ================= */}
       <section className="dashboard-row two-cols">
         <div className="dashboard-card large">
           <h2 className="impact-title green">Estado de Mantenimientos</h2>
@@ -263,19 +290,34 @@ const Dashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="value" radius={[10, 10, 0, 0]}>
-                  {dataBar.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
+                  {dataBar.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i]} />
+                  ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
+
         <div className="dashboard-card large">
-          <h2 className="impact-title orange">Checklist de Hardware</h2>
+          <h2 className="impact-title orange">Tarjetas de Acceso</h2>
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={dataPie} dataKey="value" innerRadius="55%" outerRadius="80%" paddingAngle={4}>
-                  {dataPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                <Pie
+                  data={dataPie}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius="55%"
+                  outerRadius="80%"
+                  paddingAngle={4}
+                >
+                  {dataPie.map((_, i) => (
+                    <Cell
+                      key={i}
+                      fill={COLORS[i % COLORS.length]}
+                    />
+                  ))}
                 </Pie>
                 <Tooltip />
                 <Legend />
@@ -402,7 +444,6 @@ const Dashboard = () => {
           )}
         </div>
         
-        {/* FOOTER IMPORTADO AL FINAL DE MAIN-AREA */}
         <Footer />
       </main>
     </div>

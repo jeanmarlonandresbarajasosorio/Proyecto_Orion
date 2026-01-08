@@ -43,7 +43,8 @@ export default function MantenimientosPage() {
       const res = await fetch(API_URL);
       const data = await res.json();
       setRecords(data);
-      setFilteredRecords(data);
+      // Importante: filteredRecords inicia vacío para no mostrar nada al cargar
+      setFilteredRecords([]);
       setCurrentPage(1);
     } catch (err) {
       console.error(err);
@@ -58,6 +59,12 @@ export default function MantenimientosPage() {
 
   /* ================= FILTER LOGIC ================= */
   useEffect(() => {
+    // Si no hay texto en inventario ni fechas seleccionadas, vaciamos la tabla
+    if (!filtroInventario.trim() && !fechaInicio && !fechaFin) {
+      setFilteredRecords([]);
+      return;
+    }
+
     setLoadingTable(true);
     const t = setTimeout(() => {
       let result = [...records];
@@ -88,7 +95,7 @@ export default function MantenimientosPage() {
     return () => clearTimeout(t);
   }, [filtroInventario, fechaInicio, fechaFin, records]);
 
-  /* ================= PAGINATION ================= */
+  /* ================= PAGINATION LOGIC ================= */
   useEffect(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
     const end = start + PAGE_SIZE;
@@ -115,13 +122,13 @@ export default function MantenimientosPage() {
   };
 
   const f = v => (v ? v : "-");
-  const d = v => (v ? new Date(v).toLocaleString() : "-");
+  const d = v => (v ? new Date(v).toLocaleDateString() : "-");
 
   return (
     <div className="mui-container">
       <h1 className="mui-title">Mantenimientos</h1>
 
-      {/* ================= BARRA DE HERRAMIENTAS ACTUALIZADA ================= */}
+      {/* ================= BARRA DE HERRAMIENTAS ================= */}
       <div className="acta-toolbar">
         <input
           className="acta-search-input"
@@ -160,7 +167,9 @@ export default function MantenimientosPage() {
       {/* ================= TABLA ================= */}
       <div className="mui-card">
         <div className="mui-card-header" style={{ padding: '15px 20px', borderBottom: '1px solid #eee', fontWeight: 700 }}>
-          Registros Encontrados: {visibleRecords.length}
+          {filteredRecords.length > 0 
+            ? `Registros Encontrados: ${filteredRecords.length}` 
+            : "Por favor, ingrese un criterio de búsqueda."}
         </div>
 
         <div className="mui-card-body table-container">
@@ -202,82 +211,94 @@ export default function MantenimientosPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visibleRecords.map(r => (
-                      <tr key={r._id}>
-                        <td>
-                          <button
-                            className="small btn neutral"
-                            onClick={() => {
-                              setEditingRecord(r);
-                              setDialogOpen(true);
-                            }}
-                          >
-                            Editar
-                          </button>
+                    {visibleRecords.length > 0 ? (
+                      visibleRecords.map(r => (
+                        <tr key={r._id}>
+                          <td>
+                            <button
+                              className="small btn neutral"
+                              onClick={() => {
+                                setEditingRecord(r);
+                                setDialogOpen(true);
+                              }}
+                            >
+                              Editar
+                            </button>
+                          </td>
+                          <td>{f(r.sede)}</td>
+                          <td>{f(r.area)}</td>
+                          <td>{f(r.ubicacion)}</td>
+                          <td>
+                            <button
+                              className="orion-eye-btn"
+                              onClick={() => {
+                                setEquiposSeleccionados(r.equipos || []);
+                                setEquiposDialogOpen(true);
+                              }}
+                            />
+                          </td>
+                          <td>{d(r.fechaRetiro)}</td>
+                          <td>{f(r.autorizaRetiro)}</td>
+                          <td>{d(r.fechaEntrega)}</td>
+                          <td>{f(r.recibe)}</td>
+                          <td>{f(r.funcionarioRealiza)}</td>
+                          <td>{d(r.fechaRealiza)}</td>
+                          <td>{f(r.funcionarioAprueba)}</td>
+                          <td>{d(r.fechaAprueba)}</td>
+                          <td>{f(r.softwareChecks?.Antivirus)}</td>
+                          <td>{f(r.softwareChecks?.["Nombre del computador"])}</td>
+                          <td>{f(r.softwareChecks?.["Actualizaciones de Windows"])}</td>
+                          <td>{f(r.softwareChecks?.["OCS Inventory"])}</td>
+                          <td>{f(r.softwareChecks?.SAP)}</td>
+                          <td>{f(r.garantia)}</td>
+                          <td>{d(r.vencimientoGarantia)}</td>
+                          <td>{f(r.minutosParada)}</td>
+                          <td>{f(r.proporcionParada)}</td>
+                          <td>{f(r.totalDisponibilidad)}</td>
+                          <td>{f(r.noOrdenSAP)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="24" style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                          {!filtroInventario && !fechaInicio && !fechaFin 
+                            ? "Ingrese un número de inventario o rango de fechas para ver resultados."
+                            : "No se encontraron mantenimientos con esos criterios."}
                         </td>
-                        <td>{f(r.sede)}</td>
-                        <td>{f(r.area)}</td>
-                        <td>{f(r.ubicacion)}</td>
-                        <td>
-                          <button
-                            className="orion-eye-btn"
-                            onClick={() => {
-                              setEquiposSeleccionados(r.equipos || []);
-                              setEquiposDialogOpen(true);
-                            }}
-                          />
-                        </td>
-                        <td>{d(r.fechaRetiro)}</td>
-                        <td>{f(r.autorizaRetiro)}</td>
-                        <td>{d(r.fechaEntrega)}</td>
-                        <td>{f(r.recibe)}</td>
-                        <td>{f(r.funcionarioRealiza)}</td>
-                        <td>{d(r.fechaRealiza)}</td>
-                        <td>{f(r.funcionarioAprueba)}</td>
-                        <td>{d(r.fechaAprueba)}</td>
-                        <td>{f(r.softwareChecks?.Antivirus)}</td>
-                        <td>{f(r.softwareChecks?.["Nombre del computador"])}</td>
-                        <td>{f(r.softwareChecks?.["Actualizaciones de Windows"])}</td>
-                        <td>{f(r.softwareChecks?.["OCS Inventory"])}</td>
-                        <td>{f(r.softwareChecks?.SAP)}</td>
-                        <td>{f(r.garantia)}</td>
-                        <td>{d(r.vencimientoGarantia)}</td>
-                        <td>{f(r.minutosParada)}</td>
-                        <td>{f(r.proporcionParada)}</td>
-                        <td>{f(r.totalDisponibilidad)}</td>
-                        <td>{f(r.noOrdenSAP)}</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
 
-              {/* Paginación */}
-              <div className="orion-pagination">
-                <button
-                  className="orion-page-btn"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(p => p - 1)}
-                >
-                  Anterior
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => (
+              {/* Paginación: Solo se muestra si hay más de una página de resultados */}
+              {totalPages > 1 && (
+                <div className="orion-pagination">
                   <button
-                    key={i}
-                    className={`orion-page-btn ${currentPage === i + 1 ? "active" : ""}`}
-                    onClick={() => setCurrentPage(i + 1)}
+                    className="orion-page-btn"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(p => p - 1)}
                   >
-                    {i + 1}
+                    Anterior
                   </button>
-                ))}
-                <button
-                  className="orion-page-btn"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(p => p + 1)}
-                >
-                  Siguiente
-                </button>
-              </div>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      className={`orion-page-btn ${currentPage === i + 1 ? "active" : ""}`}
+                      onClick={() => setCurrentPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    className="orion-page-btn"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(p => p + 1)}
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>

@@ -39,10 +39,11 @@ export default function ActasTarjetaPage() {
       setLoadingInitial(true);
       const res = await fetch(API_URL);
       const data = await res.json();
-      // Siguiendo la lógica de ordenamiento descendente (más recientes primero)
       const sortedData = Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : [];
       setRecords(sortedData);
-      setFilteredRecords(sortedData);
+      
+      // Iniciamos con la lista filtrada vacía para no mostrar nada al entrar
+      setFilteredRecords([]);
       setCurrentPage(1);
     } catch (err) {
       console.error("Error al cargar actas:", err);
@@ -57,6 +58,12 @@ export default function ActasTarjetaPage() {
 
   /* ================= FILTER LOGIC ================= */
   useEffect(() => {
+    // CAMBIO CLAVE: Si no hay búsqueda activa, la tabla permanece vacía
+    if (!filtroNombre.trim() && !fechaInicio && !fechaFin) {
+      setFilteredRecords([]);
+      return;
+    }
+
     setLoadingTable(true);
     const t = setTimeout(() => {
       let result = [...records];
@@ -119,7 +126,7 @@ export default function ActasTarjetaPage() {
     <div className="mui-container">
       <h1 className="mui-title">Actas de Tarjeta de Acceso</h1>
 
-      {/* ================= BARRA DE HERRAMIENTAS (Clones Mantenimiento) ================= */}
+      {/* ================= BARRA DE HERRAMIENTAS ================= */}
       <div className="acta-toolbar">
         <input
           className="acta-search-input"
@@ -155,10 +162,12 @@ export default function ActasTarjetaPage() {
         </button>
       </div>
 
-      {/* ================= TABLA (Estructura 100% idéntica) ================= */}
+      {/* ================= TABLA ================= */}
       <div className="mui-card">
         <div className="mui-card-header" style={{ padding: '15px 20px', borderBottom: '1px solid #eee', fontWeight: 700 }}>
-          Registros Encontrados: {filteredRecords.length}
+          {filteredRecords.length > 0 
+            ? `Registros Encontrados: ${filteredRecords.length}` 
+            : "Por favor, ingrese un criterio de búsqueda."}
         </div>
 
         <div className="mui-card-body table-container">
@@ -185,35 +194,38 @@ export default function ActasTarjetaPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visibleRecords.map(r => (
-                      <tr key={r._id}>
-                        <td>
-                          <button
-                            className="small btn neutral"
-                            onClick={() => {
-                              setEditingRecord(r);
-                              setDialogOpen(true);
-                            }}
-                          >
-                            Editar
-                          </button>
-                        </td>
-                        <td style={{ fontWeight: 600 }}>{f(r.nombre)}</td>
-                        <td>{f(r.cedula)}</td>
-                        <td>{f(r.sede)}</td>
-                        <td>{f(r.correo)}</td>
-                        <td>{f(r.tipoEntrega)}</td>
-                        <td>{f(r.tipoCambio)}</td>
-                        <td>{d(r.createdAt)}</td>
-                        <td style={{ fontSize: '0.85em', color: '#666', fontFamily: 'monospace' }}>
-                          {r._id.slice(-6).toUpperCase()}
-                        </td>
-                      </tr>
-                    ))}
-                    {visibleRecords.length === 0 && (
+                    {visibleRecords.length > 0 ? (
+                      visibleRecords.map(r => (
+                        <tr key={r._id}>
+                          <td>
+                            <button
+                              className="small btn neutral"
+                              onClick={() => {
+                                setEditingRecord(r);
+                                setDialogOpen(true);
+                              }}
+                            >
+                              Editar
+                            </button>
+                          </td>
+                          <td style={{ fontWeight: 600 }}>{f(r.nombre)}</td>
+                          <td>{f(r.cedula)}</td>
+                          <td>{f(r.sede)}</td>
+                          <td>{f(r.correo)}</td>
+                          <td>{f(r.tipoEntrega)}</td>
+                          <td>{f(r.tipoCambio)}</td>
+                          <td>{d(r.createdAt)}</td>
+                          <td style={{ fontSize: '0.85em', color: '#666', fontFamily: 'monospace' }}>
+                            {r._id.slice(-6).toUpperCase()}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
                       <tr>
-                        <td colSpan="9" style={{ textAlign: 'center', padding: '30px', color: '#999' }}>
-                          No se encontraron registros de actas.
+                        <td colSpan="9" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                          {!filtroNombre && !fechaInicio && !fechaFin 
+                            ? "Ingrese un nombre, cédula o rango de fechas para buscar." 
+                            : "No se encontraron registros que coincidan con la búsqueda."}
                         </td>
                       </tr>
                     )}
@@ -221,32 +233,34 @@ export default function ActasTarjetaPage() {
                 </table>
               </div>
 
-              {/* Paginación idéntica */}
-              <div className="orion-pagination">
-                <button
-                  className="orion-page-btn"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(p => p - 1)}
-                >
-                  Anterior
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => (
+              {/* Paginación: Solo se muestra si hay más de una página de resultados */}
+              {totalPages > 1 && (
+                <div className="orion-pagination">
                   <button
-                    key={i}
-                    className={`orion-page-btn ${currentPage === i + 1 ? "active" : ""}`}
-                    onClick={() => setCurrentPage(i + 1)}
+                    className="orion-page-btn"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(p => p - 1)}
                   >
-                    {i + 1}
+                    Anterior
                   </button>
-                ))}
-                <button
-                  className="orion-page-btn"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(p => p + 1)}
-                >
-                  Siguiente
-                </button>
-              </div>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      className={`orion-page-btn ${currentPage === i + 1 ? "active" : ""}`}
+                      onClick={() => setCurrentPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    className="orion-page-btn"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(p => p + 1)}
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
