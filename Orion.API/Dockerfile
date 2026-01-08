@@ -11,6 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copiar todo el contenido de orion.api al contenedor
+COPY public/ ./public/
 COPY . .
 
 # Exponer el puerto del backend

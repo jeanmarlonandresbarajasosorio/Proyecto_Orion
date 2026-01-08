@@ -25,6 +25,7 @@ import procesadorRoutes from "./src/routes/procesador.routes.js";
 import tipoEntregaRoutes from "./src/routes/tipoEntrega.routes.js";
 import tipoCambioRoutes from "./src/routes/tipoCambio.routes.js";
 import actaTarjetaRoutes from "./src/routes/actaTarjeta.routes.js";
+import emailRoutes from "./src/routes/email.routes.js";
 
 
 import testRoutes from "./src/routes/test.routes.js";
@@ -74,6 +75,7 @@ app.use("/api/procesadores", procesadorRoutes);
 app.use("/api/tipos-entrega", tipoEntregaRoutes);
 app.use("/api/tipos-cambio", tipoCambioRoutes);
 app.use("/api/actas-tarjeta", actaTarjetaRoutes);
+app.use("/emails", emailRoutes);
 
 
 /* ===============================

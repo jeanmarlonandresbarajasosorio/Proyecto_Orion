@@ -2,28 +2,35 @@ import mongoose from "mongoose";
 
 const actaTarjetaSchema = new mongoose.Schema({
   sede: { type: String, required: true },
-  tipoEntrega: { type: String, required: true },
-  tipoCambio: { type: String, required: true }, 
-  otraCual: { type: String },                    
+  tipoEntrega: { type: String, required: true }, 
+  tipoCambio: { type: String, required: true },  
+  numeroTarjeta: { type: String },              
   
   dia: { type: String, required: true },
   mes: { type: String, required: true },
   anio: { type: String, required: true },
+  fechaEntrega: { type: Date },
+  fechaDevolucion: { type: Date },
 
   nombre: { type: String, required: true },
   cedula: { type: String, required: true },
   correo: { type: String, required: true },
   firma: { type: String, required: true }, 
 
-  funcionarioEntrega: { type: String },
+  funcionarioEntrega: { type: String }, 
+  entregadoPor: { type: String }, 
   cargo: { type: String },
   area: { type: String },
-  numeroTarjeta: { type: String },
-  fechaEntrega: { type: Date },
-  fechaDevolucion: { type: Date },
 
 }, { 
   timestamps: true 
+});
+
+actaTarjetaSchema.pre('save', function(next) {
+  if (!this.fechaEntrega) {
+    this.fechaEntrega = new Date();
+  }
+  next();
 });
 
 export default mongoose.model("ActaTarjeta", actaTarjetaSchema);

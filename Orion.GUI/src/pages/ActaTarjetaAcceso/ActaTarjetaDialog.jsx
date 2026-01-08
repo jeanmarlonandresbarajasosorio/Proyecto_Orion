@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "./ActaTarjetaDialog.css";
 import FirmaCanvas from "../../components/FirmaCanvas";
+import { sendActaTarjetaEmail } from "../../services/email.service";
 
 const API_TIPO_ENTREGA = `${import.meta.env.VITE_API_URL}/tipos-entrega`;
 const API_TIPO_CAMBIO = `${import.meta.env.VITE_API_URL}/tipos-cambio`;
+const API_FUNCIONARIOS = `${import.meta.env.VITE_API_URL}/funcionarios`;
 
 const initialForm = {
   sede: "",
   tipoEntrega: "",
   tipoCambio: "",
+  numeroTarjeta: "",
+  entregadoPor: "",
   otraCual: "",
   dia: new Date().getDate().toString(),
   mes: (new Date().getMonth() + 1).toString(),
@@ -23,28 +27,32 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
   const [form, setForm] = useState(initialForm);
   const [tiposEntrega, setTiposEntrega] = useState([]);
   const [tiposCambio, setTiposCambio] = useState([]);
+  const [funcionarios, setFuncionarios] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [entregaRes, cambioRes] = await Promise.all([
+        const [entregaRes, cambioRes, funcionariosRes] = await Promise.all([
           fetch(API_TIPO_ENTREGA),
-          fetch(API_TIPO_CAMBIO)
+          fetch(API_TIPO_CAMBIO),
+          fetch(API_FUNCIONARIOS)
         ]);
+
         const dataEntrega = await entregaRes.json();
         const dataCambio = await cambioRes.json();
-        
+        const dataFuncionarios = await funcionariosRes.json();
+
         setTiposEntrega(dataEntrega);
         setTiposCambio(dataCambio);
+        setFuncionarios(dataFuncionarios);
 
         if (editingRecord) {
           setForm({
             ...editingRecord,
-            // Aseguramos que los select carguen los IDs
             tipoEntrega: editingRecord.tipoEntrega?._id || editingRecord.tipoEntrega,
             tipoCambio: editingRecord.tipoCambio?._id || editingRecord.tipoCambio,
-            // Aseguramos que las fechas se mantengan como strings al editar
+            entregadoPor: editingRecord.entregadoPor?._id || editingRecord.entregadoPor,
             dia: editingRecord.dia?.toString() || "",
             mes: editingRecord.mes?.toString() || "",
             anio: editingRecord.anio?.toString() || ""
@@ -54,6 +62,7 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
         console.error("Error cargando maestros:", error);
       }
     };
+
     fetchData();
   }, [editingRecord]);
 
@@ -63,6 +72,7 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!form.firma) {
       alert("Debe registrar la firma digital");
       return;
@@ -70,22 +80,33 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
 
     try {
       setLoading(true);
-      
-      // Buscar los nombres correspondientes para el PDF y la Tabla
+
       const nombreEntrega = tiposEntrega.find(t => t._id === form.tipoEntrega)?.nombre;
       const nombreCambio = tiposCambio.find(t => t._id === form.tipoCambio)?.nombre;
+      const nombreFuncionario = funcionarios.find(f => f._id === form.entregadoPor)?.nombre;
 
-      // Construcción robusta del objeto para evitar errores de validación "Required"
       const dataToSend = {
         ...form,
         dia: form.dia.toString(),
         mes: form.mes.toString(),
         anio: form.anio.toString(),
         tipoEntregaNombre: nombreEntrega || form.tipoEntregaNombre,
-        tipoCambioNombre: nombreCambio || form.tipoCambioNombre
+        tipoCambioNombre: nombreCambio || form.tipoCambioNombre,
+        entregadoPorNombre: nombreFuncionario || form.entregadoPorNombre
       };
 
-      await onSave(dataToSend);
+      const actaGuardada = await onSave(dataToSend);
+
+      try {
+        await sendActaTarjetaEmail({
+          actaId: actaGuardada?._id,
+          correo: dataToSend.correo,
+          nombre: dataToSend.nombre
+        });
+      } catch (emailError) {
+        console.warn("⚠ No se pudo enviar el correo:", emailError);
+      }
+
       onClose();
     } catch (error) {
       console.error("Error al procesar acta:", error);
@@ -95,23 +116,31 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
     }
   };
 
-  const nombreInstitucion = form.sede === "foscal" 
-    ? "FOSCAL" 
-    : form.sede === "foscal-internacional" 
-      ? "FUNDACIÓN FOSUNAB" 
+  const nombreInstitucion =
+    form.sede === "foscal"
+      ? "FOSCAL"
+      : form.sede === "foscal-internacional"
+      ? "FUNDACIÓN FOSUNAB"
       : "LA INSTITUCIÓN";
 
   return (
     <div className="modal-backdrop">
       <form className="modal-card" onSubmit={handleSubmit}>
         <header className="modal-header">
-          <h2>{editingRecord ? "Editar Acta de Entrega" : "Acta de Entrega – Tarjeta Control de Acceso"}</h2>
-          <button type="button" className="close-btn" onClick={onClose}>✕</button>
+          <h2>
+            {editingRecord
+              ? "Editar Acta de Entrega"
+              : "Acta de Entrega – Tarjeta Control de Acceso"}
+          </h2>
+          <button type="button" className="close-btn" onClick={onClose}>
+            ✕
+          </button>
         </header>
 
         <section className="modal-body">
           <div className="permissions-section">
-            <div className="permission-title">Datos Generales</div>
+            <div className="permission-title">Datos del Registro</div>
+
             <div className="form-grid">
               <label>
                 Sede
@@ -143,7 +172,30 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
               </label>
             </div>
 
-            <div className="form-grid" style={{ marginTop: '16px' }}>
+            <div className="form-grid" style={{ marginTop: "16px" }}>
+              <label>
+                Número de Tarjeta
+                <input 
+                  name="numeroTarjeta" 
+                  value={form.numeroTarjeta} 
+                  onChange={handleChange} 
+                  placeholder=""
+                  required 
+                />
+              </label>
+
+              <label>
+                Entregado Por
+                <select name="entregadoPor" value={form.entregadoPor} onChange={handleChange} required>
+                  <option value="">Seleccionar Funcionario</option>
+                  {funcionarios.map(f => (
+                    <option key={f._id} value={f._id}>{f.nombre}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="form-grid" style={{ marginTop: "16px" }}>
               <label>Día <input name="dia" value={form.dia} onChange={handleChange} required /></label>
               <label>Mes <input name="mes" value={form.mes} onChange={handleChange} required /></label>
               <label>Año <input name="anio" value={form.anio} onChange={handleChange} required /></label>
@@ -152,16 +204,15 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
 
           <div className="permissions-section">
             <div className="permission-title">Normas de Uso y Aceptación</div>
-            <div className="permission-group">
-              <p style={{ color: '#1e293b', fontWeight: '600', marginBottom: '10px', fontSize: '13px' }}>
-                Al firmar este documento se da constancia de la recepción y aceptación de:
-              </p>
-              <ul className="normas-list">
-                <li>Obligación de custodiar la tarjeta; el titular es responsable del uso indebido.</li>
-                <li>La tarjeta permite ingreso a áreas de <b>{nombreInstitucion}</b>; es personal e intransferible.</li>
-                <li>Pérdida o hurto debe notificarse inmediatamente (Ext. 6191 - 6192).</li>
-                <li>En caso de daño o pérdida, se debe cancelar el valor establecido.</li>
-                <li>Debe ser entregada en la <b>Subgerencia de Tecnología</b> al finalizar el contrato.</li>
+            <div className="normas-texto-completo">
+              <p>Al firmar este documento se da constancia de que se recibió una tarjeta de control de acceso y se aceptan las siguientes normas de uso:</p>
+              <ul>
+                <li>La asignación de la tarjeta de control de acceso implica la obligación de custodiarla de modo que ninguna otra persona pueda hacer uso de la misma y por lo tanto el titular asume ante su empleador y/o ante terceros la responsabilidad por cualquier uso indebido que se haga a causa del descuido del manejo de la tarjeta de control de acceso.</li>
+                <li>La tarjeta de control de acceso permite el ingreso a algunas áreas restringidas de <b>{nombreInstitucion}</b> de acuerdo a las funciones del cargo de la persona que recibe la misma, por lo tanto esta tarjeta es de uso personal e intransferible.</li>
+                <li>En caso de pérdida o hurto de la tarjeta de control de acceso, el responsable de la misma deberá notificar de forma inmediata a la institución y se compromete a formular el respectivo denuncio para que <b>{nombreInstitucion}</b> tome medidas convenientes en forma oportuna. El responsable de la tarjeta asumirá todos los perjuicios que causen con la utilización no autorizada de la misma en caso de no realizar el reporte oportuno la Jefe interventoría de Outsourcing - Vigilancia 6191 - 6192.</li>
+                <li>En caso de hurto, pérdida o daño de la tarjeta de control de acceso se deberá cancelar el valor correspondiente establecido en el momento.</li>
+                <li>La tarjeta de control de acceso es de propiedad de la institución por lo que <b>{nombreInstitucion}</b> se reserva el derecho de solicitar la devolución. Es deber del usuario su cuidado y mantenerla en buen estado.</li>
+                <li>La tarjeta de control de acceso debe ser entregada por el trabajador en la Subgerencia Tecnología al finalizar su contrato laboral con la institución o con terceros.</li>
               </ul>
             </div>
           </div>
@@ -170,21 +221,14 @@ export default function ActaTarjetaDialog({ onClose, onSave, editingRecord }) {
             <div className="permission-title">Datos del Responsable</div>
             <div className="form-grid">
               <label>Nombre Completo <input name="nombre" value={form.nombre} onChange={handleChange} required /></label>
-              <label>Número de Cédula <input name="cedula" value={form.cedula} onChange={handleChange} required /></label>
-              <label>Correo Electrónico <input type="email" name="correo" value={form.correo} onChange={handleChange} required /></label>
+              <label>Cédula <input name="cedula" value={form.cedula} onChange={handleChange} required /></label>
+              <label>Correo <input type="email" name="correo" value={form.correo} onChange={handleChange} required /></label>
             </div>
           </div>
 
           <div className="permissions-section">
             <div className="permission-title">Firma Digital</div>
-            <div className="permission-group" style={{ background: '#fff' }}>
-              <FirmaCanvas onSave={(firma) => setForm(prev => ({ ...prev, firma }))} />
-              {form.firma && (
-                <div className="permissions-warning" style={{ background: '#ecfdf5', borderColor: '#10b981', color: '#065f46', marginTop: '10px' }}>
-                  ✔ Firma registrada correctamente
-                </div>
-              )}
-            </div>
+            <FirmaCanvas onSave={(firma) => setForm(prev => ({ ...prev, firma }))} />
           </div>
         </section>
 

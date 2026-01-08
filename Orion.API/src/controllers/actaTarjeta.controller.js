@@ -1,30 +1,29 @@
 import ActaTarjeta from "../models/ActaTarjeta.js";
-import { generateActaPDF } from "../utils/generateActaPDF.js";
+import { generateActaTarjetaPDF } from "../utils/actaTarjetaPdf.js";
 import { sendEmailWithPDF } from "../utils/sendEmail.js";
 
 // Crear o Actualizar Acta (POST/PUT unificado)
 export const crearOActualizarActa = async (req, res) => {
-  // Extraemos el id al inicio para que esté disponible en el catch si algo falla
   const { id } = req.params;
 
   try {
     // 1. LIMPIEZA Y PREPARACIÓN DE DATOS
-    // Aseguramos que los campos obligatorios (dia, mes, anio) existan y sean strings
+    // Agregamos numeroTarjeta y entregadoPor a la limpieza
     const datosActa = {
       ...req.body,
       dia: req.body.dia?.toString() || "",
       mes: req.body.mes?.toString() || "",
       anio: req.body.anio?.toString() || "",
-      // Limpiamos los IDs si vienen como objetos desde el frontend
       tipoEntrega: req.body.tipoEntrega?._id || req.body.tipoEntrega,
-      tipoCambio: req.body.tipoCambio?._id || req.body.tipoCambio
+      tipoCambio: req.body.tipoCambio?._id || req.body.tipoCambio,
+      entregadoPor: req.body.entregadoPor?._id || req.body.entregadoPor,
+      numeroTarjeta: req.body.numeroTarjeta || ""
     };
 
     let acta;
 
     if (id) {
-      // MODO EDICIÓN: Actualiza el registro existente
-      // { runValidators: true } asegura que Mongoose verifique los campos requeridos
+      // MODO EDICIÓN
       acta = await ActaTarjeta.findByIdAndUpdate(id, datosActa, { 
         new: true, 
         runValidators: true 
@@ -34,21 +33,27 @@ export const crearOActualizarActa = async (req, res) => {
         return res.status(404).json({ message: "Acta no encontrada para editar" });
       }
     } else {
-      // MODO CREACIÓN: Crea un nuevo registro
+      // MODO CREACIÓN
       acta = await ActaTarjeta.create(datosActa);
     }
-
-    // 2. PROCESO DE PDF Y ENVÍO (Protegido para no romper el flujo)
     try {
-      const pdfBuffer = await generateActaPDF(acta);
+      const datosParaPdf = {
+        ...acta.toObject(), 
+        tipoEntregaNombre: req.body.tipoEntregaNombre, 
+        tipoCambioNombre: req.body.tipoCambioNombre,  
+        entregadoPorNombre: req.body.entregadoPorNombre 
+      };
+
+      const pdfBuffer = await generateActaTarjetaPDF(datosParaPdf);
       await sendEmailWithPDF(acta.correo, pdfBuffer);
+      
+      console.log(`✅ PDF generado y enviado a: ${acta.correo}`);
     } catch (mailError) {
-      // Si el correo falla (Error 535), devolvemos 201 indicando que el registro SÍ se guardó
-      console.warn("Error SMTP detectado (El acta se guardó, pero el mail no salió):", mailError.message);
+      console.warn("⚠ Error SMTP (El acta se guardó, pero el mail falló):", mailError.message);
       return res.status(201).json({
         message: "Acta guardada correctamente, pero hubo un error al enviar el correo.",
         acta,
-        warning: "Revisa la contraseña de aplicación de Gmail en tu .env"
+        warning: "Verifica la configuración SMTP en el servidor."
       });
     }
 
@@ -59,8 +64,7 @@ export const crearOActualizarActa = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error crítico en el controlador de actas:", error);
-    // Respondemos con el error de validación específico para saber qué campo falló
+    console.error("❌ Error crítico en el controlador de actas:", error);
     res.status(500).json({ 
       message: id ? "Error al actualizar el acta" : "Error al crear el acta",
       error: error.message 

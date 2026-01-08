@@ -1,29 +1,36 @@
 import nodemailer from "nodemailer";
 
 export const sendEmailWithPDF = async (to, pdfBuffer) => {
+  const cleanUser = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : "";
+  const cleanPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : "";
+
+  // LOG DE SEGURIDAD: Verifica esto en tu terminal de Docker
+  console.log(`DEBUG SMTP: Usuario: ${cleanUser} | Pass Length: ${cleanPass.length}`);
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: 587,
-    secure: false,
+    port: Number(process.env.SMTP_PORT),
+    secure: process.env.SMTP_SECURE === "true",
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
+      user: cleanUser,
+      pass: cleanPass
+    },
+    tls: {
+      rejectUnauthorized: false
     }
   });
 
-  await transporter.sendMail({
-    from: `"Orion Sistemas" <${process.env.SMTP_USER}>`,
-    to,
-    subject: "Acta de Entrega – Tarjeta de Acceso",
-    html: `
-      <p>Adjunto encontrará el acta de entrega de la tarjeta de control de acceso.</p>
-      <p>Este correo fue generado automáticamente.</p>
-    `,
-    attachments: [
-      {
-        filename: "acta-tarjeta.pdf",
-        content: pdfBuffer
-      }
-    ]
-  });
+  try {
+    await transporter.sendMail({
+      from: `"Orion Sistemas" <${cleanUser}>`,
+      to,
+      subject: "Acta de Entrega – Tarjeta de Acceso",
+      html: `<p>Adjunto encontrará su acta en PDF.</p>`,
+      attachments: [{ filename: "acta-tarjeta.pdf", content: pdfBuffer }]
+    });
+    console.log("✅ Envío exitoso");
+  } catch (error) {
+    console.error("❌ Error detallado:", error.message);
+    throw error;
+  }
 };
